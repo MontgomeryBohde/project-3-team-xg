@@ -9,7 +9,7 @@ const Page = () => {
     const router = useRouter();
 
     const navigateToLogin = () => {
-        router.push("/employee/login"); // Navigate to the login page
+        router.push("/employee"); // Navigate to the login page
     };
 
     return (
