@@ -1,0 +1,14 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.menuBoardContainer {
+    height: 100vh;
+    width: 100%;
+    background-color: #FFFCEA;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    overflow: auto;
+}
