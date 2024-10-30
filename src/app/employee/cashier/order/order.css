@@ -1,5 +1,16 @@
 /* src/app/employee/order.css */
 
+.menu-container {
+    display: flex;
+    justify-content: space-between; /* Adjusts the space between items */
+    align-items: flex-start; /* Aligns items to the top */
+}
+
+.menu-category {
+    flex: 1; /* Allows each category to take up equal space */
+    margin: 0 10px; /* Add some spacing between the categories */
+}
+
 .order-container {
     display: flex;
     flex-direction: column;
@@ -74,4 +85,25 @@
 
 .total {
     font-weight: bold;
+}
+
+/* src/app/employee/cashier/order/order.css */
+.menu-columns {
+    display: flex;
+    gap: 20px; /* Add spacing between columns */
+}
+
+.menu-grid {
+    display: grid;
+    gap: 10px;
+}
+
+.menu-button {
+    background-color: #d9534f; /* Adjust to match the red color */
+    color: white;
+    padding: 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.2em;
 }
