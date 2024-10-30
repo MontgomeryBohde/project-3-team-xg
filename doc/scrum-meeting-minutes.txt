@@ -1,0 +1,55 @@
+_________Sprint 1_________
+10/23 Wed (not Scrum meeting because before backlog is set)
+12:15-2:00 pm
+Brief problems found
+Discuss solutions
+Customer view
+Report split
+12:21-1:51 pm
+Determined user stories, discussed solutions
+
+10/23 Wed
+3:00-3:50 pm
+Determine frameworks
+Decide on time estimates/user story points
+3:10-3:55 pm
+Frameworks
+Half of estimates
+
+10/25 Fri
+11:40 am-2:00 pm
+11:44 am-1:00 pm
+Alisa: worked on report
+Monte: no updates
+Risha: worked on customer sketch
+Tee: looked at React and worked on report
+Rebecca: no updates
+Clear up questions
+
+10/28 Mon
+12:20-2:00 pm
+12:29-12:37 pm
+Alisa
+-Working on today: menu board
+-Roadblocks: not sure how we are doing it
+Tee
+-Done: edited report burn-down chart
+-Today: start on cashier code
+-Roadblocks: no blocks
+Rebecca
+-did report, decided dates for tasks, added pages on scrum board
+-will be working on menu board
+Risha
+-worked on Figma for customers
+-will be fixing based on feedback
+-Trevor-mode?
+Monte
+-did database design, initialized project structure with Next.js
+-will be creating the Login page and Manager Home and work on querying the database
+-tried to deploy to Vercel but can’t deploy from organization GitHub repo so created new personal repo
+12:37-1:47 pm
+-Go over new repo, connect to scrum board
+-Make suggestions for customer figma
+-Decide tasks and due dates
+-Next.js
+
