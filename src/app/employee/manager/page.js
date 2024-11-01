@@ -146,8 +146,15 @@ export default function Menu() {
                 <button className="item-button" onClick={() => handlePopup("", "Drink")}> Add New Item </button>
             </section>
 
-            <section>
+            <section className="section">
                 <h2>Seasonal</h2>
+                <div className="button-grid">
+                    {seasonal.map((item, index) => (
+                        <button key={index} className="item-button" onClick={() => handlePopup(item, "Seasonal")}>
+                            {item}
+                        </button>
+                    ))}
+                </div>
                 <button className="item-button" onClick={() => handlePopup("", "Seasonal")}> Add New Item </button>
             </section>
 
