@@ -3,6 +3,18 @@ import EmployeeCard from "./EmployeeCard";
 import "./EmployeeInfo.css";
 
 const EmployeeInfo = () => {
+    // Commented out API fetch for later use
+    /*
+    useEffect(() => {
+        const fetchEmployees = async () => {
+            const response = await fetch('/api/employees');
+            const data = await response.json();
+            setEmployees(data);
+        };
+
+        fetchEmployees();
+    }, []);
+    */
     const employees = [
         { id: "1", name: "Alisa Lu", clockedIn: true, position: "Manager" },
         { id: "2", name: "Monte Bode", clockedIn: false, position: "Server" },
@@ -10,6 +22,8 @@ const EmployeeInfo = () => {
         { id: "4", name: "Risha Thimmancherla", clockedIn: true, position: "Server" },
         { id: "5", name: "Tee Li", clockedIn: false, position: "Cashier" },
     ];
+
+     
 
     return (
         <div className="employee-info-container">
