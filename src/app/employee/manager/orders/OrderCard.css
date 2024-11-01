@@ -19,7 +19,7 @@
 }
 .order-time {
     font-size: 1.1em;
-    color: #555;
+    color: #434040;
 }
 .order-content-middle {
     margin-top: 10px;
@@ -38,9 +38,10 @@
     margin-top: 4px; 
 }
 .order-total {
+    position: absolute;
     right: 20px;
     bottom: 10px;
     font-size: 1.1em;
     color: #302e2e;
-    position: absolute; 
+     
 }

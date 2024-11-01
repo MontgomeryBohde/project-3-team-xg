@@ -10,7 +10,7 @@ const OrderInfo = () => {
 
     //will get info form the database in the future when in works 
     const getOrders = async () => {
-        const mockData = [
+        const sampleData = [
             { id: 1, time: '2024-10-31 14:30', type: 'Plate', contents: ['Steamed Rice', 'Broccoli Beef', 'Orange Chicken'], total: 12.99 },
             { id: 2, time: '2024-10-31 15:00', type: 'Bigger Plate', contents: ['Steamed Rice', 'Terriyaki Chicken', 'Spring Rolls'], total: 15.99 },
             { id: 3, time: '2024-10-31 15:15', type: 'Bowl', contents: ['Super Greens', 'Orange Chicken', 'Apple Pie Roll'], total: 10.49 },
@@ -22,7 +22,7 @@ const OrderInfo = () => {
             { id: 9, time: '2024-10-31 18:30', type: 'Plate', contents: ['Super Greens', 'Beijing Beef', 'Spring Rolls'], total: 13.49 },
             { id: 10, time: '2024-10-31 18:45', type: 'Plate', contents: ['Fried Rice', 'Broccoli Beef', 'Honey Walnut Shrimp'], total: 12.99 }
         ];
-        setOrders(mockData);
+        setOrders(sampleData);
     };
 
     useEffect(() => {
@@ -53,7 +53,7 @@ const OrderInfo = () => {
             <h1 className="title">Order Information</h1>
             <div className="order-cards-container">
                 {currentOrders.map(order => (
-                    <OrderCard key={order.id} order={order} />
+                    <OrderCard key={order.id} order={order}/>
                 ))}
             </div>
             <div className="page-buttons">
