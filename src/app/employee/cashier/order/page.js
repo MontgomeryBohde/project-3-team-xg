@@ -1,10 +1,10 @@
-// src/app/employee/order/page.js
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import MealTypes from "@/components/ui/employee/cashier/order/meal_types/MealTypes";
 import FoodTypes from "@/components/ui/employee/cashier/order/food_types/FoodTypes";
-import DetailedMenu from "@/components/ui/employee/cashier/order/detailed_menu/DetailedMenu";
+import EntreeAndSideMenu from "@/components/ui/employee/cashier/order/detailed_menu/EntreeAndSideMenu";
+import AppetizerMenu from "@/components/ui/employee/cashier/order/detailed_menu/AppetizerMenu";
 import Cart from "@/components/ui/employee/cashier/order/cart/Cart";
 import "./order.css";
 
@@ -25,6 +25,7 @@ const OrderPage = () => {
     const [order, setOrder] = useState([]);
     const [selectedSides, setSelectedSides] = useState([]);
     const [selectedEntrees, setSelectedEntrees] = useState([]);
+    const [showAppetizers, setShowAppetizers] = useState(false);
 
     const handleLogout = () => {
         router.push("/employee");
@@ -38,18 +39,36 @@ const OrderPage = () => {
     };
 
     const handleFoodTypeClick = (foodType) => {
-        setSelectedFoodType(foodType);
-        setSelectedMeal(null);
+        if (foodType === "Appetizers") {
+            setShowAppetizers(true);
+        } else {
+            setSelectedFoodType(foodType);
+            setSelectedMeal(null);
+        }
     };
 
-    const handleAddToOrder = (item, type) => {
-        setOrder((prevOrder) => [...prevOrder, { name: item, type, price: "0" }]);
+    const handleAddToOrder = (item, type, price = 5) => { // Default price for demonstration
+        setOrder((prevOrder) => {
+            // Check if the item is already in the cart
+            const existingItemIndex = prevOrder.findIndex(
+                (orderItem) => orderItem.name === item && orderItem.type === type
+            );
+            if (existingItemIndex >= 0) {
+                // Item already in cart, increase the quantity
+                const updatedOrder = [...prevOrder];
+                updatedOrder[existingItemIndex].quantity += 1;
+                return updatedOrder;
+            } else {
+                // New item, add to cart
+                return [...prevOrder, { name: item, type, price, quantity: 1 }];
+            }
+        });
     };
 
     const handleBackClick = () => {
         setSelectedMeal(null);
         setSelectedFoodType(null);
-        setOrder([]);
+        setShowAppetizers(false);
     };
 
     return (
@@ -60,8 +79,13 @@ const OrderPage = () => {
             </header>
 
             <div className="main-content">
-                {selectedMeal || selectedFoodType ? (
-                    <DetailedMenu
+                {showAppetizers ? (
+                    <AppetizerMenu 
+                        onBackClick={handleBackClick} 
+                        onAddToOrder={handleAddToOrder} 
+                    />
+                ) : selectedMeal || selectedFoodType ? (
+                    <EntreeAndSideMenu
                         mealType={selectedMeal}
                         foodType={selectedFoodType}
                         selectedSides={selectedSides}
@@ -78,7 +102,10 @@ const OrderPage = () => {
                     </div>
                 )}
 
-                <Cart order={order} />
+                <Cart 
+                    order={order}
+                    setOrder={setOrder} // Pass setOrder to allow modification of the cart
+                />
             </div>
         </div>
     );

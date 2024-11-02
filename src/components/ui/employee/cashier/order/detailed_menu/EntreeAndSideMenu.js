@@ -1,4 +1,4 @@
-// src/components/ui/employee/cashier/meal_types/detailed_menu/DetailedMenu.js
+// src/components/ui/employee/cashier/meal_types/detailed_menu/EntreeAndSideMenu.js
 import React from "react";
 
 const entrees = [
@@ -9,18 +9,32 @@ const entrees = [
 ];
 const sides = ["Chow Mein", "Fried Rice", "White Steamed Rice", "Super Greens"];
 
-const DetailedMenu = ({ mealType, selectedSides, selectedEntrees, setSelectedSides, setSelectedEntrees, onAddToOrder, onBackClick }) => {
+const EntreeAndSideMenu = ({ 
+    mealType, 
+    selectedSides, 
+    selectedEntrees, 
+    setSelectedSides, 
+    setSelectedEntrees, 
+    onAddToOrder, 
+    onBackClick 
+}) => {
     const handleEntreeClick = (entree) => {
         if (selectedEntrees.length < mealType.entrees) {
-            setSelectedEntrees((prev) => [...prev, entree]);
-            onAddToOrder(entree, "entree");
+            setSelectedEntrees((prev) => {
+                const updatedEntrees = [...prev, entree];
+                onAddToOrder(entree, "entree");  // Add to order as the item is selected
+                return updatedEntrees;
+            });
         }
     };
 
     const handleSideClick = (side) => {
         if (selectedSides.length < mealType.sides) {
-            setSelectedSides((prev) => [...prev, side]);
-            onAddToOrder(side, "side");
+            setSelectedSides((prev) => {
+                const updatedSides = [...prev, side];
+                onAddToOrder(side, "side");  // Add to order as the item is selected
+                return updatedSides;
+            });
         }
     };
 
@@ -69,4 +83,4 @@ const DetailedMenu = ({ mealType, selectedSides, selectedEntrees, setSelectedSid
     );    
 };
 
-export default DetailedMenu;
+export default EntreeAndSideMenu;

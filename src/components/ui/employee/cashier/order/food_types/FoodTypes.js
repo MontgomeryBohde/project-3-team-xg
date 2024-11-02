@@ -1,7 +1,7 @@
 // src/components/ui/employee/cashier/order/food_types/FoodTypes.js
 import React from "react";
 
-const FoodTypes = ({ foodItems, onFoodItemClick }) => (
+const FoodTypes = ({ foodItems, onFoodTypeClick }) => (
     <div className="food-types">
         <h3>Food Items</h3>
         <div className="menu-grid">
@@ -9,7 +9,7 @@ const FoodTypes = ({ foodItems, onFoodItemClick }) => (
                 <button 
                     key={food} 
                     className="menu-button" 
-                    onClick={() => onFoodItemClick(food)}
+                    onClick={() => onFoodTypeClick(food)}
                 >
                     {food}
                 </button>
