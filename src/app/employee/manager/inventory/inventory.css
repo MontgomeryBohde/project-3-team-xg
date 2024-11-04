@@ -5,9 +5,19 @@
 }
 
 .category-menu {
-    width: 200px;
-    display: flex;
-    flex-direction: column;
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+
+  position: fixed; /* Fixes the navbar to the left side of the screen */
+  top: 0;           /* Aligns the navbar to the top */
+  left: 0;          /* Aligns the navbar to the left */
+  width: 200px;     /* Set the width of the navbar */
+  height: 100vh;    /* Fills the entire vertical height of the screen */
+  display: flex;    /* Allows you to organize items vertically */
+  flex-direction: column; /* Items will be stacked vertically */
+  background-color: #f0f0f0;  /* Optional: background color */
+  padding-top: 20px; /* Optional: spacing from the top */
 }
 
 .category-button {
@@ -27,6 +37,7 @@
 .items-display {
     flex: 1;
     padding: 20px;
+    margin-left: 20px; /* Leaves space for the sidebar */
 }
 
 .popup {
@@ -77,6 +88,7 @@ body {
     text-align: center;
     margin-bottom: 20px;
     margin-top: 0px;
+    margin-left: 150px; /* Leaves space for the sidebar */
   }
   
   .inventory-container {
@@ -109,11 +121,15 @@ body {
     color: #333;
     border: none;
     border-radius: 8px;
-    padding: 40px;
+    padding: 60px 60px; /* Adjusted padding for better centering */
     font-size: 0.9em;
-    text-align: center;
+    text-align: center; /* Centers text horizontally */
+    display: flex; /* Use flexbox for centering */
+    align-items: center; /* Centers text vertically */
+    justify-content: center; /* Centers text horizontally */
     cursor: pointer;
     transition: background-color 0.2s ease;
+    height: 60px;
   }
   
   .item-button:hover {
