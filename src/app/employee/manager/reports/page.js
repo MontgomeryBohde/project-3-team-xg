@@ -3,7 +3,6 @@
 import { useRouter } from "next/navigation";
 import EmployeeHeader from "@/components/ui/employee/header/EmployeeHeader";
 import Head from "next/head";
-import './reports.css';
 
 const Page = () => {
     const router = useRouter();
