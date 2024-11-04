@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import DiscountPopUp from '@/components/ui/employee/cashier/order/confirmation/DiscountPopUp';
-import PaymentPopUp from '@/components/ui/employee/cashier/order/confirmation/PaymentPopup';
+import PaymentPopUp from '@/components/ui/employee/cashier/order/confirmation/PaymentPopUp';
 
 const ConfirmationPage = () => {
     const [cartItems, setCartItems] = useState([]);
