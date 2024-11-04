@@ -9,16 +9,16 @@ const Page = () => {
     const router = useRouter();
 
     const navigateToSales = () => {
-        router.push("/employee/manager/reports/sales"); // Navigate to the reports menu page
+        router.push("/employee/manager/reports/sales");
     };
     const navigateToDailyReports = () => {
-        router.push("/employee/manager/reports/sales"); // Navigate to the reports menu page
+        router.push("/employee/manager/reports/daily-reports");
     };
     const navigateToMenuPopularity = () => {
-        router.push("/employee/manager/reports/sales"); // Navigate to the reports menu page
+        router.push("/employee/manager/reports/menu-popularity");
     };
     const navigateToProductUsage = () => {
-        router.push("/employee/manager/reports/sales"); // Navigate to the reports menu page
+        router.push("/employee/manager/reports/product-usage");
     };
 
     return (
