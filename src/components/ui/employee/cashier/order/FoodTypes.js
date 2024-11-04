@@ -1,5 +1,5 @@
-// src/components/ui/employee/cashier/order/food_types/FoodTypes.js
-import React from "react";
+// src/components/ui/employee/cashier/order/FoodTypes.js
+import React from 'react';
 
 const FoodTypes = ({ foodItems, onFoodTypeClick }) => (
     <div className="food-types">

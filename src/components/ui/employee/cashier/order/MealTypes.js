@@ -1,5 +1,5 @@
-// src/components/ui/employee/cashier/meal_types/MealTypes.js
-import React from "react";
+// src/componets/ui/employee/cashier/order/MealTypes.js
+import React from 'react';
 
 const MealTypes = ({ mealTypes, onMealTypeClick }) => (
     <div className="meal-types">
