@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import getMenuItems from '@/backend/menuItems';
-import '../../menu.css';
+import '../../../menu.css';
 
 const Page = () => {
     const [menuItems, setMenuItems] = useState([]);
