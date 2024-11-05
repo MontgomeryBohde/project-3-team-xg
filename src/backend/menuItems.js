@@ -8,7 +8,6 @@ export default async function getMenuItems() {
 
     const client = new Client({
         connectionString: connectionString,
-        connectionTimeoutMillis: 10000, // Increase timeout to 10 seconds
     });
 
     try {
