@@ -1,0 +1,138 @@
+/* iventory.css */
+
+.inventory-layout {
+    display: flex;
+}
+
+.category-menu {
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+
+  position: fixed; /* Fixes the navbar to the left side of the screen */
+  top: 0;           /* Aligns the navbar to the top */
+  left: 0;          /* Aligns the navbar to the left */
+  width: 200px;     /* Set the width of the navbar */
+  height: 100vh;    /* Fills the entire vertical height of the screen */
+  display: flex;    /* Allows you to organize items vertically */
+  flex-direction: column; /* Items will be stacked vertically */
+  background-color: #f0f0f0;  /* Optional: background color */
+  padding-top: 20px; /* Optional: spacing from the top */
+}
+
+.category-button {
+    padding: 10px;
+    background-color: #f0f0f0;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+}
+
+.category-button.active {
+    background-color: #ddd;
+    font-weight: bold;
+}
+
+.items-display {
+    flex: 1;
+    padding: 20px;
+    margin-left: 20px; /* Leaves space for the sidebar */
+}
+
+.popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.popup label {
+    display: block;
+    margin: 10px 0;
+}
+
+.popup button {
+    margin-top: 10px;
+    margin-right: 5px;
+}
+
+.popup input, .popup select {
+    margin-left: 10px;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f7f7f7;
+    display: flex;
+    justify-content: center;
+  }
+  
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    margin-top: 0px;
+    margin-left: 150px; /* Leaves space for the sidebar */
+  }
+  
+  .inventory-container {
+    width: 80%;
+    max-width: 1000px;
+    margin: 20px auto;
+  }
+  
+  .section {
+    background-color: #d3d3d3;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+  }
+  
+  .section h2 {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+  }
+  
+  .button-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+    padding-bottom: 10px;
+  }
+  
+  .item-button {
+    background-color: #87aade;
+    color: #333;
+    border: none;
+    border-radius: 8px;
+    padding: 60px 60px; /* Adjusted padding for better centering */
+    font-size: 0.9em;
+    text-align: center; /* Centers text horizontally */
+    display: flex; /* Use flexbox for centering */
+    align-items: center; /* Centers text vertically */
+    justify-content: center; /* Centers text horizontally */
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    height: 60px;
+  }
+  
+  .item-button:hover {
+    background-color: #6399cd;
+  }
+  
