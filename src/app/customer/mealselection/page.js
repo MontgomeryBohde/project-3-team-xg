@@ -1,6 +1,8 @@
-import React from "react";
+"use client";
+import React, { useState, useEffect } from "react"; // Add this import statement
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { FaUtensils, FaDrumstickBite, FaCarrot, FaConciergeBell, FaGlassCheers, FaGift, FaTruck } from "react-icons/fa";
+import { FaUtensils, FaShoppingCart, FaDrumstickBite, FaCarrot, FaConciergeBell, FaGlassCheers, FaGift, FaTruck } from "react-icons/fa";
+import Link from "next/link";
 import './mealselection.css';
 
 const MealSelectionPage = () => {
@@ -10,12 +12,12 @@ const MealSelectionPage = () => {
         { name: "Orange Chicken", image: "https://via.placeholder.com/150" },
         { name: "Black Pepper Sirloin Steak", image: "https://via.placeholder.com/150" },
         { name: "Honey Walnut Shrimp", image: "https://via.placeholder.com/150" },
-        { name: "Grilled Terriyaki Chicken", image: "https://via.placeholder.com/150" },
+        { name: "Grilled Teriyaki Chicken", image: "https://via.placeholder.com/150" },
         { name: "Kung Pao Chicken", image: "https://via.placeholder.com/150" },
         { name: "Honey Seasame Chicken Breast", image: "https://via.placeholder.com/150" },
         { name: "Beijing Beef", image: "https://via.placeholder.com/150" },
         { name: "Mushroom Chicken", image: "https://via.placeholder.com/150" },
-        { name: "SweetFire Chicekn Breast", image: "https://via.placeholder.com/150" },
+        { name: "SweetFire Chicken Breast", image: "https://via.placeholder.com/150" },
         { name: "String Bean Chicken Breast", image: "https://via.placeholder.com/150" },
         { name: "Broccoli Beef", image: "https://via.placeholder.com/150" },
         { name: "Black Pepper Chicken", image: "https://via.placeholder.com/150" },
@@ -53,6 +55,50 @@ const MealSelectionPage = () => {
         { name: "Buffet Setup", image: "https://via.placeholder.com/150" }
     ];
 
+    // Initialize the cart state and load any previously saved items from localStorage
+    const [cart, setCart] = useState([]);
+
+    useEffect(() => {
+        const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
+        setCart(savedCart);
+    }, []);
+
+    const handleAddToCart = (mealName) => {
+        // Add item to cart
+        const updatedCart = [...cart, mealName];
+        setCart(updatedCart);
+
+        // Save to localStorage
+        localStorage.setItem("cart", JSON.stringify(updatedCart));
+    };
+
+    const renderItems = (items) => (
+        items.map((item, index) => (
+            <div key={index} className="col-4 col-md-3 col-lg-2 mb-3">
+                <div className="card">
+                    <img src={item.image} className="card-img-top" alt={item.name} />
+                    <div className="card-body text-center">
+                        <p className="card-text">{item.name}</p>
+                        <button 
+                            className="btn btn-primary"
+                            onClick={() => handleAddToCart(item.name)}
+                        >
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+        ))
+    );
+
+    // Smooth scroll to section function
+    const handleScrollToSection = (sectionId) => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+            element.scrollIntoView({ behavior: "smooth" });
+        }
+    };
+
     return (
         <div className="container-fluid">
             <div className="row">
@@ -61,43 +107,43 @@ const MealSelectionPage = () => {
                     <div className="position-sticky">
                         <ul className="nav flex-column">
                             <li className="nav-item">
-                                <a className="nav-link active" href="#meals" style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
+                                <a className="nav-link active" onClick={() => handleScrollToSection('meals')} style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
                                     <FaUtensils className="me-2" style={{ fontSize: '2rem' }} />
                                     <span>Meals</span>
                                 </a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link" href="#aLaCarte" style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
+                                <a className="nav-link" onClick={() => handleScrollToSection('aLaCarte')} style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
                                     <FaDrumstickBite className="me-2" style={{ fontSize: '2rem' }} />
                                     <span>A La Carte</span>
                                 </a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link" href="#sides" style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
+                                <a className="nav-link" onClick={() => handleScrollToSection('sides')} style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
                                     <FaCarrot className="me-2" style={{ fontSize: '2rem' }} />
                                     <span>Sides</span>
                                 </a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link" href="#appetizers" style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
+                                <a className="nav-link" onClick={() => handleScrollToSection('appetizers')} style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
                                     <FaConciergeBell className="me-2" style={{ fontSize: '2rem' }} />
                                     <span>Appetizers</span>
                                 </a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link" href="#drinks" style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
+                                <a className="nav-link" onClick={() => handleScrollToSection('drinks')} style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
                                     <FaGlassCheers className="me-2" style={{ fontSize: '2rem' }} />
                                     <span>Drinks</span>
                                 </a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link" href="#deals" style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
+                                <a className="nav-link" onClick={() => handleScrollToSection('deals')} style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
                                     <FaGift className="me-2" style={{ fontSize: '2rem' }} />
                                     <span>Deals/Rewards</span>
                                 </a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link" href="#catering" style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
+                                <a className="nav-link" onClick={() => handleScrollToSection('catering')} style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
                                     <FaTruck className="me-2" style={{ fontSize: '2rem' }} />
                                     <span>Catering</span>
                                 </a>
@@ -106,98 +152,53 @@ const MealSelectionPage = () => {
                     </div>
                 </nav>
 
-                {/* Main Content */}
                 <main className="col-md-9 ms-sm-auto col-lg-10 px-md-4 overflow-auto" style={{ maxHeight: '100vh' }}>
                     <h2 id="meals">Meals</h2>
-                    {/* Add content for "Meals" here */}
-                    
-                    <h3 id="aLaCarte">A La Carte</h3>
                     <div className="row">
-                        {entrees.map((entree, index) => (
-                            <div key={index} className="col-4 col-md-3 col-lg-2 mb-3">
-                                <div className="card">
-                                    <img src={entree.image} className="card-img-top" alt={`Entree${index + 1}`} />
-                                    <div className="card-body text-center">
-                                        <p className="card-text">{entree.name}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
+                        {renderItems(entrees)}
                     </div>
 
-                    <h3 id="sides">Sides</h3>
+                    <h2 id="aLaCarte">A La Carte</h2>
                     <div className="row">
-                        {sides.map((side, index) => (
-                            <div key={index} className="col-4 col-md-3 col-lg-2 mb-3">
-                                <div className="card">
-                                    <img src={side.image} className="card-img-top" alt={`Side${index + 1}`} />
-                                    <div className="card-body text-center">
-                                        <p className="card-text">{side.name}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
+                        {renderItems(appetizers)}
                     </div>
 
-                    <h3 id="appetizers">Appetizers</h3>
+                    <h2 id="sides">Sides</h2>
                     <div className="row">
-                        {appetizers.map((appetizer, index) => (
-                            <div key={index} className="col-4 col-md-3 col-lg-2 mb-3">
-                                <div className="card">
-                                    <img src={appetizer.image} className="card-img-top" alt={`Appetizer${index + 1}`} />
-                                    <div className="card-body text-center">
-                                        <p className="card-text">{appetizer.name}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
+                        {renderItems(sides)}
                     </div>
 
-                    <h3 id="drinks">Drinks</h3>
+                    <h2 id="appetizers">Appetizers</h2>
                     <div className="row">
-                        {drinks.map((drink, index) => (
-                            <div key={index} className="col-4 col-md-3 col-lg-2 mb-3">
-                                <div className="card">
-                                    <img src={drink.image} className="card-img-top" alt={`Drink${index + 1}`} />
-                                    <div className="card-body text-center">
-                                        <p className="card-text">{drink.name}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
+                        {renderItems(appetizers)}
                     </div>
 
-                    <h3 id="deals">Deals</h3>
+                    <h2 id="drinks">Drinks</h2>
                     <div className="row">
-                        {deals.map((deal, index) => (
-                            <div key={index} className="col-4 col-md-3 col-lg-2 mb-3">
-                                <div className="card">
-                                    <img src={deal.image} className="card-img-top" alt={`Deal${index + 1}`} />
-                                    <div className="card-body text-center">
-                                        <p className="card-text">{deal.name}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
+                        {renderItems(drinks)}
                     </div>
 
-                    <h3 id="catering">Catering</h3>
+                    <h2 id="deals">Deals & Rewards</h2>
                     <div className="row">
-                        {catering.map((item, index) => (
-                            <div key={index} className="col-4 col-md-3 col-lg-2 mb-3">
-                                <div className="card">
-                                    <img src={item.image} className="card-img-top" alt={`Catering${index + 1}`} />
-                                    <div className="card-body text-center">
-                                        <p className="card-text">{item.name}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
+                        {renderItems(deals)}
+                    </div>
+
+                    <h2 id="catering">Catering</h2>
+                    <div className="row">
+                        {renderItems(catering)}
+                    </div>
+
+                    {/* Cart Button */}
+                    <div className="position-fixed bottom-0 end-0 m-3">
+                        <Link href="/customer/cart" className="btn btn-primary">
+                            <FaShoppingCart className="me-2" />
+                            Cart ({cart.length})
+                        </Link>
                     </div>
                 </main>
             </div>
         </div>
     );
-}
+};
 
 export default MealSelectionPage;
