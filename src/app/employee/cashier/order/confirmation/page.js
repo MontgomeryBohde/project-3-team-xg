@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import DiscountPopUp from '@/components/ui/employee/cashier/order/confirmation/DiscountPopUp';
 import PaymentPopUp from '@/components/ui/employee/cashier/order/confirmation/PaymentPopUp';
+import EmployeeLogInHeader from "@/components/ui/employee/header/EmployeeLogInHeader";
 
 const ConfirmationPage = () => {
     const [cartItems, setCartItems] = useState([]);
@@ -33,7 +34,9 @@ const ConfirmationPage = () => {
     };
 
     return (
-        <div className="container">
+        <div>
+            <EmployeeLogInHeader />
+            <div className="container">
             <div className="row justify-content-center">
                 <div className="col-md-8">
                     <div className="card mb-4">
@@ -73,6 +76,7 @@ const ConfirmationPage = () => {
                 onClose={() => setShowDiscountPopUp(false)} 
                 subtotal={calculateSubtotal()}
             />}
+        </div>
         </div>
     );
 };

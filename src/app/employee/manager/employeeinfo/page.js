@@ -1,6 +1,11 @@
+"use client"
+
 import React from "react";
 import EmployeeCard from "./EmployeeCard"; 
 import "./EmployeeInfo.css";
+
+
+import EmployeeLogInHeader from "@/components/ui/employee/header/EmployeeLogInHeader";
 
 const EmployeeInfo = () => {
     const employees = [
@@ -12,20 +17,23 @@ const EmployeeInfo = () => {
     ];
 
     return (
-        <div className="employee-info-container">
-            <h1 className="title">Employee Information</h1>
-            <div className="employee-cards-container">
-                {employees.map((employee) => (
-                    <EmployeeCard
-                        key={employee.id}
-                        employeeId={employee.id}
-                        name={employee.name}
-                        clockedIn={employee.clockedIn}
-                        position={employee.position}
-                    />
-                ))}
+        <div>
+            <EmployeeLogInHeader />
+            <div className="employee-info-container">
+                <h1 className="title">Employee Information</h1>
+                <div className="employee-cards-container">
+                    {employees.map((employee) => (
+                        <EmployeeCard
+                            key={employee.id}
+                            employeeId={employee.id}
+                            name={employee.name}
+                            clockedIn={employee.clockedIn}
+                            position={employee.position}
+                        />
+                    ))}
+                </div>
             </div>
-        </div>
+        </div>  
     );
 };
 

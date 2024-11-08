@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from "next/navigation";
-import EmployeeHeader from "@/components/ui/employee/header/EmployeeHeader";
+import EmployeeLogInHeader from "@/components/ui/employee/header/EmployeeLogInHeader";
 import 'bootstrap/dist/css/bootstrap.css';
 
 const ContactPage = () => {
@@ -13,7 +13,7 @@ const ContactPage = () => {
 				<title>Contact Maintenance</title>
 			</head>
 			<body>
-				<EmployeeHeader />
+				<EmployeeLogInHeader />
 				<ContactForm />
 			</body>
 		</html>
