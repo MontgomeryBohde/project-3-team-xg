@@ -1,7 +1,7 @@
 "use client";
 // src/components/ui/employee/login/LoginForm.js
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from "next/navigation";
 import 'bootstrap/dist/css/bootstrap.css';
 import './LoginForm.css';
@@ -10,68 +10,70 @@ const LoginForm = () => {
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+  const [employees, setEmployees] = useState([]);
   const router = useRouter();
 
+  // Fetch employee data
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const response = await fetch('/api/employees');
+        if (!response.ok) {
+          throw new Error('Failed to fetch employees');
+        }
+        const data = await response.json();
+        setEmployees(data);
+      } catch (error) {
+        console.error('Error fetching employees:', error);
+      }
+    };
+
+    fetchEmployees();
+  }, []);
+
+  // Handle form submission
   const handleSubmit = async (event) => {
     console.log("handle submit button");
     event.preventDefault();
 
-    // Example logic for checking user ID and password
-    if (password === "1234") {
-      if (userId === '1') {
-        console.log("manager");
-        const navigateToManager = window.confirm("Do you want to go to the Manager page or Employee page? Click 'OK' for Manager, 'Cancel' for Employee.");
-
-        if (navigateToManager) {
-          router.push('/employee/manager/menu');  // Navigate to manager page
-        } else {
-          router.push('/employee/employee-page');  // Navigate to employee page (replace with actual route)
-        }
-      } else if (['2', '3', '4', '5'].includes(userId)) {
-        console.log("cashier");
-        router.push('/employee/cashier/order');
-      } else {
-        setError("Incorrect UserID");
-      }
-    } else {
-      setError("Incorrect password/UserID");
-    }
-
-    /*
-    Console.log("handle submit button");
-    event.preventDefault();
+    // Reset error state
     setError(null);
 
-    try {
-      const response = await fetch(`/api/employee/${userId}`);
+    // Find the employee by user ID
+    const employee = employees.find(emp => emp.id.toString() === userId);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        setError(errorData.error || 'Employee not found');
-        return;
-      }
+    // Check if the employee exists
+    if (!employee) {
+      setError("User ID not found");
+      return;
+    }
+    else // store this employee in local storage
+    {
+      localStorage.setItem('loggedInEmployee', JSON.stringify(employee));
+    }
 
-      const data = await response.json();
+    // Validate password
+    if (password !== "1234") {
+      setError("Incorrect password");
+      return;
+    }
 
-      // Check if password matches (implement password check if you have it in the database)
-      if (data.password !== password) {
-        setError("Incorrect password");
-        return;
-      }
+    // Check if the employee is a manager
+    if (employee.is_manager) {
+      const navigateToManager = window.confirm(
+        "Do you want to go to the Manager page or Employee page? Click 'OK' for Manager, 'Cancel' for Employee."
+      );
 
-      // Navigate based on the employee's role
-      if (data.is_manager) {
-        router.push('/manager/home');
+      if (navigateToManager) {
+        router.push('/employee/manager/menu'); // Navigate to manager page
       } else {
-        router.push('/employee/cashier/order');
+        router.push('/employee/cashier/order'); // Navigate to general employee page
       }
+    } else {
+      // Navigate to cashier page if not a manager
+      router.push('/employee/cashier/order');
     }
-    catch (err) {
-      setError("Failed to log in. Please try again.");
-      console.error("Login error:", err);
-    }
-    */
-   
+
   };
 
   return (
@@ -100,7 +102,6 @@ const LoginForm = () => {
           />
         </div>
 
-        {/* Error message */}
         {error && (
           <div className="alert alert-danger mb-3">
             {error}

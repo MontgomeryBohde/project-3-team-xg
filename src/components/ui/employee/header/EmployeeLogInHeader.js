@@ -1,15 +1,23 @@
-import React from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-
 import './EmployeeHeader.css';
 
 const EmployeeLogInHeader = () => {
-  const router = useRouter(); // Initialize the router here
+  const [employee, setEmployee] = useState(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    // Retrieve employee data from local storage
+    const storedEmployee = localStorage.getItem('loggedInEmployee');
+    if (storedEmployee) {
+      setEmployee(JSON.parse(storedEmployee));
+    }
+  }, []);
+
   const handleBackClick = () => {
-    // You can implement navigation logic here if needed
     router.push("/employee");
   };
 
@@ -26,15 +34,19 @@ const EmployeeLogInHeader = () => {
         <h4 className="mb-0 ms-2">Welcome!</h4>
       </div>
 
-      {/* Employee ID */}
-      <div className="d-flex align-items-center ms-3">
-        <span>ID: 1</span>
-      </div>
-
-      {/* Employee Name */}
-      <div className="d-flex align-items-center ms-3">
-        <span>Name: Alisa</span>
-      </div>
+      {/* Check if employee is loaded before displaying ID and Name */}
+      {employee ? (
+        <>
+          <div className="d-flex align-items-center ms-3">
+            <span>ID: {employee.id}</span>
+          </div>
+          <div className="d-flex align-items-center ms-3">
+            <span>Name: {employee.first_name}</span>
+          </div>
+        </>
+      ) : (
+        <div>Loading employee data...</div>
+      )}
 
       {/* Weather Info */}
       <div className="d-flex align-items-center">
@@ -49,4 +61,3 @@ const EmployeeLogInHeader = () => {
 };
 
 export default EmployeeLogInHeader;
-
