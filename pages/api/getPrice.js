@@ -22,9 +22,10 @@ export default async function handler(req, res) {
         console.log("Database connected successfully");
 
         const query = `
-            SELECT food_name, price 
-            FROM menu_items 
-            WHERE food_name = ANY($1);
+            SELECT food_name, price
+            FROM menu_items
+            WHERE food_name = ANY($1)
+            
         `;
 
 

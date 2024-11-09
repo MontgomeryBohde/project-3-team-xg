@@ -1,35 +1,38 @@
 "use client";
-import React, { useState, useEffect } from "react"; // Add this import statement
+import React, { useState, useEffect } from "react"; 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FaUtensils, FaShoppingCart, FaDrumstickBite, FaCarrot, FaConciergeBell, FaGlassCheers, FaGift, FaTruck } from "react-icons/fa";
 import Link from "next/link";
 import './mealselection.css';
 
 const MealSelectionPage = () => {
-    // Define items for each category
+    
+    
+    //the available items from menu to purchase
     const entrees = [
-        { name: "Beyond The Original Orange Chicken", image: "https://via.placeholder.com/150" },
-        { name: "Orange Chicken", image: "https://via.placeholder.com/150" },
-        { name: "Black Pepper Sirloin Steak", image: "https://via.placeholder.com/150" },
-        { name: "Honey Walnut Shrimp", image: "https://via.placeholder.com/150" },
-        { name: "Grilled Teriyaki Chicken", image: "https://via.placeholder.com/150" },
-        { name: "Kung Pao Chicken", image: "https://via.placeholder.com/150" },
-        { name: "Honey Seasame Chicken Breast", image: "https://via.placeholder.com/150" },
-        { name: "Beijing Beef", image: "https://via.placeholder.com/150" },
-        { name: "Mushroom Chicken", image: "https://via.placeholder.com/150" },
-        { name: "SweetFire Chicken Breast", image: "https://via.placeholder.com/150" },
-        { name: "String Bean Chicken Breast", image: "https://via.placeholder.com/150" },
-        { name: "Broccoli Beef", image: "https://via.placeholder.com/150" },
-        { name: "Black Pepper Chicken", image: "https://via.placeholder.com/150" },
-        { name: "Super Greens", image: "https://via.placeholder.com/150" }
+        { name: "Beyond The Original Orange Chicken", image: "/images/beyond-orange-chicken.jpg" },
+        { name: "The Original Orange Chicken", image: "/images/orange-chicken.jpg" },
+        { name: "Black Pepper Sirloin Steak", image: "/images/black-pepper-sirloin.jpg" },
+        { name: "Honey Walnut Shrimp", image: "/images/honey-walnut-shrimp.jpg" },
+        { name: "Grilled Teriyaki Chicken", image: "/images/grilled-teriyaki-chicken.jpg" },
+        { name: "Kung Pao Chicken", image: "/images/kung-pao-chicken.jpg" },
+        { name: "Honey Sesame Chicken Breast", image: "/images/honey-sesame-chicken-breast.jpg" },
+        { name: "Broccoli Beef", image: "/images/beijing-beef.jpg" },
+        { name: "Mushroom Chicken", image: "/images/mushroom-chicken.jpg" },
+        { name: "SweetFire Chicken Breast", image: "/images/sweetfire-chicken-breast.jpg" },
+        { name: "String Bean Chicken Breast", image: "/images/string-bean-chicken-breast.jpg" },
+        { name: "Broccoli Beef", image: "/images/broccoli-beef.jpg" },
+        { name: "Super Greens", image: "/images/super-greens.jpg" }
     ];
+    
 
     const sides = [
-        { name: "White Steamed Rice", image: "https://via.placeholder.com/150" },
-        { name: "Fried Rice", image: "https://via.placeholder.com/150" },
-        { name: "Chow Mein", image: './public/images/chowmein.png' },
-        { name: "Super Greens", image: "https://via.placeholder.com/150" }
+        { name: "White Steamed Rice", image: "/images/white-steamed-rice.jpg" },
+        { name: "Fried Rice", image: "/images/fried-rice.jpg" },
+        { name: "Chow Mein", image: "/images/chowmein.png" },
+        { name: "Super Greens", image: "/images/super-greens.jpg" }
     ];
+    
 
     const appetizers = [
         { name: "Chicken Egg Roll", image: "https://via.placeholder.com/150" },
@@ -63,11 +66,12 @@ const MealSelectionPage = () => {
         { name: "Buffet Setup", image: "https://via.placeholder.com/150" }
     ];
 
-    // Initialize the cart state and load any previously saved items from localStorage
+    //initialize cart, load items that were saved
     const [cart, setCart] = useState([]);
 
     useEffect(() => {
         const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
+        const totalItemsInCart = savedCart.reduce((total, item) => total + item.quantity, 0);
         setCart(savedCart);
     }, []);
 
@@ -76,42 +80,47 @@ const MealSelectionPage = () => {
     
     let updatedCart;
     if (existingItem) {
-        // If the item already exists, increase its quantity
+        //item already in cart so just increase quantity
         updatedCart = cart.map(item => 
             item.name === mealName
                 ? { ...item, quantity: item.quantity + 1 }
                 : item
         );
     } else {
-        // If the item doesn't exist, add it with quantity 1
+        //item doesn't exist so quantity is 1
         updatedCart = [...cart, { name: mealName, quantity: 1 }];
     }
 
-    // Update the cart state and save it to localStorage
+    //update and save cart
     setCart(updatedCart);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
     };
 
     const renderItems = (items) => (
-        items.map((item, index) => (
-            <div key={index} className="col-4 col-md-3 col-lg-2 mb-3">
-                <div className="card">
-                    <img src={item.image} className="card-img-top" alt={item.name} />
-                    <div className="card-body text-center">
-                        <p className="card-text">{item.name}</p>
-                        <button 
-                            className="btn btn-primary"
-                            onClick={() => handleAddToCart(item.name)}
-                        >
-                            Add to Cart
-                        </button>
-                    </div>
-                </div>
+    items.map((item, index) => (
+        <div key={index} className="col-4 col-md-3 col-lg-2 mb-3">
+        <div className="card">
+            
+            <img 
+            src={item.image} 
+            className="card-img-top" 
+            alt={item.name} 
+            style={{ width: '365px', height: '200px', objectFit: 'cover' }} 
+            />
+            <div className="card-body text-center">
+            <p className="card-text">{item.name}</p>
+            <button 
+                className="btn btn-primary"
+                onClick={() => handleAddToCart(item.name)}
+            > Add to Cart
+            </button>
             </div>
-        ))
-    );
+        </div>
+        </div>
+    ))
+);
 
-    // Smooth scroll to section function
+    //scrolling 
     const handleScrollToSection = (sectionId) => {
         const element = document.getElementById(sectionId);
         if (element) {
@@ -122,7 +131,6 @@ const MealSelectionPage = () => {
     return (
         <div className="container-fluid">
             <div className="row">
-                {/* Sidebar */}
                 <nav className="col-md-2 d-none d-md-block bg-light sidebar" style={{ height: '100vh', fontSize: '1.5rem' }}>
                     <div className="position-sticky">
                         <ul className="nav flex-column">
@@ -133,7 +141,7 @@ const MealSelectionPage = () => {
                                 </a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link" onClick={() => handleScrollToSection('aLaCarte')} style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
+                                <a className="nav-link" onClick={() => handleScrollToSection('A La Carte')} style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
                                     <FaDrumstickBite className="me-2" style={{ fontSize: '2rem' }} />
                                     <span>A La Carte</span>
                                 </a>
@@ -173,15 +181,11 @@ const MealSelectionPage = () => {
                 </nav>
 
                 <main className="col-md-9 ms-sm-auto col-lg-10 px-md-4 overflow-auto" style={{ maxHeight: '100vh' }}>
-                    <h2 id="meals">Meals</h2>
+                    <h2 id="A La Carte">A La Carte</h2>
                     <div className="row">
                         {renderItems(entrees)}
                     </div>
 
-                    <h2 id="aLaCarte">A La Carte</h2>
-                    <div className="row">
-                        {renderItems(appetizers)}
-                    </div>
 
                     <h2 id="sides">Sides</h2>
                     <div className="row">
@@ -208,11 +212,10 @@ const MealSelectionPage = () => {
                         {renderItems(catering)}
                     </div>
 
-                    {/* Cart Button */}
                     <div className="position-fixed bottom-0 end-0 m-3">
                         <Link href="/customer/cart" className="btn btn-primary">
                             <FaShoppingCart className="me-2" />
-                            Cart ({cart.length})
+                            Cart ({cart.reduce((total, item) => total + item.quantity, 0)})
                         </Link>
                     </div>
                 </main>
