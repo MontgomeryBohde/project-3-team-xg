@@ -1,6 +1,6 @@
 // src/app/page.js
 "use client";
-import { useState } from "react";
+
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import './menu.css';
@@ -9,7 +9,7 @@ const Page = () => {
     const router = useRouter();
 
     const navigateToLogin = () => {
-        router.push("/employee/login"); // Navigate to the login page
+        router.push("/employee"); // Navigate to the login page
     };
 
     return (
