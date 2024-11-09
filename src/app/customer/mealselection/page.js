@@ -27,20 +27,28 @@ const MealSelectionPage = () => {
     const sides = [
         { name: "White Steamed Rice", image: "https://via.placeholder.com/150" },
         { name: "Fried Rice", image: "https://via.placeholder.com/150" },
-        { name: "Chow Mein", image: "https://via.placeholder.com/150" },
+        { name: "Chow Mein", image: './public/images/chowmein.png' },
         { name: "Super Greens", image: "https://via.placeholder.com/150" }
     ];
 
     const appetizers = [
-        { name: "Bruschetta", image: "https://via.placeholder.com/150" },
-        { name: "Stuffed Mushrooms", image: "https://via.placeholder.com/150" },
-        { name: "Mozzarella Sticks", image: "https://via.placeholder.com/150" }
+        { name: "Chicken Egg Roll", image: "https://via.placeholder.com/150" },
+        { name: "Apple Pie Roll", image: "https://via.placeholder.com/150" },
+        { name: "Veggie Spring Roll", image: "https://via.placeholder.com/150" },
+        { name: "Cream Cheese Rangoon", image: "https://via.placeholder.com/150" }
     ];
 
     const drinks = [
-        { name: "Coke", image: "https://via.placeholder.com/150" },
-        { name: "Lemonade", image: "https://via.placeholder.com/150" },
-        { name: "Iced Tea", image: "https://via.placeholder.com/150" }
+        { name: "Dr Pepper", image: "https://via.placeholder.com/150" },
+        { name: "Sweet Tea", image: "https://via.placeholder.com/150" },
+        { name: "Diet Pepsi", image: "https://via.placeholder.com/150" },
+        { name: "Pepsi", image: "https://via.placeholder.com/150" },
+        { name: "Mountain Dew", image: "https://via.placeholder.com/150" },
+        { name: "Lipton Brisk Raspberry Iced Tea", image: "https://via.placeholder.com/150" },
+        { name: "Sierra Mist", image: "https://via.placeholder.com/150" },
+        { name: "Tropicana Lemonade", image: "https://via.placeholder.com/150" },
+        { name: "Aquafina", image: "https://via.placeholder.com/150" },
+        { name: "Gatorade Lemon Lime", image: "https://via.placeholder.com/150" },
     ];
 
     const deals = [
@@ -64,12 +72,24 @@ const MealSelectionPage = () => {
     }, []);
 
     const handleAddToCart = (mealName) => {
-        // Add item to cart
-        const updatedCart = [...cart, mealName];
-        setCart(updatedCart);
+        const existingItem = cart.find(item => item.name === mealName);
+    
+    let updatedCart;
+    if (existingItem) {
+        // If the item already exists, increase its quantity
+        updatedCart = cart.map(item => 
+            item.name === mealName
+                ? { ...item, quantity: item.quantity + 1 }
+                : item
+        );
+    } else {
+        // If the item doesn't exist, add it with quantity 1
+        updatedCart = [...cart, { name: mealName, quantity: 1 }];
+    }
 
-        // Save to localStorage
-        localStorage.setItem("cart", JSON.stringify(updatedCart));
+    // Update the cart state and save it to localStorage
+    setCart(updatedCart);
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
     };
 
     const renderItems = (items) => (
