@@ -20,7 +20,6 @@ const MealSelectionPage = () => {
         { name: "SweetFire Chicken Breast", image: "/images/sweetfire-chicken-breast.jpg" },
         { name: "String Bean Chicken Breast", image: "/images/string-bean-chicken-breast.jpg" },
         { name: "Broccoli Beef", image: "/images/broccoli-beef.jpg" },
-        { name: "Super Greens", image: "/images/super-greens.jpg" }
     ];
 
     const sides = [
@@ -31,10 +30,10 @@ const MealSelectionPage = () => {
     ];
 
     const appetizers = [
-        { name: "Chicken Egg Roll", image: "https://via.placeholder.com/150" , sizeType: "side"  },
-        { name: "Apple Pie Roll", image: "https://via.placeholder.com/150" , sizeType: "side"  },
-        { name: "Veggie Spring Roll", image: "https://via.placeholder.com/150", sizeType: "side"   },
-        { name: "Cream Cheese Rangoon", image: "https://via.placeholder.com/150", sizeType: "side"   }
+        { name: "Chicken Egg Roll", image: "https://via.placeholder.com/150" , sizeType: "app"  },
+        { name: "Apple Pie Roll", image: "https://via.placeholder.com/150"  },
+        { name: "Veggie Spring Roll", image: "https://via.placeholder.com/150", sizeType: "app"   },
+        { name: "Cream Cheese Rangoon", image: "https://via.placeholder.com/150", sizeType: "app"   }
     ];
 
     const drinks = [
@@ -51,15 +50,14 @@ const MealSelectionPage = () => {
     ];
 
     const deals = [
-        { name: "Buy One Get One Free", image: "https://via.placeholder.com/150" },
-        { name: "20% Off", image: "https://via.placeholder.com/150" },
-        { name: "Free Drink with Meal", image: "https://via.placeholder.com/150" }
+        { name: "50 percent off", image: "https://via.placeholder.com/150", sizeType: "special" }
     ];
 
     const catering = [
-        { name: "Party Platter", image: "https://via.placeholder.com/150" },
-        { name: "Catering Package A", image: "https://via.placeholder.com/150" },
-        { name: "Buffet Setup", image: "https://via.placeholder.com/150" }
+        { name: "Party Size Side", image: "https://via.placeholder.com/150",sizeType: "special", },
+        { name: "12-16 Person Party Bundle", image: "https://via.placeholder.com/150",sizeType: "special"  },
+        { name: "18-22 Person Party Bundle", image: "https://via.placeholder.com/150",sizeType: "special" },
+        { name: "26-30 Person Party Bundle", image: "https://via.placeholder.com/150",sizeType: "special"}
     ];
 
     const [cart, setCart] = useState([]);
@@ -81,51 +79,54 @@ const MealSelectionPage = () => {
     };
 
     const handleAddToCart = (mealName, items) => {
-        // Get the item details (assuming mealName is unique or you can fetch details based on it)
-        const item = items.find((item) => item.name === mealName);
-        
-        // Determine the default size based on item type
-        const defaultSize = item?.sizeType === "mediumOnly"
-            ? "Medium"
-            : item?.sizeType === "side"
-            ? "Medium"
-            : "Small"; // Default to "Small" for regular items
+    // Get the item details (assuming mealName is unique or you can fetch details based on it)
+    const item = items.find((item) => item.name === mealName);
     
-        // Get the selected size, default to the determined default size
-        const size = selectedSize[mealName] || defaultSize; // Ensure selectedSize is available
-        const existingItem = cart.find(item => item.name === mealName && item.size === size);
-    
-        let updatedCart;
-        if (existingItem) {
-            // If the item already exists in the cart, increase the quantity
-            updatedCart = cart.map(item => 
-                item.name === mealName && item.size === size
-                    ? { ...item, quantity: item.quantity + 1 }
-                    : item
-            );
-        } else {
-            // Otherwise, add a new item to the cart
-            updatedCart = [...cart, { name: mealName, size: size, quantity: 1 }];
-        }
-    
-        // Update the cart state and save to localStorage
-        setCart(updatedCart);
-        localStorage.setItem("cart", JSON.stringify(updatedCart));
-    };
-    
+    // Determine the default size based on item type
+    const defaultSize = item?.sizeType === "special" ? null : item?.sizeType === "mediumOnly"
+        ? "Medium"
+        : item?.sizeType === "side"
+        ? "Medium"
+        : "Small"; // Default to "Small" for regular items
 
-    const renderItems = (items) => (
-        items.map((item, index) => (
-            <div key={index} className="col-4 col-md-3 col-lg-2 mb-3">
-                <div className="card">
-                    <img 
-                        src={item.image} 
-                        className="card-img-top" 
-                        alt={item.name} 
-                        style={{ width: '365px', height: '200px', objectFit: 'cover' }} 
-                    />
-                    <div className="card-body text-center">
-                        <p className="card-text">{item.name}</p>
+    // Get the selected size, default to the determined default size
+    const size = selectedSize[mealName] || defaultSize; // Ensure selectedSize is available
+    const existingItem = cart.find(item => item.name === mealName && item.size === size);
+
+    let updatedCart;
+    if (existingItem) {
+        // If the item already exists in the cart, increase the quantity
+        updatedCart = cart.map(item => 
+            item.name === mealName && item.size === size
+                ? { ...item, quantity: item.quantity + 1 }
+                : item
+        );
+    } else {
+        // Otherwise, add a new item to the cart
+        updatedCart = [...cart, { name: mealName, size: size, quantity: 1 }];
+    }
+
+    // Update the cart state and save to localStorage
+    setCart(updatedCart);
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+};
+
+
+const renderItems = (items) => (
+    items.map((item, index) => (
+        <div key={index} className="col-4 col-md-3 col-lg-2 mb-3">
+            <div className="card">
+                <img 
+                    src={item.image} 
+                    className="card-img-top" 
+                    alt={item.name} 
+                    style={{ width: '365px', height: '200px', objectFit: 'cover' }} 
+                />
+                <div className="card-body text-center">
+                    <p className="card-text">{item.name}</p>
+
+                    {/* Conditionally render the size selection */}
+                    {item.sizeType !== "special" && (
                         <select 
                             className="form-select mb-2"
                             onChange={(e) => handleSizeChange(item.name, e.target.value)}
@@ -139,7 +140,14 @@ const MealSelectionPage = () => {
                                     <option value="Medium">Medium</option>
                                     <option value="Large">Large</option>
                                 </>
-                            ) : (
+                            ) 
+                            : item.sizeType === "app" ? (
+                                // Show only Small and Large for apps
+                                <>
+                                    <option value="Small">Small</option>
+                                    <option value="Large">Large</option>
+                                </>
+                                ): (
                                 // Show Small, Medium, and Large for regular items
                                 <>
                                     <option value="Small">Small</option>
@@ -148,17 +156,20 @@ const MealSelectionPage = () => {
                                 </>
                             )}
                         </select>
-                        <button 
-                            className="btn btn-primary"
-                            onClick={() => handleAddToCart(item.name,items)}
-                        > 
-                            Add to Cart
-                        </button>
-                    </div>
+                    )}
+
+                    <button 
+                        className="btn btn-primary"
+                        onClick={() => handleAddToCart(item.name,items)}
+                    > 
+                        Add to Cart
+                    </button>
                 </div>
             </div>
-        ))
-    );
+        </div>
+    ))
+);
+
     
 
     const handleScrollToSection = (sectionId) => {

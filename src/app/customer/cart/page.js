@@ -9,7 +9,18 @@ const CartPage = () => {
     const [loading, setLoading] = useState(true);
     const [promoCode, setPromoCode] = useState("");
     const [discount, setDiscount] = useState(0);
-    const [taxRate] = useState(0.08); //using a .8% tax rate
+    const [taxRate] = useState(0.08); // Using a .08 (8%) tax rate
+
+    // Hardcode special deal prices
+    const specialDealPrices = {
+        "Party Size Side": 16.00,
+        "12-16 Person Party Bundle": 108.00,
+        "18-22 Person Party Bundle": 154.00,
+        "26-30 Person Party Bundle": 194.00
+    };
+
+    // Handle 50% off deal
+    const isFiftyPercentOff = cart.some(item => item.name.toLowerCase().includes("50 percent off"));
 
     useEffect(() => {
         const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -35,22 +46,31 @@ const CartPage = () => {
         });
     }, []);
 
-    const subtotal = cart.reduce((total, item) => {
-        const itemPrice = prices[item.name]?.[item.size]; // Access price by both name and size
-        return total + (itemPrice || 0) * item.quantity;
-    }, 0);
+    const calculateSubtotal = () => {
+        return cart.reduce((total, item) => {
+            // If the item is a special deal, use the hardcoded price
+            const itemPrice = prices[item.name]?.[item.size] || specialDealPrices[item.name] || 0;
+            return total + (itemPrice * item.quantity);
+        }, 0);
+    };
+
+    const subtotal = calculateSubtotal();
 
     const handleApplyPromoCode = () => {
         if (promoCode === "SAVE10") {
-            setDiscount(subtotal * 0.1); // Apply 10% discount
+            setDiscount(subtotal * 0.1); // Apply 10% discount for the promo code
         } else {
             alert("Invalid promo code");
             setDiscount(0);
         }
     };
 
+    // If "50 percent off" is in the cart, apply a 50% discount
+    const automaticDiscount = isFiftyPercentOff ? subtotal * 0.5 : 0;
+
+    // Tax and final total
     const tax = subtotal * taxRate;
-    const total = subtotal - discount + tax;
+    const total = subtotal - discount - automaticDiscount + tax;
 
     // Handle cart item quantity update
     const updateQuantity = (index, change) => {
@@ -88,7 +108,10 @@ const CartPage = () => {
                                 {loading ? (
                                     <span>Price: Loading...</span>
                                 ) : (
-                                    <span>Price: ${Number(prices[item.name]?.[item.size] || 0).toFixed(2)}</span>
+                                    <span>Price: ${specialDealPrices[item.name] 
+                                        ? (specialDealPrices[item.name] * item.quantity).toFixed(2) 
+                                        : (Number(prices[item.name]?.[item.size] || 0) * item.quantity).toFixed(2)}
+                                    </span>
                                 )}
                                 <br />
                                 <span>Size: {item.size || "Not selected"}</span>
@@ -122,6 +145,12 @@ const CartPage = () => {
                     <p>Discount:</p>
                     <p>-${discount.toFixed(2)}</p>
                 </div>
+                {isFiftyPercentOff && (
+                    <div className="d-flex justify-content-between">
+                        <p>Automatic 50% Off:</p>
+                        <p>-${automaticDiscount.toFixed(2)}</p>
+                    </div>
+                )}
                 <div className="d-flex justify-content-between">
                     <p>Tax:</p>
                     <p>${tax.toFixed(2)}</p>
