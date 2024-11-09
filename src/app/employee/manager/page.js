@@ -2,6 +2,8 @@
 import React from 'react';
 import Head from 'next/head';
 import EmployeeHeader from "@/components/ui/employee/header/EmployeeHeader";
+import Link from 'next/link';
+
 import 'bootstrap/dist/css/bootstrap.css';
 import './managerHomePage.css';
 
@@ -16,32 +18,32 @@ const ManagerHomePage = () => {
                 <div className="row">
                     <div className="col-4 mb-2">
                         <div className="btn btn-danger btn-square">
-                            <a href="/employee/manager/menu">Menu</a>
+                            <Link href="/employee/manager/menu">Menu</Link>
                         </div>
                     </div>
                     <div className="col-4 mb-2">
                         <div className="btn btn-danger btn-square">
-                            <a href="/employee/manager/orders">Orders</a>
+                            <Link href="/employee/manager/orders">Orders</Link>
                         </div>
                     </div>
                     <div className="col-4 mb-2">
                         <div className="btn btn-danger btn-square">
-                            <a href="/employee/manager/reports">Reports</a>
+                            <Link href="/employee/manager/reports">Reports</Link>
                         </div>
                     </div>
                     <div className="col-4 mb-2">
                         <div className="btn btn-danger btn-square">
-                            <a href="/employee/manager/inventory">Inventory</a>
+                            <Link href="/employee/manager/inventory">Inventory</Link>
                         </div>
                     </div>
                     <div className="col-4 mb-2">
                         <div className="btn btn-danger btn-square">
-                            <a href="/employee/manager/employeeinfo">Employee Info</a>
+                            <Link href="/employee/manager/employeeinfo">Employee Info</Link>
                         </div>
                     </div>
                     <div className="col-4 mb-2">
                         <div className="btn btn-danger btn-square">
-                            <a href="/employee/manager/contact">Contact</a>
+                            <Link href="/employee/manager/contact">Contact</Link>
                         </div>
                     </div>
                 </div>
