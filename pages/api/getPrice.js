@@ -21,21 +21,24 @@ export default async function handler(req, res) {
         await client.connect();
         console.log("Database connected successfully");
 
+        // Updated query to fetch prices for both food_name and item_size
         const query = `
-            SELECT food_name, price
+            SELECT food_name, item_size, price
             FROM menu_items
             WHERE food_name = ANY($1)
-            
         `;
-
 
         const values = [foodNames];
 
         const result = await client.query(query, values);
         console.log("Fetched prices:", result.rows);  // Log database results
 
+        // Organize the prices by food_name and item_size
         const prices = result.rows.reduce((acc, row) => {
-            acc[row.food_name] = row.price;
+            if (!acc[row.food_name]) {
+                acc[row.food_name] = {};
+            }
+            acc[row.food_name][row.item_size] = row.price; // Price keyed by both food_name and item_size
             return acc;
         }, {});
 

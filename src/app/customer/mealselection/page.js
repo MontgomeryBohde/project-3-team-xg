@@ -7,10 +7,8 @@ import './mealselection.css';
 
 const MealSelectionPage = () => {
     
-    
-    //the available items from menu to purchase
     const entrees = [
-        { name: "Beyond The Original Orange Chicken", image: "/images/beyond-orange-chicken.jpg" },
+        { name: "Beyond The Original Orange Chicken", image: "/images/beyond-orange-chicken.jpg"},
         { name: "The Original Orange Chicken", image: "/images/orange-chicken.jpg" },
         { name: "Black Pepper Sirloin Steak", image: "/images/black-pepper-sirloin.jpg" },
         { name: "Honey Walnut Shrimp", image: "/images/honey-walnut-shrimp.jpg" },
@@ -24,21 +22,19 @@ const MealSelectionPage = () => {
         { name: "Broccoli Beef", image: "/images/broccoli-beef.jpg" },
         { name: "Super Greens", image: "/images/super-greens.jpg" }
     ];
-    
 
     const sides = [
-        { name: "White Steamed Rice", image: "/images/white-steamed-rice.jpg" },
-        { name: "Fried Rice", image: "/images/fried-rice.jpg" },
-        { name: "Chow Mein", image: "/images/chowmein.png" },
-        { name: "Super Greens", image: "/images/super-greens.jpg" }
+        { name: "White Steamed Rice", image: "/images/white-steamed-rice.jpg", sizeType: "side"  },
+        { name: "Fried Rice", image: "/images/fried-rice.jpg", sizeType: "side"   },
+        { name: "Chow Mein", image: "/images/chowmein.png", sizeType: "side"   },
+        { name: "Super Greens", image: "/images/super-greens.jpg" , sizeType: "side"  }
     ];
-    
 
     const appetizers = [
-        { name: "Chicken Egg Roll", image: "https://via.placeholder.com/150" },
-        { name: "Apple Pie Roll", image: "https://via.placeholder.com/150" },
-        { name: "Veggie Spring Roll", image: "https://via.placeholder.com/150" },
-        { name: "Cream Cheese Rangoon", image: "https://via.placeholder.com/150" }
+        { name: "Chicken Egg Roll", image: "https://via.placeholder.com/150" , sizeType: "side"  },
+        { name: "Apple Pie Roll", image: "https://via.placeholder.com/150" , sizeType: "side"  },
+        { name: "Veggie Spring Roll", image: "https://via.placeholder.com/150", sizeType: "side"   },
+        { name: "Cream Cheese Rangoon", image: "https://via.placeholder.com/150", sizeType: "side"   }
     ];
 
     const drinks = [
@@ -50,8 +46,8 @@ const MealSelectionPage = () => {
         { name: "Lipton Brisk Raspberry Iced Tea", image: "https://via.placeholder.com/150" },
         { name: "Sierra Mist", image: "https://via.placeholder.com/150" },
         { name: "Tropicana Lemonade", image: "https://via.placeholder.com/150" },
-        { name: "Aquafina", image: "https://via.placeholder.com/150" },
-        { name: "Gatorade Lemon Lime", image: "https://via.placeholder.com/150" },
+        { name: "Aquafina", image: "https://via.placeholder.com/150", sizeType: "mediumOnly" },
+        { name: "Gatorade Lemon Lime", image: "https://via.placeholder.com/150", sizeType: "mediumOnly" }
     ];
 
     const deals = [
@@ -66,61 +62,105 @@ const MealSelectionPage = () => {
         { name: "Buffet Setup", image: "https://via.placeholder.com/150" }
     ];
 
-    //initialize cart, load items that were saved
     const [cart, setCart] = useState([]);
+    const [selectedSize, setSelectedSize] = useState({});
 
     useEffect(() => {
         const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
-        const totalItemsInCart = savedCart.reduce((total, item) => total + item.quantity, 0);
         setCart(savedCart);
     }, []);
 
-    const handleAddToCart = (mealName) => {
-        const existingItem = cart.find(item => item.name === mealName);
-    
-    let updatedCart;
-    if (existingItem) {
-        //item already in cart so just increase quantity
-        updatedCart = cart.map(item => 
-            item.name === mealName
-                ? { ...item, quantity: item.quantity + 1 }
-                : item
-        );
-    } else {
-        //item doesn't exist so quantity is 1
-        updatedCart = [...cart, { name: mealName, quantity: 1 }];
-    }
-
-    //update and save cart
-    setCart(updatedCart);
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
+    const handleSizeChange = (mealName, size, isSide) => {
+        if (isSide) {
+            // Only allow Medium and Large for sides
+            setSelectedSize(prevSize => ({ ...prevSize, [mealName]: size }));
+        } else {
+            // For entrees, allow Small, Medium, and Large
+            setSelectedSize(prevSize => ({ ...prevSize, [mealName]: size }));
+        }
     };
 
-    const renderItems = (items) => (
-    items.map((item, index) => (
-        <div key={index} className="col-4 col-md-3 col-lg-2 mb-3">
-        <div className="card">
-            
-            <img 
-            src={item.image} 
-            className="card-img-top" 
-            alt={item.name} 
-            style={{ width: '365px', height: '200px', objectFit: 'cover' }} 
-            />
-            <div className="card-body text-center">
-            <p className="card-text">{item.name}</p>
-            <button 
-                className="btn btn-primary"
-                onClick={() => handleAddToCart(item.name)}
-            > Add to Cart
-            </button>
-            </div>
-        </div>
-        </div>
-    ))
-);
+    const handleAddToCart = (mealName, items) => {
+        // Get the item details (assuming mealName is unique or you can fetch details based on it)
+        const item = items.find((item) => item.name === mealName);
+        
+        // Determine the default size based on item type
+        const defaultSize = item?.sizeType === "mediumOnly"
+            ? "Medium"
+            : item?.sizeType === "side"
+            ? "Medium"
+            : "Small"; // Default to "Small" for regular items
+    
+        // Get the selected size, default to the determined default size
+        const size = selectedSize[mealName] || defaultSize; // Ensure selectedSize is available
+        const existingItem = cart.find(item => item.name === mealName && item.size === size);
+    
+        let updatedCart;
+        if (existingItem) {
+            // If the item already exists in the cart, increase the quantity
+            updatedCart = cart.map(item => 
+                item.name === mealName && item.size === size
+                    ? { ...item, quantity: item.quantity + 1 }
+                    : item
+            );
+        } else {
+            // Otherwise, add a new item to the cart
+            updatedCart = [...cart, { name: mealName, size: size, quantity: 1 }];
+        }
+    
+        // Update the cart state and save to localStorage
+        setCart(updatedCart);
+        localStorage.setItem("cart", JSON.stringify(updatedCart));
+    };
+    
 
-    //scrolling 
+    const renderItems = (items) => (
+        items.map((item, index) => (
+            <div key={index} className="col-4 col-md-3 col-lg-2 mb-3">
+                <div className="card">
+                    <img 
+                        src={item.image} 
+                        className="card-img-top" 
+                        alt={item.name} 
+                        style={{ width: '365px', height: '200px', objectFit: 'cover' }} 
+                    />
+                    <div className="card-body text-center">
+                        <p className="card-text">{item.name}</p>
+                        <select 
+                            className="form-select mb-2"
+                            onChange={(e) => handleSizeChange(item.name, e.target.value)}
+                        >
+                            {item.sizeType === "mediumOnly" ? (
+                                // Show only Medium for medium-only items
+                                <option value="Medium">Medium</option>
+                            ) : item.sizeType === "side" ? (
+                                // Show only Medium and Large for sides
+                                <>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Large">Large</option>
+                                </>
+                            ) : (
+                                // Show Small, Medium, and Large for regular items
+                                <>
+                                    <option value="Small">Small</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Large">Large</option>
+                                </>
+                            )}
+                        </select>
+                        <button 
+                            className="btn btn-primary"
+                            onClick={() => handleAddToCart(item.name,items)}
+                        > 
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+        ))
+    );
+    
+
     const handleScrollToSection = (sectionId) => {
         const element = document.getElementById(sectionId);
         if (element) {
@@ -167,7 +207,7 @@ const MealSelectionPage = () => {
                             <li className="nav-item">
                                 <a className="nav-link" onClick={() => handleScrollToSection('deals')} style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
                                     <FaGift className="me-2" style={{ fontSize: '2rem' }} />
-                                    <span>Deals/Rewards</span>
+                                    <span>Deals</span>
                                 </a>
                             </li>
                             <li className="nav-item">
@@ -176,47 +216,53 @@ const MealSelectionPage = () => {
                                     <span>Catering</span>
                                 </a>
                             </li>
+                            <li className="nav-item">
+                            <Link href="/customer/cart">
+                                <span style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
+                                    <FaShoppingCart className="me-2" style={{ fontSize: '2rem' }} />
+                                    <span>View Cart</span>
+                                </span>
+                            </Link>
+                            </li>
                         </ul>
                     </div>
                 </nav>
-
-                <main className="col-md-9 ms-sm-auto col-lg-10 px-md-4 overflow-auto" style={{ maxHeight: '100vh' }}>
-                    <h2 id="A La Carte">A La Carte</h2>
-                    <div className="row">
-                        {renderItems(entrees)}
+                <main className="col-md-10 ms-sm-auto col-lg-10 px-md-4">
+                    <div className="py-3" id="meals">
+                        <h2>Entrees</h2>
+                        <div className="row">
+                            {renderItems(entrees)}
+                        </div>
                     </div>
-
-
-                    <h2 id="sides">Sides</h2>
-                    <div className="row">
-                        {renderItems(sides)}
+                    <div className="py-3" id="sides">
+                        <h2>Sides</h2>
+                        <div className="row">
+                            {renderItems(sides,"side")} {/*Send true that this is a side so it only shows med and large */}
+                        </div>
                     </div>
-
-                    <h2 id="appetizers">Appetizers</h2>
-                    <div className="row">
-                        {renderItems(appetizers)}
+                    <div className="py-3" id="appetizers">
+                        <h2>Appetizers</h2>
+                        <div className="row">
+                            {renderItems(appetizers,"side")} {/*Send true that this is a app so it only shows med and large */}
+                        </div>
                     </div>
-
-                    <h2 id="drinks">Drinks</h2>
-                    <div className="row">
-                        {renderItems(drinks)}
+                    <div className="py-3" id="drinks">
+                        <h2>Drinks</h2>
+                        <div className="row">
+                            {renderItems(drinks)}
+                        </div>
                     </div>
-
-                    <h2 id="deals">Deals & Rewards</h2>
-                    <div className="row">
-                        {renderItems(deals)}
+                    <div className="py-3" id="deals">
+                        <h2>Deals</h2>
+                        <div className="row">
+                            {renderItems(deals)}
+                        </div>
                     </div>
-
-                    <h2 id="catering">Catering</h2>
-                    <div className="row">
-                        {renderItems(catering)}
-                    </div>
-
-                    <div className="position-fixed bottom-0 end-0 m-3">
-                        <Link href="/customer/cart" className="btn btn-primary">
-                            <FaShoppingCart className="me-2" />
-                            Cart ({cart.reduce((total, item) => total + item.quantity, 0)})
-                        </Link>
+                    <div className="py-3" id="catering">
+                        <h2>Catering</h2>
+                        <div className="row">
+                            {renderItems(catering)}
+                        </div>
                     </div>
                 </main>
             </div>
