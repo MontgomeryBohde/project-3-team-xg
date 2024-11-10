@@ -164,7 +164,7 @@ const CartPage = () => {
             </div>
 
             <button onClick={handleClearCart} className="btn btn-danger mt-3">Clear Order</button>
-            <Link href="/customer/mealselection" className="btn btn-primary mt-3">Back to Menu</Link>
+            <Link href="/customer/menuselection" className="btn btn-primary mt-3">Back to Menu</Link>
             <Link href="/customer/confirm" className="btn btn-success mt-3">Confirm</Link>
         </div>
     );
