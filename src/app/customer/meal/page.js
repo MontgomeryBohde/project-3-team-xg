@@ -20,6 +20,8 @@ const CustomerMealSelect = () => {
   const [selectedSides, setSelectedSides] = useState([]);
   const [selectedEntrees, setSelectedEntrees] = useState([]);
 
+  const [cart, setCart] = useState([]); // Cart to hold both simple and complex objects
+
   const router = useRouter();
 
   // Update numEntrees based on selected meal
@@ -54,18 +56,37 @@ const CustomerMealSelect = () => {
     }
   };
 
-  // Handle quantity change for selected entrees
-  const handleQuantityChange = (item, increment) => {
-    setSelectedEntrees((prevEntrees) =>
-      prevEntrees
-        .map((selectedItem) =>
-          selectedItem === item
-            ? { ...selectedItem, quantity: selectedItem.quantity + increment }
-            : selectedItem
-        )
-        .filter((selectedItem) => selectedItem.quantity > 0) // Ensure no item has a non-positive quantity
-    );
-  };
+// Handle quantity change for selected entrees
+const handleQuantityChange = (item, increment) => {
+  setSelectedEntrees((prevSelectedEntrees) => {
+    let updatedEntrees = [...prevSelectedEntrees]; // Create a copy of the previous state
+
+    if (increment > 0 && canAddEntree()) {
+      // Add item increment times if we can add more entrees
+      for (let i = 0; i < increment; i++) {
+        updatedEntrees.push(item); // Add the item increment number of times
+      }
+    } else if (increment < 0) {
+      // Remove item increment times if increment is negative
+      for (let i = 0; i < Math.abs(increment); i++) {
+        const index = updatedEntrees.indexOf(item);
+        if (index !== -1) {
+          updatedEntrees.splice(index, 1); // Remove the item if it exists
+        }
+      }
+    }
+
+    return updatedEntrees; // Return the updated state
+  });
+};
+
+
+// Helper function to check if you can add more entrees
+const canAddEntree = () => {
+  return selectedEntrees.length < numEntrees; // Ensure selectedEntrees doesn't exceed numEntrees
+};
+
+
 
   // Handle cancel action
   const handleCancel = () => {
@@ -76,8 +97,18 @@ const CustomerMealSelect = () => {
   const handleConfirm = () => {
     // Check if the number of selected items equals the expected number of entrees + 1 (for sides)
     if (selectedEntrees.length === numEntrees && selectedSides.length === 1) {
-      localStorage.setItem("OrderedEntrees", JSON.stringify(selectedEntrees)); // save to local storage
-      localStorage.setItem("OrderedSides", JSON.stringify(selectedSides)); // save to local storage
+      // Add selected items to the cart as a complex object
+      const mealCartItem = {
+        mealItem: meal,
+        entrees: selectedEntrees,
+        sides: selectedSides,
+        quantity: 1, // Adjust quantity if needed
+      };
+      
+      setCart([...cart, mealCartItem]); // Add the complex meal object to the cart
+
+      localStorage.setItem("Cart", JSON.stringify([...cart, mealCartItem])); // Save cart to localStorage
+
       router.push("/customer/menu"); // Navigate to the menu page
     } else {
       // Optional: show an error or alert if the user hasn't selected the correct number of items
@@ -100,7 +131,17 @@ const CustomerMealSelect = () => {
                 <button
                   key={index}
                   className={`item-button ${isSelected ? "selected" : ""}`}
-                  onClick={() => handlePressed(item, "Side")}
+                  onClick={() => {
+                    if (!isSelected) {
+                      // Only allow selection if no side is selected yet
+                      if (selectedSides.length < 1) {
+                        handlePressed(item, "Side");
+                      }
+                    } else {
+                      // Unselect the side if it's already selected
+                      handlePressed(item, "Side");
+                    }
+                  }}
                 >
                   {item}
                 </button>
@@ -119,7 +160,13 @@ const CustomerMealSelect = () => {
                 <div key={index} className="item-container">
                   <button
                     className={`item-button ${isSelected ? "selected" : ""}`}
-                    onClick={() => handlePressed(item, "Entree")}
+                    onClick={() => {
+                      if (!isSelected && selectedEntrees.length < numEntrees) {
+                        handlePressed(item, "Entree");
+                      } else if (isSelected) {
+                        handlePressed(item, "Entree");
+                      }
+                    }}
                   >
                     {item}
                   </button>
@@ -141,6 +188,7 @@ const CustomerMealSelect = () => {
             })}
           </div>
         </section>
+
 
         {/* Display selected meal items */}
         <section className="section">
@@ -165,7 +213,7 @@ const CustomerMealSelect = () => {
               <ul>
                 {selectedEntrees.map((entree, index) => (
                   <li key={index}>
-                    {entree} - Quantity: 1 {/* Since no mealItems, default to 1 quantity */}
+                    {entree}
                   </li>
                 ))}
               </ul>
