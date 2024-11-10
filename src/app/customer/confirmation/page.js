@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from "next/navigation";
+import Head from 'next/head';
 import EmployeeHeader from "@/components/ui/employee/header/EmployeeHeader";
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -9,56 +10,49 @@ import Image from 'next/image';
 import './confirmation.css';
 
 const CashConfirmation = () => {
-  const [timeLeft, setTimeLeft] = useState(15); // Starting with 5 seconds
-  const [paymentMethod, setPaymentMethod] = useState("Cash"); // TODO: define this in cart page
+  const [timeLeft, setTimeLeft] = useState(15);
+  const [paymentMethod, setPaymentMethod] = useState("Cash");
   const router = useRouter();
 
+  // Set up the timer countdown
   useEffect(() => {
-	// Check if 'paymentMethod' exists in localStorage
-    const storedPaymentMethod = localStorage.getItem('paymentMethod');
-	if(storedPaymentMethod)
-	{
-		setPaymentMethod(storedPaymentMethod); // Set the payment method state
-	}
+    if (typeof window !== 'undefined') {
+      const storedPaymentMethod = localStorage.getItem('paymentMethod');
+      if (storedPaymentMethod) {
+        setPaymentMethod(storedPaymentMethod);
+      }
+    }
 
     const timer = setInterval(() => {
-      setTimeLeft((prevTime) => {
-        if (prevTime === 1) {
-          router.push('/'); // TODO: Redirect to correct page
-          clearInterval(timer);  // Clear the interval once redirection happens
-          return prevTime;
-        }
-        return prevTime - 1; // Decrease the time by 1 second
-      });
+      setTimeLeft((prevTime) => prevTime - 1);
     }, 1000);
 
-    // Clean up the interval on component unmount
     return () => clearInterval(timer);
-  }, [router]);
+  }, []);
+
+  // Redirect when timeLeft reaches 0
+  useEffect(() => {
+    if (timeLeft === 0) {
+      router.push('/');
+    }
+  }, [timeLeft, router]);
 
   return (
     <>
-      <head>
+      <Head>
         <title>Order Confirmed</title>
-      </head>
-      <body>
+      </Head>
+      <div>
         <EmployeeHeader />
-		<div className="confirm-content"> 
-			<h3>Your Order Number is: </h3>
-			<h1>123456</h1>
-
-			{/* Conditionally render the "Please pay at counter." message */}
-				{paymentMethod === 'Cash' && (
-				<h2>Please pay at counter.</h2>
-			)}
-
-			<Image src="/panda-icon.png" alt="Panda Icon" width={100} height={100} />
-			<h2>Thank you!</h2>
-
-			{/* Display the time left before redirection */}
-			<h4>Exiting in {timeLeft} seconds...</h4>
-		</div>
-      </body>
+        <div className="confirm-content">
+          <h3>Your Order Number is:</h3>
+          <h1>123456</h1>
+          {paymentMethod === 'Cash' && <h2>Please pay at counter.</h2>}
+          <Image src="/panda-icon.png" alt="Panda Icon" width={100} height={100} />
+          <h2>Thank you!</h2>
+          <h4>Exiting in {timeLeft} seconds...</h4>
+        </div>
+      </div>
     </>
   );
 };
