@@ -15,7 +15,6 @@ const MealSelectionPage = () => {
         { name: "Grilled Teriyaki Chicken", image: "/images/grilled-teriyaki-chicken.jpg" },
         { name: "Kung Pao Chicken", image: "/images/kung-pao-chicken.jpg" },
         { name: "Honey Sesame Chicken Breast", image: "/images/honey-sesame-chicken-breast.jpg" },
-        { name: "Broccoli Beef", image: "/images/beijing-beef.jpg" },
         { name: "Mushroom Chicken", image: "/images/mushroom-chicken.jpg" },
         { name: "SweetFire Chicken Breast", image: "/images/sweetfire-chicken-breast.jpg" },
         { name: "String Bean Chicken Breast", image: "/images/string-bean-chicken-breast.jpg" },
