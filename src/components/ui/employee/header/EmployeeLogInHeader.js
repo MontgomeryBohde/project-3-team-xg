@@ -22,7 +22,7 @@ const EmployeeLogInHeader = () => {
   };
 
   return (
-    <header className="bg-danger text-white p-2 d-flex align-items-center justify-content-between">
+    <header className="bg-primary text-white p-2 d-flex align-items-center justify-content-between">
       {/* Back Button */}
       <button className="btn btn-light me-3" onClick={handleBackClick}>
         <i className="bi bi-arrow-left"></i> Back
