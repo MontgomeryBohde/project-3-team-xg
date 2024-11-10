@@ -25,39 +25,39 @@ const MealSelectionPage = () => {
     const sides = [
         { name: "White Steamed Rice", image: "/images/white-steamed-rice.jpg", sizeType: "side"  },
         { name: "Fried Rice", image: "/images/fried-rice.jpg", sizeType: "side"   },
-        { name: "Chow Mein", image: "/images/chowmein.png", sizeType: "side"   },
+        { name: "Chow Mein", image: "/images/chowmein.jpg", sizeType: "side"   },
         { name: "Super Greens", image: "/images/super-greens.jpg" , sizeType: "side"  }
     ];
 
     const appetizers = [
-        { name: "Chicken Egg Roll", image: "https://via.placeholder.com/150" , sizeType: "app"  },
-        { name: "Apple Pie Roll", image: "https://via.placeholder.com/150"  },
-        { name: "Veggie Spring Roll", image: "https://via.placeholder.com/150", sizeType: "app"   },
-        { name: "Cream Cheese Rangoon", image: "https://via.placeholder.com/150", sizeType: "app"   }
+        { name: "Chicken Egg Roll", image: "/images/chicken-egg-roll.jpg" , sizeType: "app"  },
+        { name: "Apple Pie Roll", image: "/images/apple-pie.jpg"  },
+        { name: "Veggie Spring Roll", image: "/images/veggie-spring.jpg", sizeType: "app"   },
+        { name: "Cream Cheese Rangoon", image: "/images/cream-cheese.jpg", sizeType: "app"   }
     ];
 
     const drinks = [
-        { name: "Dr Pepper", image: "https://via.placeholder.com/150" },
-        { name: "Sweet Tea", image: "https://via.placeholder.com/150" },
-        { name: "Diet Pepsi", image: "https://via.placeholder.com/150" },
-        { name: "Pepsi", image: "https://via.placeholder.com/150" },
-        { name: "Mountain Dew", image: "https://via.placeholder.com/150" },
-        { name: "Lipton Brisk Raspberry Iced Tea", image: "https://via.placeholder.com/150" },
-        { name: "Sierra Mist", image: "https://via.placeholder.com/150" },
-        { name: "Tropicana Lemonade", image: "https://via.placeholder.com/150" },
-        { name: "Aquafina", image: "https://via.placeholder.com/150", sizeType: "mediumOnly" },
-        { name: "Gatorade Lemon Lime", image: "https://via.placeholder.com/150", sizeType: "mediumOnly" }
+        { name: "Dr Pepper", image: "/images/dr_pepper.jpg" },
+        { name: "Sweet Tea", image: "/images/sweet_tea.jpg" },
+        { name: "Diet Pepsi", image: "/images/diet_pepsi.jpg" },
+        { name: "Pepsi", image: "/images/pepsi.jpg" },
+        { name: "Mountain Dew", image: "/images/mountain_dew.jpg" },
+        { name: "Lipton Brisk Raspberry Iced Tea", image: "/images/lipton_brisk_raspberry_iced_tea.jpg" },
+        { name: "Sierra Mist", image: "/images/sierra_mist.jpg" },
+        { name: "Tropicana Lemonade", image: "/images/tropicana_lemonade.jpg" },
+        { name: "Aquafina", image: "/images/aquafina.jpg", sizeType: "mediumOnly" },
+        { name: "Gatorade Lemon Lime", image: "/images/gatorade_lemon_lime.jpg", sizeType: "mediumOnly" }
     ];
 
     const deals = [
-        { name: "50 percent off", image: "https://via.placeholder.com/150", sizeType: "special" }
+        { name: "50 percent off", image: "/images/50per.jpg", sizeType: "special" }
     ];
 
     const catering = [
-        { name: "Party Size Side", image: "https://via.placeholder.com/150",sizeType: "special", },
-        { name: "12-16 Person Party Bundle", image: "https://via.placeholder.com/150",sizeType: "special"  },
-        { name: "18-22 Person Party Bundle", image: "https://via.placeholder.com/150",sizeType: "special" },
-        { name: "26-30 Person Party Bundle", image: "https://via.placeholder.com/150",sizeType: "special"}
+        { name: "Party Size Side", image: "/images/party_size_side.jpg", sizeType: "special" },
+        { name: "12-16 Person Party Bundle", image: "/images/12_16_person_party_bundle.jpg", sizeType: "special" },
+        { name: "18-22 Person Party Bundle", image: "/images/12_16_person_party_bundle.jpg", sizeType: "special" },
+        { name: "26-30 Person Party Bundle", image: "/images/12_16_person_party_bundle.jpg", sizeType: "special" }
     ];
 
     const [cart, setCart] = useState([]);
@@ -70,43 +70,41 @@ const MealSelectionPage = () => {
 
     const handleSizeChange = (mealName, size, isSide) => {
         if (isSide) {
-            // Only allow Medium and Large for sides
+            //meidium and large only
             setSelectedSize(prevSize => ({ ...prevSize, [mealName]: size }));
         } else {
-            // For entrees, allow Small, Medium, and Large
+            //all sizes (regular)
             setSelectedSize(prevSize => ({ ...prevSize, [mealName]: size }));
         }
     };
 
     const handleAddToCart = (mealName, items) => {
-    // Get the item details (assuming mealName is unique or you can fetch details based on it)
+   
     const item = items.find((item) => item.name === mealName);
-    
-    // Determine the default size based on item type
     const defaultSize = item?.sizeType === "special" ? null : item?.sizeType === "mediumOnly"
         ? "Medium"
         : item?.sizeType === "side"
         ? "Medium"
-        : "Small"; // Default to "Small" for regular items
+        : "Small"; //for regular items the default is small
 
-    // Get the selected size, default to the determined default size
-    const size = selectedSize[mealName] || defaultSize; // Ensure selectedSize is available
+    
+    const size = selectedSize[mealName] || defaultSize;
     const existingItem = cart.find(item => item.name === mealName && item.size === size);
 
     let updatedCart;
     if (existingItem) {
-        // If the item already exists in the cart, increase the quantity
+        //if item already exists in the cart, increase the quantity
         updatedCart = cart.map(item => 
             item.name === mealName && item.size === size
                 ? { ...item, quantity: item.quantity + 1 }
                 : item
         );
     } else {
-        // Otherwise, add a new item to the cart
+        //else just add new item
         updatedCart = [...cart, { name: mealName, size: size, quantity: 1 }];
     }
 
-    // Update the cart state and save to localStorage
+    //update cart and save to localStorage
     setCart(updatedCart);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
 };
@@ -125,30 +123,27 @@ const renderItems = (items) => (
                 <div className="card-body text-center">
                     <p className="card-text">{item.name}</p>
 
-                    {/* Conditionally render the size selection */}
                     {item.sizeType !== "special" && (
                         <select 
                             className="form-select mb-2"
                             onChange={(e) => handleSizeChange(item.name, e.target.value)}
                         >
                             {item.sizeType === "mediumOnly" ? (
-                                // Show only Medium for medium-only items
+    
                                 <option value="Medium">Medium</option>
                             ) : item.sizeType === "side" ? (
-                                // Show only Medium and Large for sides
+                               
                                 <>
                                     <option value="Medium">Medium</option>
                                     <option value="Large">Large</option>
                                 </>
                             ) 
-                            : item.sizeType === "app" ? (
-                                // Show only Small and Large for apps
+                            : item.sizeType === "app" ? (     
                                 <>
                                     <option value="Small">Small</option>
                                     <option value="Large">Large</option>
                                 </>
                                 ): (
-                                // Show Small, Medium, and Large for regular items
                                 <>
                                     <option value="Small">Small</option>
                                     <option value="Medium">Medium</option>
@@ -159,8 +154,8 @@ const renderItems = (items) => (
                     )}
 
                     <button 
-                        className="btn btn-primary"
-                        onClick={() => handleAddToCart(item.name,items)}
+                        className="btn btn-danger"
+                        onClick={() => handleAddToCart(item.name, items)}
                     > 
                         Add to Cart
                     </button>
@@ -229,18 +224,46 @@ const renderItems = (items) => (
                             </li>
                             <li className="nav-item">
                             <Link href="/customer/cart">
-                                <span style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
-                                    <FaShoppingCart className="me-2" style={{ fontSize: '2rem' }} />
-                                    <span>View Cart</span>
-                                </span>
+                            <span style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
+                                <FaShoppingCart className="me-2" style={{ fontSize: '2rem', color: 'red' }} />
+                                <span style={{ color: 'red' }}>View Cart</span>
+                            </span>
                             </Link>
                             </li>
                         </ul>
                     </div>
                 </nav>
                 <main className="col-md-10 ms-sm-auto col-lg-10 px-md-4">
-                    <div className="py-3" id="meals">
-                        <h2>Entrees</h2>
+                <div className="py-3" id="Meals">
+                    <h2>Meals</h2>
+                    <h3>Choose Your Meal</h3>
+                    <div className="row mb-4">
+                        <div className="col-4">
+                            <Link href="PLACEHOLD">
+                                <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}>
+                                    Bowl
+                                </button>
+                            </Link>
+                        </div>
+                        <div className="col-4">
+                            <Link href="PLACEHOLD">
+                                <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}>
+                                    Plate
+                                </button>
+                            </Link>
+                        </div>
+                        <div className="col-4">
+                            <Link href="PLACEHOLD">
+                                <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}>
+                                    Bigger Plate
+                                </button>
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+
+                    <div className="py-3" id="A La Carte">
+                        <h2>A La Carte</h2>
                         <div className="row">
                             {renderItems(entrees)}
                         </div>
@@ -248,13 +271,13 @@ const renderItems = (items) => (
                     <div className="py-3" id="sides">
                         <h2>Sides</h2>
                         <div className="row">
-                            {renderItems(sides,"side")} {/*Send true that this is a side so it only shows med and large */}
+                            {renderItems(sides, "side")} {/*Send true that this is a side so it only shows med and large */}
                         </div>
                     </div>
                     <div className="py-3" id="appetizers">
                         <h2>Appetizers</h2>
                         <div className="row">
-                            {renderItems(appetizers,"side")} {/*Send true that this is a app so it only shows med and large */}
+                            {renderItems(appetizers, "side")} {/*Send true that this is an app so it only shows small and large */}
                         </div>
                     </div>
                     <div className="py-3" id="drinks">

@@ -1,7 +1,7 @@
 import { Client } from 'pg';
 
 export default async function handler(req, res) {
-    console.log("Received request body:", req.body); // Check incoming request data
+    console.log("Received request body:", req.body); 
 
     const { foodNames } = req.body;
 
@@ -21,7 +21,6 @@ export default async function handler(req, res) {
         await client.connect();
         console.log("Database connected successfully");
 
-        // Updated query to fetch prices for both food_name and item_size
         const query = `
             SELECT food_name, item_size, price
             FROM menu_items
@@ -31,14 +30,14 @@ export default async function handler(req, res) {
         const values = [foodNames];
 
         const result = await client.query(query, values);
-        console.log("Fetched prices:", result.rows);  // Log database results
+        console.log("Fetched prices:", result.rows); 
 
-        // Organize the prices by food_name and item_size
+        //organizing by price 
         const prices = result.rows.reduce((acc, row) => {
             if (!acc[row.food_name]) {
                 acc[row.food_name] = {};
             }
-            acc[row.food_name][row.item_size] = row.price; // Price keyed by both food_name and item_size
+            acc[row.food_name][row.item_size] = row.price; 
             return acc;
         }, {});
 

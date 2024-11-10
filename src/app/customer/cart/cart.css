@@ -2,42 +2,41 @@
     max-width: 600px;
     margin: 0 auto;
 }
-
 .total-box {
-    background-color: #f1f1f1; /* Light gray background */
-    padding: 20px;
+    background-color: #f1f1f1; 
+    
     border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     text-align: center;
     margin-top: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    
 }
-
 .total-box p {
+    color: #556;
     font-size: 16px;
-    color: #555;
+    
     margin: 0;
 }
-
 .total-box h2 {
-    font-size: 36px;
-    font-weight: bold;
-    color: #333;
     margin: 5px 0 0;
+    font-weight: bold;
+    color: #332;
+    font-size: 36px;
 }
 .button-group {
     display: flex;
     gap: 10px;
 }
-
 .cancel-btn {
-    background-color: #ff4d4d;
+    
     color: white;
     border: none;
     padding: 10px 20px;
+    background-color: #ff4d4e;
     border-radius: 5px;
     cursor: pointer;
 }
-
 .cancel-btn:hover {
     background-color: #ff1a1a;
 }

@@ -9,9 +9,9 @@ const CartPage = () => {
     const [loading, setLoading] = useState(true);
     const [promoCode, setPromoCode] = useState("");
     const [discount, setDiscount] = useState(0);
-    const [taxRate] = useState(0.08); // Using a .08 (8%) tax rate
+    const [taxRate] = useState(0.08);//use.08 tax rate
 
-    // Hardcode special deal prices
+    //catered prices, hardcoded
     const specialDealPrices = {
         "Party Size Side": 16.00,
         "12-16 Person Party Bundle": 108.00,
@@ -19,7 +19,7 @@ const CartPage = () => {
         "26-30 Person Party Bundle": 194.00
     };
 
-    // Handle 50% off deal
+    //hardcoded 50% off deal, can change later
     const isFiftyPercentOff = cart.some(item => item.name.toLowerCase().includes("50 percent off"));
 
     useEffect(() => {
@@ -37,7 +37,7 @@ const CartPage = () => {
         })
         .then(response => response.json())
         .then(data => {
-            setPrices(data);  // The data is now an object with food_name -> item_size -> price
+            setPrices(data); 
             setLoading(false);
         })
         .catch(error => {
@@ -48,7 +48,7 @@ const CartPage = () => {
 
     const calculateSubtotal = () => {
         return cart.reduce((total, item) => {
-            // If the item is a special deal, use the hardcoded price
+            //if catered, use the hardcoded prcie
             const itemPrice = prices[item.name]?.[item.size] || specialDealPrices[item.name] || 0;
             return total + (itemPrice * item.quantity);
         }, 0);
@@ -58,21 +58,21 @@ const CartPage = () => {
 
     const handleApplyPromoCode = () => {
         if (promoCode === "SAVE10") {
-            setDiscount(subtotal * 0.1); // Apply 10% discount for the promo code
+            setDiscount(subtotal * 0.1);//10% discount code, can also change later if we want
         } else {
             alert("Invalid promo code");
             setDiscount(0);
         }
     };
 
-    // If "50 percent off" is in the cart, apply a 50% discount
+    //apply 50% of deal if its in the cart
     const automaticDiscount = isFiftyPercentOff ? subtotal * 0.5 : 0;
 
-    // Tax and final total
+   //tax and get total
     const tax = subtotal * taxRate;
     const total = subtotal - discount - automaticDiscount + tax;
 
-    // Handle cart item quantity update
+    //change the quanitity already in cart
     const updateQuantity = (index, change) => {
         const updatedCart = cart.map((item, i) => {
             if (i === index) {
@@ -87,7 +87,7 @@ const CartPage = () => {
         localStorage.setItem("cart", JSON.stringify(updatedCart));
     };
 
-    // Clear the cart
+    //clear 
     const handleClearCart = () => {
         setCart([]);
         localStorage.removeItem("cart");
@@ -95,7 +95,9 @@ const CartPage = () => {
 
     return (
         <div className="container">
-            {/* Cart Page Content */}
+           
+            <h1 className="text-center my-4">Your Cart</h1>
+
             {cart.length === 0 ? (
                 <p>Your cart is empty.</p>
             ) : (

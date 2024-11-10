@@ -1,24 +1,7 @@
-/* Sidebar icon styling */
+
 .sidebar .nav-link {
-    display: flex;
-    align-items: center;
-    padding: 1rem 2rem;
-    transition: background-color 0.3s, color 0.3s;
-    cursor: pointer; /* Add this line to change the cursor to a hand on hover */
+    color: black !important;
 }
-
-.sidebar .nav-link:hover,
-.sidebar .nav-link.active {
-    background-color: #f1f1f1;
-    color: #007bff;
-}
-
-.sidebar .nav-link .sidebar-icon {
-    transition: transform 0.3s, color 0.3s;
-}
-
-.sidebar .nav-link:hover .sidebar-icon,
-.sidebar .nav-link.active .sidebar-icon {
-    transform: scale(1.2);
-    color: #007bff;
+.sidebar .nav-link:hover {
+    color: black !important;
 }
