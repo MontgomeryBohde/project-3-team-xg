@@ -16,6 +16,14 @@ const CustomerMealSelect = () => {
   const [sides, setSides] = useState(["White Steamed Rice", "Fried Rice", "Chow Mein", "Super Greens"]);
 
   const [meal, setMeal] = useState("Bowl");
+  /*
+  // TODO: define selected meal in menu page & store in local memory
+  useEffect(() => {
+    // Retrieve selected meal data from local storage
+    const storedEmployee = localStorage.getItem('selectedMeal');
+    if (selectedMeal) {
+      setMeal(JSON.parse(selectedMeal));
+  } }, []); */
   const [numEntrees, setNumEntrees] = useState(null);
   const [selectedSides, setSelectedSides] = useState([]);
   const [selectedEntrees, setSelectedEntrees] = useState([]);
