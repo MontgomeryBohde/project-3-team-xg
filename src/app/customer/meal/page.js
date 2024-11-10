@@ -132,27 +132,28 @@ const canAddEntree = () => {
         <section className="section">
           <h2>Sides</h2>
           <h4>Select 1</h4>
-          <div className="button-grid">
+          <div className="row row-cols-3 g-3"> {/* Bootstrap grid layout with gaps */}
             {sides.map((item, index) => {
-              const isSelected = selectedSides.includes(item); // Check if item is selected
+              const isSelected = selectedSides.includes(item);
               return (
-                <button
-                  key={index}
-                  className={`item-button ${isSelected ? "selected" : ""}`}
-                  onClick={() => {
-                    if (!isSelected) {
-                      // Only allow selection if no side is selected yet
-                      if (selectedSides.length < 1) {
+                <div key={index} className="col">
+                  <button
+                    className={`btn btn-outline-secondary w-100 h-100 ${isSelected ? "btn-selected" : ""}`}
+                    onClick={() => {
+                      if (!isSelected) {
+                        // Only allow selection if no side is selected yet
+                        if (selectedSides.length < 1) {
+                          handlePressed(item, "Side");
+                        }
+                      } else {
+                        // Unselect the side if it's already selected
                         handlePressed(item, "Side");
                       }
-                    } else {
-                      // Unselect the side if it's already selected
-                      handlePressed(item, "Side");
-                    }
-                  }}
-                >
-                  {item}
-                </button>
+                    }}
+                  >
+                    {item}
+                  </button>
+                </div>
               );
             })}
           </div>
@@ -161,13 +162,13 @@ const canAddEntree = () => {
         <section className="section">
           <h2>Entrees</h2>
           <h4>Select {numEntrees}</h4>
-          <div className="button-grid">
+          <div className="row row-cols-3 g-3"> {/* Bootstrap grid layout with gaps */}
             {entrees.map((item, index) => {
-              const isSelected = selectedEntrees.includes(item); // Check if item is selected
+              const isSelected = selectedEntrees.includes(item);
               return (
-                <div key={index} className="item-container">
+                <div key={index} className="col">
                   <button
-                    className={`item-button ${isSelected ? "selected" : ""}`}
+                    className={`btn btn-outline-secondary w-100 h-100 ${isSelected ? "btn-selected" : ""}`}
                     onClick={() => {
                       if (!isSelected && selectedEntrees.length < numEntrees) {
                         handlePressed(item, "Entree");
@@ -180,9 +181,10 @@ const canAddEntree = () => {
                   </button>
                   {isSelected && numEntrees > 1 && (
                     <div className="quantity-slider">
-                      <button onClick={() => handleQuantityChange(item, -1)}>-</button>
-                      <span>{1}</span> {/* Default to 1 if no quantity management needed */}
+                      <button className="btn btn-outline-secondary" onClick={() => handleQuantityChange(item, -1)}>-</button>
+                      <span>{1}</span>
                       <button
+                        className="btn btn-outline-secondary"
                         onClick={() =>
                           selectedEntrees.length < numEntrees && handleQuantityChange(item, 1)
                         }
@@ -222,7 +224,7 @@ const canAddEntree = () => {
                 {selectedEntrees.map((entree, index) => (
                   <li key={index}>
                     {entree}
-                  </li>
+                    </li>
                 ))}
               </ul>
             ) : (
