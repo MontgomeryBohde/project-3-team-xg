@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FaUtensils, FaShoppingCart, FaDrumstickBite, FaCarrot, FaConciergeBell, FaGlassCheers, FaGift, FaTruck } from "react-icons/fa";
 import Link from "next/link";
-import './mealselection.css';
+import './menuselection.css';
 
 const MealSelectionPage = () => {
     
