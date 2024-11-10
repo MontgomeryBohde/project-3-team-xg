@@ -1,142 +1,302 @@
-// src/app/employee/order/page.js
-"use client";
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import "./order.css";
+// Page.js
+'use client';
+import './order.css';
+import 'bootstrap/dist/css/bootstrap.css';
+import React, { useState, useEffect } from 'react';
+import MealTypes from '@/components/ui/employee/cashier/order/MealTypes';
+import FoodTypes from '@/components/ui/employee/cashier/order/FoodTypes';
+import Cart from '@/components/ui/employee/cashier/order/Cart';
+import EntreeAndSideMenu from '@/components/ui/employee/cashier/order/EntreeAndSideMenu';
+import Link from 'next/link';
+
+const menuItems = {
+    appetizers: [
+        { name: "Chicken Egg Roll", sizes: [{ size: "Small", price: 2.50 }, { size: "Large", price: 4.00 }] },
+        { name: "Veggie Spring Roll", sizes: [{ size: "Small", price: 2.00 }, { size: "Large", price: 3.50 }] },
+        { name: "Cream Cheese Rangoon", sizes: [{ size: "Small", price: 1.95 }, { size: "Large", price: 3.25 }] },
+        { name: "Chicken Potsticker", sizes: [{ size: "Small", price: 2.75 }, { size: "Large", price: 4.50 }] }
+    ],
+    entrees: [
+        { name: "Orange Chicken", price: 6.00 },
+        { name: "Kung Pao Chicken", price: 6.50 },
+        { name: "Broccoli Beef", price: 7.00 },
+        { name: "Grilled Teriyaki Chicken", price: 6.25 }
+    ],
+    sides: [
+        { name: "Chow Mein", price: 3.50 },
+        { name: "Fried Rice", price: 3.75 },
+        { name: "White Steamed Rice", price: 3.00 },
+        { name: "Super Greens", price: 3.25 }
+    ],
+    drinks: [
+        { name: "Soft Drink", price: 1.95 },
+        { name: "Bottled Water", price: 1.50 }
+    ]
+};
 
 const mealTypes = [
-    { name: "Bowl", sides: 1, entrees: 1 },
-    { name: "Plate", sides: 1, entrees: 2 },
-    { name: "Bigger Plate", sides: 1, entrees: 3 },
-    { name: "Cub Meal", sides: 1, entrees: 1 },
-    { name: "Family Meal", sides: 2, entrees: 3 }
+    { name: "Bowl", sides: 1, entrees: 1, price: 8.30 },
+    { name: "Plate", sides: 1, entrees: 2, price: 10.00 },
+    { name: "Bigger Plate", sides: 1, entrees: 3, price: 11.75 },
+    { name: "Cub Meal", sides: 1, entrees: 1, price: 6.00 },
+    { name: "Family Meal", sides: 2, entrees: 3, price: 32.00 }
 ];
-const entrees = [
-    "Orange Chicken", "Grilled Teriyaki Chicken", "Broccoli Beef",
-    "Kung Pao Chicken", "Honey Sesame Chicken Breast", "Beijing Beef",
-    "Mushroom Chicken", "Sweetfire Chicken Breast", "String Bean Chicken Breast",
-    "Black Pepper Chicken", "Black Pepper Sirloin Steak", "Honey Walnut Shrimp"
-];
-const sides = ["Chow Mein", "Fried Rice", "White Steamed Rice", "Super Greens"];
+
+const foodTypes = ["Appetizers", "Entrees & Sides", "Drinks"];
 
 const OrderPage = () => {
-    const router = useRouter();
-    const [selectedMeal, setSelectedMeal] = useState(null);
-    const [order, setOrder] = useState([]);
-    const [selectedSides, setSelectedSides] = useState([]);
-    const [selectedEntrees, setSelectedEntrees] = useState([]);
+    const [selectedMealType, setSelectedMealType] = useState(null);
+    const [cart, setCart] = useState([]);
+    const [currentMenu, setCurrentMenu] = useState('main');
+    const [entreeCount, setEntreeCount] = useState(0);
+    const [sideCount, setSideCount] = useState(0);
+    const [selectedAppetizer, setSelectedAppetizer] = useState(null);
+    const [warningMessage, setWarningMessage] = useState('');
 
-    const handleLogout = () => {
-        router.push("/employee/login");
+    useEffect(() => {
+        import('bootstrap/dist/js/bootstrap.bundle.min.js');
+        // Retrieve cart items from local storage
+        const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
+        setCart(storedCart);
+    }, []);
+
+    useEffect(() => {
+        // Save cart items to local storage whenever it changes
+        localStorage.setItem('cart', JSON.stringify(cart));
+    }, [cart]);
+
+    // Add item to cart
+    const handleAddToCart = (item, size = null) => {
+        setCart([...cart, { ...item, size, quantity: 1 }]);
+        setCurrentMenu('main');
     };
 
-    const handleMealTypeClick = (mealType) => {
-        setSelectedMeal(mealType);
-        setSelectedSides([]);
-        setSelectedEntrees([]);
+    // Add meal to cart with size
+    const handleAddMealToCart = (mealType) => {
+        setCart([...cart, { ...mealType, items: [], quantity: 1 }]);
+        setSelectedMealType(mealType);
+        setEntreeCount(0);
+        setSideCount(0);
+        setWarningMessage('');
+        setCurrentMenu('entreeAndSide');
     };
 
-    const handleEntreeClick = (entree) => {
-        if (selectedEntrees.length < selectedMeal.entrees) {
-            setSelectedEntrees((prev) => [...prev, entree]);
-            setOrder((prevOrder) => [...prevOrder, { name: entree, price: "0" }]);
+    // Add entree or side to the current meal
+    const handleAddToCurrentMeal = (item, type) => {
+        const updatedCart = [...cart];
+        const currentMealIndex = updatedCart.length - 1;
+
+        if (type === 'entree' && selectedMealType && entreeCount < selectedMealType.entrees) {
+            updatedCart[currentMealIndex].items.push(item);
+            setEntreeCount(entreeCount + 1);
+            if (entreeCount + 1 === selectedMealType.entrees && sideCount === selectedMealType.sides) {
+                setCurrentMenu('main');
+            }
+        } else if (type === 'side' && selectedMealType && sideCount < selectedMealType.sides) {
+            updatedCart[currentMealIndex].items.push(item);
+            setSideCount(sideCount + 1);
+            if (sideCount + 1 === selectedMealType.sides && entreeCount === selectedMealType.entrees) {
+                setCurrentMenu('main');
+            }
+        } else {
+            setWarningMessage('You cannot add more items than allowed for this meal type.');
+            return;
         }
+
+        setCart(updatedCart);
     };
 
-    const handleSideClick = (side) => {
-        if (selectedSides.length < selectedMeal.sides) {
-            setSelectedSides((prev) => [...prev, side]);
-            setOrder((prevOrder) => [...prevOrder, { name: side, price: "0" }]);
-        }
+    // Render the detailed menu for entrees or sides
+    const handleEntreeOrSideSelection = (mealType) => {
+        handleAddMealToCart(mealType);
     };
 
-    const handleBackClick = () => {
-        setSelectedMeal(null);
-        setOrder([]);
+    // Render the detailed menu for appetizers
+    const handleAppetizerSelection = () => {
+        setCurrentMenu('appetizer');
+    };
+
+    // Handle selecting an appetizer size
+    const handleAppetizerSizeSelection = (appetizer, size) => {
+        handleAddToCart({ name: `${appetizer.name} (${size.size})`, price: size.price });
+    };
+
+    // Render the detailed menu for drinks
+    const handleDrinkSelection = () => {
+        setCurrentMenu('drink');
+    };
+
+    // Handle quantity change
+    const handleQuantityChange = (index, quantity) => {
+        const updatedCart = [...cart];
+        updatedCart[index].quantity = quantity || 1;
+        setCart(updatedCart);
+    };
+
+    // Handle removing an item from the cart
+    const handleRemoveItem = (index) => {
+        const updatedCart = cart.filter((_, i) => i !== index);
+        setCart(updatedCart);
     };
 
     return (
-        <div className="order-container">
-            <header className="header">
-                <span>Name: &lt;Cashier Name logged in&gt;</span>
-                <button className="logout-button" onClick={handleLogout}>Logout</button>
-            </header>
-
-            <div className="main-content">
-                {selectedMeal ? (
-                    <div className="detailed-menu">
-                        <button className="back-button" onClick={handleBackClick}>Back</button>
-                        <h2>{selectedMeal.name}</h2>
-                        <p>Description of the inclusions</p>
-                        
-                        <div className="menu-category">
-                            <h3>Entree</h3>
-                            <p>Choose up to {selectedMeal.entrees} entree(s)</p>
-                            <div className="menu-grid">
-                                {entrees.map((entree) => (
-                                    <button 
-                                        key={entree} 
-                                        className="menu-button" 
-                                        onClick={() => handleEntreeClick(entree)}
-                                        disabled={selectedEntrees.includes(entree) || selectedEntrees.length >= selectedMeal.entrees}
-                                    >
-                                        {entree}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                        
-                        <div className="menu-category">
-                            <h3>Side</h3>
-                            <p>Choose up to {selectedMeal.sides} side(s)</p>
-                            <div className="menu-grid">
-                                {sides.map((side) => (
-                                    <button 
-                                        key={side} 
-                                        className="menu-button" 
-                                        onClick={() => handleSideClick(side)}
-                                        disabled={selectedSides.includes(side) || selectedSides.length >= selectedMeal.sides}
-                                    >
-                                        {side}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
+        <div className="page-container">
+            {warningMessage && <div className="alert alert-warning warning-message">{warningMessage}</div>}
+            {currentMenu === 'main' && (
+                <div className="main-menu">
+                    <div className="mb-4">
+                        <MealTypes mealTypes={mealTypes} onMealTypeClick={handleEntreeOrSideSelection} />
                     </div>
-                ) : (
-                    <div className="meal-types">
-                        <h3>Meal Types</h3>
-                        <div className="menu-grid">
-                            {mealTypes.map((meal) => (
-                                <button 
-                                    key={meal.name} 
-                                    className="menu-button" 
-                                    onClick={() => handleMealTypeClick(meal)}
-                                >
-                                    {meal.name}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                {/* Order Summary */}
-                <div className="order-summary">
-                    <h3>Order</h3>
-                    {order.map((item, index) => (
-                        <div key={index} className="order-item">
-                            <span>{item.name}</span> <span>${item.price}</span>
-                        </div>
-                    ))}
-                    <div className="order-summary-footer">
-                        <div className="summary-line">Subtotal <span>$0</span></div>
-                        <div className="summary-line">Discount <span>$0</span></div>
-                        <div className="summary-line">Tax <span>$0</span></div>
-                        <div className="summary-line total">Total <span>$0.00</span></div>
-                        <button className="confirm-button">Confirm Order</button>
+                    <div>
+                        <FoodTypes 
+                            foodItems={foodTypes} 
+                            onFoodTypeClick={(food) => {
+                                if (food === "Appetizers") {
+                                    handleAppetizerSelection();
+                                } else if (food === "Drinks") {
+                                    handleDrinkSelection();
+                                } else if (food === "Entrees & Sides") {
+                                    handleEntreeOrSideSelection(mealTypes[0]); // Use the first meal type for simplicity
+                                }
+                            }}
+                        />
                     </div>
                 </div>
-            </div>
+            )}
+            
+            {currentMenu === 'entreeAndSide' && selectedMealType && (
+                <div className="menu-container">
+                    <h3>Entrees & Sides</h3>
+                    <div className="row">
+                        <div className="col-md-6 entree-section">
+                            <div className="card mb-4">
+                                <div className="card-body">
+                                    <h4 className="card-title">Entrees</h4>
+                                    {menuItems.entrees.map((entree) => (
+                                        <button 
+                                            key={entree.name} 
+                                            className="btn btn-outline-primary menu-button mb-2 w-100"
+                                            onClick={() => handleAddToCurrentMeal(entree, 'entree')}
+                                        >
+                                            {entree.name}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                        <div className="col-md-6 side-section">
+                            <div className="card mb-4">
+                                <div className="card-body">
+                                    <h4 className="card-title">Sides</h4>
+                                    {menuItems.sides.map((side) => (
+                                        <button 
+                                            key={side.name} 
+                                            className="btn btn-outline-primary menu-button mb-2 w-100"
+                                            onClick={() => handleAddToCurrentMeal(side, 'side')}
+                                        >
+                                            {side.name}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button onClick={() => setCurrentMenu('main')} className="btn btn-secondary back-button mt-3">Back</button>
+                </div>
+            )}
+            
+            {currentMenu === 'appetizer' && (
+                <div className="container">
+                    <div className="row justify-content-center">
+                        <div className="col-md-8">
+                            <div className="card mb-4">
+                                <div className="card-body">
+                                    <h4 className="card-title">Appetizers</h4>
+                                    {menuItems.appetizers.map((item) => (
+                                        <button
+                                            key={item.name}
+                                            className="btn btn-outline-primary menu-button mb-2 w-100"
+                                            onClick={() => {
+                                                setSelectedAppetizer(item);
+                                                setCurrentMenu('appetizerSizeSelection');
+                                            }}
+                                        >
+                                            {item.name}
+                                        </button>
+                                    ))}
+                                    <button className="btn btn-secondary" onClick={() => setCurrentMenu('main')}>Back</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {currentMenu === 'appetizerSizeSelection' && selectedAppetizer && (
+                <div className="container">
+                    <div className="row justify-content-center">
+                        <div className="col-md-6">
+                            <div className="card mb-4">
+                                <div className="card-body">
+                                    <h4 className="card-title">Select Size for {selectedAppetizer.name}</h4>
+                                    {selectedAppetizer.sizes.map((size) => (
+                                        <button
+                                            key={size.size}
+                                            className="btn btn-outline-success menu-button mb-2 w-100"
+                                            onClick={() => handleAppetizerSizeSelection(selectedAppetizer, size)}
+                                        >
+                                            {size.size}
+                                        </button>
+                                    ))}
+                                    <button className="btn btn-secondary" onClick={() => setCurrentMenu('appetizer')}>Back</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            
+            {currentMenu === 'drink' && (
+                <div className="menu-container">
+                    <h3>Drinks</h3>
+                    <div className="row">
+                        {menuItems.drinks.map((drink) => (
+                            <div className="col-md-6 mb-3" key={drink.name}>
+                                <button 
+                                    className="btn btn-outline-primary menu-button w-100"
+                                    onClick={() => handleAddToCart(drink)}
+                                >
+                                    {drink.name}
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                    <button onClick={() => setCurrentMenu('main')} className="btn btn-secondary back-button mt-3">Back</button>
+                </div>
+            )}
+
+            <Cart 
+                cartItems={cart} 
+                showQuantityControls={currentMenu === 'main'} 
+                handleQuantityChange={(index, quantity) => {
+                    const updatedCart = [...cart];
+                    updatedCart[index].quantity = quantity || 1;
+                    setCart(updatedCart);
+                }} 
+                handleRemoveItem={(index) => {
+                    const updatedCart = cart.filter((_, i) => i !== index);
+                    setCart(updatedCart);
+                }}
+            />
+
+            {cart.length > 0 && currentMenu === 'main' && (
+                <div className="checkout-button-container mt-4">
+                    <Link href={{ pathname: "/employee/cashier/order/confirmation", query: { cart: JSON.stringify(cart) } }}>
+                        <button className="btn btn-success">Check Out</button>
+                    </Link>
+                </div>
+            )}
+
         </div>
     );
 };
