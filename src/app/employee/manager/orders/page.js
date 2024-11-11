@@ -6,7 +6,7 @@ import OrderCard from './OrderCard';
 const OrderInfo = () => {
     const [orders, setOrders] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const ordersPerPage = 3;
+    const numPerPage = 4;
 
     const getOrders = async () => {
         try {
@@ -15,7 +15,7 @@ const OrderInfo = () => {
                 throw new Error(`Error: ${response.status}`);
             }
             const data = await response.json();
-            console.log(data);  // Log the data here to verify if meal_type is included
+          //  console.log(data); 
             setOrders(data);
         } catch (error) {
             console.error("Failed to fetch orders:", error);
@@ -27,12 +27,12 @@ const OrderInfo = () => {
         getOrders();
     }, []);
 
-    const indexOfLastOrder = currentPage * ordersPerPage;
-    const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+    const indexOfLastOrder = currentPage * numPerPage;
+    const indexOfFirstOrder = indexOfLastOrder - numPerPage;
     const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
 
     const nextPage = () => {
-        if (currentPage < Math.ceil(orders.length / ordersPerPage)) {
+        if (currentPage < Math.ceil(orders.length / numPerPage)) {
             setCurrentPage(currentPage + 1);
         }
     };
@@ -55,12 +55,12 @@ const OrderInfo = () => {
                 <button onClick={prevPage} disabled={currentPage === 1}> 
                     Previous Page
                 </button>
-                <button onClick={nextPage} disabled={currentPage === Math.ceil(orders.length / ordersPerPage)}>
+                <button onClick={nextPage} disabled={currentPage === Math.ceil(orders.length / numPerPage)}>
                     Next Page
                 </button>
             </div>
             <div className="page-info">
-                <p>Page {currentPage} of {Math.ceil(orders.length / ordersPerPage)}</p>
+                <p>Page {currentPage} of {Math.ceil(orders.length / numPerPage)}</p>
             </div>
         </div>
     );

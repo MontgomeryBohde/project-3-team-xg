@@ -1,22 +1,18 @@
-/* Title Styling */
+
 .title {
     text-align: center;  
     margin-top: 19px;  
     margin-bottom: 19px; 
     font-size: 3rem;  
     font-weight: bold;
-    color: #333;  /* Ensure good contrast */
+    color: #333; 
 }
-
-/* Page Buttons Layout */
 .page-buttons {
     display: flex;
     justify-content: center;
     margin-top: 20px;
     gap: 10px;
 }
-
-/* Button Styling */
 .page-buttons button {
     padding: 7px 12px;
     background-color: #4eaac9;
@@ -24,34 +20,33 @@
     border-radius: 4px;
     color: white;
     cursor: pointer;
-    font-size: 1rem;  /* To ensure consistency in text size */
-    transition: background-color 0.3s ease; /* Smooth color transition */
+    font-size: 1rem;  
+    transition: background-color 0.3s ease; 
 }
 
-/* Button Hover Effect */
+
 .page-buttons button:hover {
     background-color: #3fa945;
 }
 
-/* Disabled Button */
 .page-buttons button:disabled {
     cursor: not-allowed; 
     background-color: #cccccc;
 }
 
-/* Optional: Responsive Styling */
+
 @media (max-width: 768px) {
     .title {
-        font-size: 2rem;  /* Adjust font size for smaller screens */
+        font-size: 2rem;
     }
 
     .page-buttons {
         flex-direction: column;
-        gap: 15px;  /* Adjust gap on smaller screens */
+        gap: 15px; 
     }
 
     .page-buttons button {
-        width: 100%;  /* Make buttons full width on mobile */
-        font-size: 1.2rem;  /* Slightly larger font for better touch usability */
+        width: 100%; 
+        font-size: 1.2rem; 
     }
 }

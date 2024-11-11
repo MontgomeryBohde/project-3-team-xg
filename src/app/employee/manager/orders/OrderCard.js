@@ -4,21 +4,21 @@ const OrderCard = ({ order }) => {
     const totalAmount = typeof order.total === 'number' && !isNaN(order.total) ? order.total : 0;
 
     return (
-        <div className="card mb-3">
+        <div className="card mb-3" style={{ backgroundColor: '#ADD8E4' }}> 
             <div className="card-body">
                 <div className="d-flex justify-content-between align-items-center">
-                    {/* Left section (Order ID) */}
+                    {/*LEFT*/}
                     <div className="text-left">
                         <span className="h5">Order ID: {order.id}</span>
                     </div>
 
-                    {/* Center section (Meal Type, Side, Entrees) */}
+                    {/*MID*/}
                     <div className="text-center">
-                        {/* Meal Type Section */}
+                        {/*Meal Type*/}
                         <div className="fs-4 fw-bold">Meal Type:</div>
-                        <div className="fs-4">{order.meal_type || 'None'}</div>
+                        <div className="fs-4">{order.meal_type || 'N/A'}</div>
 
-                        {/* Sides Section - Placed above Entrees */}
+                        {/* Sides*/}
                         {order.side && (
                             <div className="mt-3">
                                 <div className="fs-4 fw-bold mt-2">Side(s):</div>
@@ -26,33 +26,33 @@ const OrderCard = ({ order }) => {
                             </div>
                         )}
 
-                        {/* Entrees Section */}
+                        {/*Entrees and Food Items*/}
                         <div className="mt-3">
-                            <div className="fs-4 fw-bold mt-2">Entrees/Food Items:</div>
+                            <div className="fs-4 fw-bold mt-2">Entree(s):</div>
                             
-                            {/* Display entree names if they exist */}
+                          
                             {Array.isArray(order.entree_names) && order.entree_names.length > 0 ? (
                                 order.entree_names.map((entree, index) => (
-                                    <div key={index} className="fs-5">{entree}</div> // Displaying each entree name
+                                    <div key={index} className="fs-5">{entree}</div> 
                                 ))
                             ) : (
-                                <div className="fs-5"></div> // If no entree names, display "N/A"
+                                <div className="fs-5">N/A</div> //If no entree name "N/A"
                             )}
 
-                            {/* Display side food names (food_names) if they exist */}
+                            {/*Food names*/}
                             {Array.isArray(order.food_names) && order.food_names.length > 0 ? (
                                 order.food_names.map((food, index) => (
-                                    <div key={index} className="fs-5">{food}</div> // Displaying each side food name
+                                    <div key={index} className="fs-5">{food}</div> 
                                 ))
-                            ) : null} {/* If no food names, nothing is displayed */}
+                            ) : null} 
                         </div>
                     </div>
 
-                    {/* Right section (Price and Date/Time) */}
+                    {/*RIGHT*/}
                     <div className="text-right">
                         <strong className="fs-5">Total:</strong> <span className="fs-5">${parseFloat(order.total).toFixed(2)}</span>
                         <div className="fs-5">
-                            {/* Order Date/Time */}
+                            {/*Date/Time*/}
                             <span>{new Date(order.time).toLocaleString()}</span>
                         </div>
                     </div>
