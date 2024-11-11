@@ -39,12 +39,12 @@ export default async function handler(req, res) {
         const result = await client.query(query, values);
         console.log("Fetched prices:", result.rows); 
 
-        // Organizing by food_name and size
+       
         const prices = result.rows.reduce((acc, row) => {
             if (!acc[row.name]) {
                 acc[row.name] = {};
             }
-            acc[row.name][row.size] = row.price; // Updated row.food_name to row.name
+            acc[row.name][row.size] = row.price; 
             return acc;
         }, {});
 

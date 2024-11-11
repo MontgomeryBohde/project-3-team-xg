@@ -9,9 +9,9 @@ const CartPage = () => {
     const [loading, setLoading] = useState(true);
     const [promoCode, setPromoCode] = useState("");
     const [discount, setDiscount] = useState(0);
-    const [taxRate] = useState(0.08); // using 8% tax rate
+    const [taxRate] = useState(0.08); 
 
-    // Catering prices (hardcoded)
+    //Catering prices (hardcoded)
     const specialDealPrices = {
         "Party Size Side": 16.00,
         "12-16 Person Party Bundle": 108.00,
@@ -19,7 +19,7 @@ const CartPage = () => {
         "26-30 Person Party Bundle": 194.00
     };
 
-    // Check for 50% off deal
+   //50% off deal
     const isFiftyPercentOff = cart.some(item => item.name.toLowerCase().includes("50 percent off"));
 
     useEffect(() => {
@@ -48,7 +48,7 @@ const CartPage = () => {
 
     const calculateSubtotal = () => {
         return cart.reduce((total, item) => {
-            // Check if it's a special deal (catered items) or regular item
+            
             const itemPrice = prices[item.name]?.[item.size] || specialDealPrices[item.name] || 0;
             return total + (itemPrice * item.quantity);
         }, 0);
@@ -58,21 +58,20 @@ const CartPage = () => {
 
     const handleApplyPromoCode = () => {
         if (promoCode === "SAVE10") {
-            setDiscount(subtotal * 0.1); // 10% discount code
+            setDiscount(subtotal * 0.1); 
         } else {
             alert("Invalid promo code");
             setDiscount(0);
         }
     };
 
-    // Apply automatic 50% off deal if it's in the cart
     const automaticDiscount = isFiftyPercentOff ? subtotal * 0.5 : 0;
 
-    // Tax and total calculation
+    //taxes and total calculation
     const tax = subtotal * taxRate;
     const total = subtotal - discount - automaticDiscount + tax;
 
-    // Change quantity in cart
+    //can update the quanitity in the cart 
     const updateQuantity = (index, change) => {
         const updatedCart = cart.map((item, i) => {
             if (i === index) {
@@ -87,14 +86,14 @@ const CartPage = () => {
         localStorage.setItem("cart", JSON.stringify(updatedCart));
     };
 
-    // Remove item from the cart
+    //remove item from cart button
     const removeItemFromCart = (index) => {
         const updatedCart = cart.filter((_, i) => i !== index); // Remove item by index
         setCart(updatedCart);
         localStorage.setItem("cart", JSON.stringify(updatedCart));
     };
 
-    // Clear the cart
+    //clear cart button
     const handleClearCart = () => {
         setCart([]);
         localStorage.removeItem("cart");
