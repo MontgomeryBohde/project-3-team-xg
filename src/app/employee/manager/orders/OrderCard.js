@@ -3,10 +3,10 @@ import { useState } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 
 const OrderCard = ({ order }) => {
+    console.log(order); // Add this to see what the order object looks like
     const [showPopup, setShowPopup] = useState(false);
     const totalAmount = typeof order.total === 'number' && !isNaN(order.total) ? order.total : 0;
 
-    // Handle opening and closing the popup
     const handleOpenPopup = () => setShowPopup(true);
     const handleClosePopup = () => setShowPopup(false);
 
@@ -58,6 +58,7 @@ const OrderCard = ({ order }) => {
                             <div className="fs-5">
                                 <span>{new Date(order.time).toLocaleString()}</span>
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -85,6 +86,9 @@ const OrderCard = ({ order }) => {
                     <p><strong>Total:</strong> ${parseFloat(order.total).toFixed(2)}</p>
                     <p><strong>Discounts:</strong> {order.discounts || 0}</p>
                     <p><strong>Date/Time:</strong> {new Date(order.time).toLocaleString()}</p>
+
+                    {/* Show Payment Method in Popup */}
+                    <p><strong>Payment Method:</strong> {order.payment_method || 'N/A'}</p>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleClosePopup}>Close</Button>

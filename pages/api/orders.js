@@ -16,6 +16,7 @@ export default async function handler(req, res) {
                     o.id AS order_id,
                     o.order_time,
                     o.order_total,
+                    o.payment_method,  -- Added payment method from the orders table
 
                     -- Retrieve all food item names associated with this order
                     ARRAY(
@@ -51,9 +52,8 @@ export default async function handler(req, res) {
                 LEFT JOIN meal_items AS m ON m.id = ANY(o.meal_item_ids)
                 LEFT JOIN menu_items AS side ON side.id = m.side_id
                 ORDER BY o.order_time DESC
-                LIMIT 100;
+                LIMIT 100;`
 
-            `; 
 
             const { rows } = await pool.query(query);
 
@@ -77,7 +77,8 @@ export default async function handler(req, res) {
                         food_names: row.food_names || [],  
                         entree_names: row.entree_names || [],  
                         total: parseFloat(row.order_total).toFixed(2),
-                        meal_type: row.meal_type || null
+                        meal_type: row.meal_type || null,
+                        payment_method: row.payment_method || null
                     });
                 }
                 return acc;
