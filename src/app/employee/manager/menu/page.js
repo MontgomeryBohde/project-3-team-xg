@@ -29,6 +29,13 @@ export default function Menu() {
         setSelectedItem(category);
     };
 
+    const handleNavigation = (sectionId) => {
+        const section = document.getElementById(sectionId);
+        if (section) {
+            section.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+
     const addItem = () => {
         // Add the new item to the correct array based on the selected category
         switch (itemCategory) {
@@ -96,67 +103,81 @@ export default function Menu() {
 
     return (
         <div className="menu-container">
+
+            {/* Navigation Bar */}
+            <nav className="navbar">
+                <ul className="nav-list">
+                    <li className = "nav-btn"  onClick={() => handleNavigation('entrees')}>Entrees</li>
+                    <li className = "nav-btn" onClick={() => handleNavigation('sides')}>Sides</li>
+                    <li className = "nav-btn" onClick={() => handleNavigation('appetizers')}>Appetizers</li>
+                    <li className = "nav-btn" onClick={() => handleNavigation('drinks')}>Drinks</li>
+                    <li className = "nav-btn" onClick={() => handleNavigation('seasonal')}>Seasonal</li>
+                </ul>
+            </nav>
+
             <h1>Menu</h1>
 
-            <section className="section">
-                <h2>Entrees</h2>
-                <div className="button-grid">
-                    {entrees.map((item, index) => (
-                        <button key={index} className="item-button" onClick={() => handlePopup(item, "Entree")}>
-                            {item}
-                        </button>
-                    ))}
-                </div>
-                <button className="item-button" onClick={() => handlePopup("", "Entree")}> Add New Item </button>
-            </section>
+            <div className="content">
+                <section id="entrees" className="section">
+                    <h2>Entrees</h2>
+                    <div className="button-grid">
+                        {entrees.map((item, index) => (
+                            <button key={index} className="item-button" onClick={() => handlePopup(item, "Entree")}>
+                                {item}
+                            </button>
+                        ))}
+                    </div>
+                    <button className="item-button" onClick={() => handlePopup("", "Entree")}> Add New Item </button>
+                </section>
 
-            <section className="section">
-                <h2>Sides</h2>
-                <div className="button-grid">
-                    {sides.map((item, index) => (
-                        <button key={index} className="item-button" onClick={() => handlePopup(item, "Side")}>
-                            {item}
-                        </button>
-                    ))}
-                </div>
-                <button className="item-button" onClick={() => handlePopup("", "Side")}> Add New Item </button>
-            </section>
+                <section id="sides" className="section">
+                    <h2>Sides</h2>
+                    <div className="button-grid">
+                        {sides.map((item, index) => (
+                            <button key={index} className="item-button" onClick={() => handlePopup(item, "Side")}>
+                                {item}
+                            </button>
+                        ))}
+                    </div>
+                    <button className="item-button" onClick={() => handlePopup("", "Side")}> Add New Item </button>
+                </section>
 
-            <section className="section">
-                <h2>Appetizers</h2>
-                <div className="button-grid">
-                    {appetizers.map((item, index) => (
-                        <button key={index} className="item-button" onClick={() => handlePopup(item, "Appetizer")}>
-                            {item}
-                        </button>
-                    ))}
-                </div>
-                <button className="item-button" onClick={() => handlePopup("", "Appetizer")}> Add New Item </button>
-            </section>
+                <section id="appetizers" className="section">
+                    <h2>Appetizers</h2>
+                    <div className="button-grid">
+                        {appetizers.map((item, index) => (
+                            <button key={index} className="item-button" onClick={() => handlePopup(item, "Appetizer")}>
+                                {item}
+                            </button>
+                        ))}
+                    </div>
+                    <button className="item-button" onClick={() => handlePopup("", "Appetizer")}> Add New Item </button>
+                </section>
 
-            <section className="section">
-                <h2>Drinks</h2>
-                <div className="button-grid">
-                    {drinks.map((item, index) => (
-                        <button key={index} className="item-button" onClick={() => handlePopup(item, "Drink")}>
-                            {item}
-                        </button>
-                    ))}
-                </div>
-                <button className="item-button" onClick={() => handlePopup("", "Drink")}> Add New Item </button>
-            </section>
+                <section id="drinks" className="section">
+                    <h2>Drinks</h2>
+                    <div className="button-grid">
+                        {drinks.map((item, index) => (
+                            <button key={index} className="item-button" onClick={() => handlePopup(item, "Drink")}>
+                                {item}
+                            </button>
+                        ))}
+                    </div>
+                    <button className="item-button" onClick={() => handlePopup("", "Drink")}> Add New Item </button>
+                </section>
 
-            <section className="section">
-                <h2>Seasonal</h2>
-                <div className="button-grid">
-                    {seasonal.map((item, index) => (
-                        <button key={index} className="item-button" onClick={() => handlePopup(item, "Seasonal")}>
-                            {item}
-                        </button>
-                    ))}
-                </div>
-                <button className="item-button" onClick={() => handlePopup("", "Seasonal")}> Add New Item </button>
-            </section>
+                <section id="seasonal" className="section">
+                    <h2>Seasonal</h2>
+                    <div className="button-grid">
+                        {seasonal.map((item, index) => (
+                            <button key={index} className="item-button" onClick={() => handlePopup(item, "Seasonal")}>
+                                {item}
+                            </button>
+                        ))}
+                    </div>
+                    <button className="item-button" onClick={() => handlePopup("", "Seasonal")}> Add New Item </button>
+                </section>
+            </div>
 
             {selectedItem && (
                 <div className="popup">
@@ -231,6 +252,7 @@ export default function Menu() {
                     background-color: rgba(0, 0, 0, 0.5);
                     z-index: 999;
                 }
+                
             `}</style>
             
             {selectedItem && <div className="overlay" onClick={() => setSelectedItem(null)} />}
