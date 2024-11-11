@@ -42,12 +42,15 @@ const OrderCard = ({ order }) => {
                                 ) : (
                                     <div className="fs-5">N/A</div>
                                 )}
-
+                                <div className="fs-4 fw-bold mt-2">A La Carte, Appetizers, or Drinks:</div>
                                 {Array.isArray(order.food_names) && order.food_names.length > 0 ? (
                                     order.food_names.map((food, index) => (
                                         <div key={index} className="fs-5">{food}</div>
                                     ))
-                                ) : null}
+
+                                ) :  (
+                                    <div className="fs-5">None</div>
+                                )}
                             </div>
                         </div>
 
@@ -70,19 +73,9 @@ const OrderCard = ({ order }) => {
                     <Modal.Title>Order Details</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <p><strong>Order ID:</strong> {order.id}</p>
-                    <p><strong>Meal Type:</strong> {order.meal_type || 'N/A'}</p>
-                    <p><strong>Side(s):</strong> {order.side || 'N/A'}</p>
-                    <p><strong>Entree(s):</strong></p>
-                    <ul>
-                        {Array.isArray(order.entree_names) && order.entree_names.length > 0 ? (
-                            order.entree_names.map((entree, index) => (
-                                <li key={index}>{entree}</li>
-                            ))
-                        ) : (
-                            <li>N/A</li>
-                        )}
-                    </ul>
+                   
+                    
+                
                     <p><strong>Total:</strong> ${parseFloat(order.total).toFixed(2)}</p>
                     <p><strong>Discounts:</strong> {order.discounts || 0}</p>
                     <p><strong>Date/Time:</strong> {new Date(order.time).toLocaleString()}</p>

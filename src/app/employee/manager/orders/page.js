@@ -7,7 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 const OrderInfo = () => {
     const [orders, setOrders] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const numPerPage = 4;
+    const numPerPage = 3;
 
     const getOrders = async () => {
         try {
