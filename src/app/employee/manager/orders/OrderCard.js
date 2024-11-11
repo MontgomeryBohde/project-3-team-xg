@@ -58,9 +58,7 @@ const OrderCard = ({ order }) => {
                         <div className="text-right">
                             <strong className="fs-5">Total:</strong> 
                             <span className="fs-5">${parseFloat(order.total).toFixed(2)}</span>
-                            <div className="fs-5">
-                                <span>{new Date(order.time).toLocaleString()}</span>
-                            </div>
+                            
 
                         </div>
                     </div>
