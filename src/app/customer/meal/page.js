@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import EmployeeHeader from "@/components/ui/employee/header/EmployeeHeader";
+import CustomerHeader from "@/components/ui/customer/header/CustomerHeader";
 import "bootstrap/dist/css/bootstrap.css"; // Bootstrap is already included
 import "./meal-select.css"; 
 
@@ -126,7 +126,7 @@ const canAddEntree = () => {
 
   return (
     <div>
-      <EmployeeHeader />
+      <CustomerHeader />
       <div className="main-content">
         <h1>Meal: {meal}</h1>
         <section className="section">

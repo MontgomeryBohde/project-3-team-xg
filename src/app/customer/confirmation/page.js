@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from "next/navigation";
 import Head from 'next/head';
-import EmployeeHeader from "@/components/ui/employee/header/EmployeeHeader";
+import CustomerHeader from "@/components/ui/customer/header/CustomerHeader";
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import Image from 'next/image';
@@ -43,7 +43,7 @@ const CashConfirmation = () => {
         <title>Order Confirmed</title>
       </Head>
       <div>
-        <EmployeeHeader />
+        <CustomerHeader />
         <div className="confirm-content">
           <h3>Your Order Number is:</h3>
           <h1>123456</h1>
