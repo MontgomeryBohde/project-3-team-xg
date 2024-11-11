@@ -22,9 +22,16 @@ export default async function handler(req, res) {
         console.log("Database connected successfully");
 
         const query = `
-            SELECT food_name, item_size, price
-            FROM menu_items
-            WHERE food_name = ANY($1)
+            SELECT 
+                menu_items.name, 
+                item_sizes.size, 
+                item_sizes.price
+            FROM 
+                menu_items
+            JOIN 
+                item_sizes ON item_sizes.item_id = menu_items.id  -- Use item_id to join
+            WHERE 
+                menu_items.name = ANY($1);
         `;
 
         const values = [foodNames];
@@ -32,12 +39,12 @@ export default async function handler(req, res) {
         const result = await client.query(query, values);
         console.log("Fetched prices:", result.rows); 
 
-        //organizing by price 
+        // Organizing by food_name and size
         const prices = result.rows.reduce((acc, row) => {
-            if (!acc[row.food_name]) {
-                acc[row.food_name] = {};
+            if (!acc[row.name]) {
+                acc[row.name] = {};
             }
-            acc[row.food_name][row.item_size] = row.price; 
+            acc[row.name][row.size] = row.price; // Updated row.food_name to row.name
             return acc;
         }, {});
 

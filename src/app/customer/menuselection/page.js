@@ -8,7 +8,7 @@ import './menuselection.css';
 const MealSelectionPage = () => {
     
     const entrees = [
-        { name: "Beyond The Original Orange Chicken", image: "/images/beyond-orange-chicken.jpg"},
+        /*{ name: "Beyond The Original Orange Chicken", image: "/images/beyond-orange-chicken.jpg"},*/
         { name: "The Original Orange Chicken", image: "/images/orange-chicken.jpg" },
         { name: "Black Pepper Sirloin Steak", image: "/images/black-pepper-sirloin.jpg" },
         { name: "Honey Walnut Shrimp", image: "/images/honey-walnut-shrimp.jpg" },

@@ -9,9 +9,9 @@ const CartPage = () => {
     const [loading, setLoading] = useState(true);
     const [promoCode, setPromoCode] = useState("");
     const [discount, setDiscount] = useState(0);
-    const [taxRate] = useState(0.08);//use.08 tax rate
+    const [taxRate] = useState(0.08); // using 8% tax rate
 
-    //catered prices, hardcoded
+    // Catering prices (hardcoded)
     const specialDealPrices = {
         "Party Size Side": 16.00,
         "12-16 Person Party Bundle": 108.00,
@@ -19,7 +19,7 @@ const CartPage = () => {
         "26-30 Person Party Bundle": 194.00
     };
 
-    //hardcoded 50% off deal, can change later
+    // Check for 50% off deal
     const isFiftyPercentOff = cart.some(item => item.name.toLowerCase().includes("50 percent off"));
 
     useEffect(() => {
@@ -28,7 +28,7 @@ const CartPage = () => {
 
         const foodNames = savedCart.map(item => item.name);
 
-        fetch('/api/getPrice', { 
+        fetch('/api/getPrice', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -37,7 +37,7 @@ const CartPage = () => {
         })
         .then(response => response.json())
         .then(data => {
-            setPrices(data); 
+            setPrices(data);
             setLoading(false);
         })
         .catch(error => {
@@ -48,7 +48,7 @@ const CartPage = () => {
 
     const calculateSubtotal = () => {
         return cart.reduce((total, item) => {
-            //if catered, use the hardcoded prcie
+            // Check if it's a special deal (catered items) or regular item
             const itemPrice = prices[item.name]?.[item.size] || specialDealPrices[item.name] || 0;
             return total + (itemPrice * item.quantity);
         }, 0);
@@ -58,27 +58,27 @@ const CartPage = () => {
 
     const handleApplyPromoCode = () => {
         if (promoCode === "SAVE10") {
-            setDiscount(subtotal * 0.1);//10% discount code, can also change later if we want
+            setDiscount(subtotal * 0.1); // 10% discount code
         } else {
             alert("Invalid promo code");
             setDiscount(0);
         }
     };
 
-    //apply 50% of deal if its in the cart
+    // Apply automatic 50% off deal if it's in the cart
     const automaticDiscount = isFiftyPercentOff ? subtotal * 0.5 : 0;
 
-   //tax and get total
+    // Tax and total calculation
     const tax = subtotal * taxRate;
     const total = subtotal - discount - automaticDiscount + tax;
 
-    //change the quanitity already in cart
+    // Change quantity in cart
     const updateQuantity = (index, change) => {
         const updatedCart = cart.map((item, i) => {
             if (i === index) {
                 return {
                     ...item,
-                    quantity: Math.max(1, item.quantity + change),
+                    quantity: Math.max(1, item.quantity + change), // ensure quantity is at least 1
                 };
             }
             return item;
@@ -87,7 +87,14 @@ const CartPage = () => {
         localStorage.setItem("cart", JSON.stringify(updatedCart));
     };
 
-    //clear 
+    // Remove item from the cart
+    const removeItemFromCart = (index) => {
+        const updatedCart = cart.filter((_, i) => i !== index); // Remove item by index
+        setCart(updatedCart);
+        localStorage.setItem("cart", JSON.stringify(updatedCart));
+    };
+
+    // Clear the cart
     const handleClearCart = () => {
         setCart([]);
         localStorage.removeItem("cart");
@@ -95,7 +102,6 @@ const CartPage = () => {
 
     return (
         <div className="container">
-           
             <h1 className="text-center my-4">Your Cart</h1>
 
             {cart.length === 0 ? (
@@ -116,11 +122,12 @@ const CartPage = () => {
                                     </span>
                                 )}
                                 <br />
-                                <span>Size: {item.size || "Not selected"}</span>
+                                <span>Size: {item.size || "N/A"}</span>
                             </div>
                             <div className="quantity-controls">
                                 <button onClick={() => updateQuantity(index, 1)} className="btn btn-sm btn-outline-primary">+</button>
                                 <button onClick={() => updateQuantity(index, -1)} className="btn btn-sm btn-outline-secondary">-</button>
+                                <button onClick={() => removeItemFromCart(index)} className="btn btn-sm btn-danger ml-2">Remove</button>
                             </div>
                         </li>
                     ))}
