@@ -7,7 +7,7 @@ const Cart = ({ cartItems, showQuantityControls, handleQuantityChange, handleRem
         <ul>
             {cartItems.map((item, index) => (
                 <li key={index} className="cart-item">
-                    <span>{item.name} - ${item.price.toFixed(2)}</span>
+                    <span>{item.name} - ${item.price ? item.price.toFixed(2) : '0.00'}</span>
                     {showQuantityControls && (
                         <div className="quantity-controls">
                             <button onClick={() => handleQuantityChange(index, Math.max(item.quantity - 1, 1))}>-</button>
@@ -34,7 +34,7 @@ const Cart = ({ cartItems, showQuantityControls, handleQuantityChange, handleRem
                 </li>
             ))}
         </ul>
-        <p>Total: ${cartItems.reduce((total, item) => total + item.price * item.quantity + (item.items ? item.items.reduce((subTotal, subItem) => subTotal + subItem.price, 0) : 0), 0).toFixed(2)}</p>
+        <p>Total: ${cartItems.reduce((total, item) => total + (item.price || 0) * item.quantity + (item.items ? item.items.reduce((subTotal, subItem) => subTotal + (subItem.price || 0), 0) : 0), 0).toFixed(2)}</p>
     </div>
 );
 
