@@ -7,6 +7,7 @@ import MealTypes from '@/components/ui/employee/cashier/order/MealTypes';
 import FoodTypes from '@/components/ui/employee/cashier/order/FoodTypes';
 import Cart from '@/components/ui/employee/cashier/order/Cart';
 import EntreeAndSideMenu from '@/components/ui/employee/cashier/order/EntreeAndSideMenu';
+import EmployeeLogInHeader from "@/components/ui/employee/header/EmployeeLogInHeader";
 import Link from 'next/link';
 
 const menuItems = {
@@ -140,7 +141,9 @@ const OrderPage = () => {
     };
 
     return (
-        <div className="page-container">
+        <div>
+            <EmployeeLogInHeader />
+            <div className="page-container">
             {warningMessage && <div className="alert alert-warning warning-message">{warningMessage}</div>}
             {currentMenu === 'main' && (
                 <div className="main-menu">
@@ -297,6 +300,7 @@ const OrderPage = () => {
                 </div>
             )}
 
+        </div>
         </div>
     );
 };
