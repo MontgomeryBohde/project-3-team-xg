@@ -1,64 +1,96 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useState } from 'react';
+import { Modal, Button } from 'react-bootstrap';
 
 const OrderCard = ({ order }) => {
+    const [showPopup, setShowPopup] = useState(false);
     const totalAmount = typeof order.total === 'number' && !isNaN(order.total) ? order.total : 0;
 
+    // Handle opening and closing the popup
+    const handleOpenPopup = () => setShowPopup(true);
+    const handleClosePopup = () => setShowPopup(false);
+
     return (
-        <div className="card mb-3" style={{ backgroundColor: '#ADD8E4' }}> 
-            <div className="card-body">
-                <div className="d-flex justify-content-between align-items-center">
-                    {/*LEFT*/}
-                    <div className="text-left">
-                        <span className="h5">Order ID: {order.id}</span>
-                    </div>
+        <>
+            {/* Main Order Card */}
+            <div className="card mb-3" style={{ backgroundColor: '#ADD8E4' }} onClick={handleOpenPopup}>
+                <div className="card-body">
+                    <div className="d-flex justify-content-between align-items-center">
+                        {/* LEFT */}
+                        <div className="text-left">
+                            <span className="h5">Order ID: {order.id}</span>
+                        </div>
 
-                    {/*MID*/}
-                    <div className="text-center">
-                        {/*Meal Type*/}
-                        <div className="fs-4 fw-bold">Meal Type:</div>
-                        <div className="fs-4">{order.meal_type || 'N/A'}</div>
+                        {/* MID */}
+                        <div className="text-center">
+                            <div className="fs-4 fw-bold">Meal Type:</div>
+                            <div className="fs-4">{order.meal_type || 'N/A'}</div>
 
-                        {/* Sides*/}
-                        {order.side && (
-                            <div className="mt-3">
-                                <div className="fs-4 fw-bold mt-2">Side(s):</div>
-                                <div className="fs-5">{order.side}</div> {/* Display side name */}
-                            </div>
-                        )}
-
-                        {/*Entrees and Food Items*/}
-                        <div className="mt-3">
-                            <div className="fs-4 fw-bold mt-2">Entree(s):</div>
-                            
-                          
-                            {Array.isArray(order.entree_names) && order.entree_names.length > 0 ? (
-                                order.entree_names.map((entree, index) => (
-                                    <div key={index} className="fs-5">{entree}</div> 
-                                ))
-                            ) : (
-                                <div className="fs-5">N/A</div> //If no entree name "N/A"
+                            {order.side && (
+                                <div className="mt-3">
+                                    <div className="fs-4 fw-bold mt-2">Side(s):</div>
+                                    <div className="fs-5">{order.side}</div>
+                                </div>
                             )}
 
-                            {/*Food names*/}
-                            {Array.isArray(order.food_names) && order.food_names.length > 0 ? (
-                                order.food_names.map((food, index) => (
-                                    <div key={index} className="fs-5">{food}</div> 
-                                ))
-                            ) : null} 
-                        </div>
-                    </div>
+                            <div className="mt-3">
+                                <div className="fs-4 fw-bold mt-2">Entree(s):</div>
+                                {Array.isArray(order.entree_names) && order.entree_names.length > 0 ? (
+                                    order.entree_names.map((entree, index) => (
+                                        <div key={index} className="fs-5">{entree}</div>
+                                    ))
+                                ) : (
+                                    <div className="fs-5">N/A</div>
+                                )}
 
-                    {/*RIGHT*/}
-                    <div className="text-right">
-                        <strong className="fs-5">Total:</strong> <span className="fs-5">${parseFloat(order.total).toFixed(2)}</span>
-                        <div className="fs-5">
-                            {/*Date/Time*/}
-                            <span>{new Date(order.time).toLocaleString()}</span>
+                                {Array.isArray(order.food_names) && order.food_names.length > 0 ? (
+                                    order.food_names.map((food, index) => (
+                                        <div key={index} className="fs-5">{food}</div>
+                                    ))
+                                ) : null}
+                            </div>
+                        </div>
+
+                        {/* RIGHT */}
+                        <div className="text-right">
+                            <strong className="fs-5">Total:</strong> 
+                            <span className="fs-5">${parseFloat(order.total).toFixed(2)}</span>
+                            <div className="fs-5">
+                                <span>{new Date(order.time).toLocaleString()}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+
+            {/*Details Popup*/}
+            <Modal show={showPopup} onHide={handleClosePopup}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Order Details</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p><strong>Order ID:</strong> {order.id}</p>
+                    <p><strong>Meal Type:</strong> {order.meal_type || 'N/A'}</p>
+                    <p><strong>Side(s):</strong> {order.side || 'N/A'}</p>
+                    <p><strong>Entree(s):</strong></p>
+                    <ul>
+                        {Array.isArray(order.entree_names) && order.entree_names.length > 0 ? (
+                            order.entree_names.map((entree, index) => (
+                                <li key={index}>{entree}</li>
+                            ))
+                        ) : (
+                            <li>N/A</li>
+                        )}
+                    </ul>
+                    <p><strong>Total:</strong> ${parseFloat(order.total).toFixed(2)}</p>
+                    <p><strong>Discounts:</strong> {order.discounts || 0}</p>
+                    <p><strong>Date/Time:</strong> {new Date(order.time).toLocaleString()}</p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleClosePopup}>Close</Button>
+                </Modal.Footer>
+            </Modal>
+        </>
     );
 };
 

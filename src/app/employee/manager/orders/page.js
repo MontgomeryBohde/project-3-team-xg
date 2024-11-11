@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import './OrderInfo.css';
 import OrderCard from './OrderCard';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const OrderInfo = () => {
     const [orders, setOrders] = useState([]);

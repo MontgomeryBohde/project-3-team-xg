@@ -17,41 +17,43 @@ export default async function handler(req, res) {
                     o.order_time,
                     o.order_total,
 
-                    
+                    -- Retrieve all food item names associated with this order
                     ARRAY(
-                        SELECT menu_item.food_name
-                        FROM menu_items menu_item
+                        SELECT menu_item.name
+                        FROM menu_items AS menu_item
                         WHERE menu_item.id = ANY(o.menu_item_ids)
                     ) AS food_names,
 
-                   
+                    -- Determine the type of meal for each order
                     CASE
                         WHEN m.id IS NOT NULL THEN m.meal_type
                         ELSE NULL
                     END AS meal_type,
 
+                    -- Retrieve the side name associated with the meal item
                     CASE
-                        WHEN m.side_id IS NOT NULL THEN side.food_name
+                        WHEN m.side_id IS NOT NULL THEN side.name
                         ELSE NULL
                     END AS side_name,
 
+                    -- Retrieve all entree names associated with the meal item
                     CASE
                         WHEN m.entree_ids IS NOT NULL THEN 
                             ARRAY(
-                                SELECT entree.food_name
-                                FROM menu_items entree
+                                SELECT entree.name
+                                FROM menu_items AS entree
                                 WHERE entree.id = ANY(m.entree_ids)
                             )
                         ELSE NULL
                     END AS entree_names
 
-                FROM orders o
-                LEFT JOIN meal_items m ON m.id = ANY(o.meal_item_ids)
-                LEFT JOIN menu_items side ON side.id = m.side_id
-                LEFT JOIN menu_items entree ON entree.id = ANY(m.entree_ids)
+                FROM orders AS o
+                LEFT JOIN meal_items AS m ON m.id = ANY(o.meal_item_ids)
+                LEFT JOIN menu_items AS side ON side.id = m.side_id
                 ORDER BY o.order_time DESC
-                LIMIT 100; --for now because it takes a really long time 
-            `;
+                LIMIT 100;
+
+            `; 
 
             const { rows } = await pool.query(query);
 
