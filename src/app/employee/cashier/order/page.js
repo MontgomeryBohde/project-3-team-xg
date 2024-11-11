@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react';
 import Cart from '@/components/ui/employee/cashier/order/Cart';
 import EmployeeLogInHeader from "@/components/ui/employee/header/EmployeeLogInHeader";
 import Link from 'next/link';
+import Appetizer from '@/components/ui/employee/cashier/order/Appetizer';
 import Entree from '@/components/ui/employee/cashier/order/Entree';
 import Side from '@/components/ui/employee/cashier/order/Side';
 import Drink from '@/components/ui/employee/cashier/order/Drink';
@@ -16,7 +17,6 @@ const OrderPage = () => {
     const [currentMenu, setCurrentMenu] = useState('main');
     const [entreeCount, setEntreeCount] = useState(0);
     const [sideCount, setSideCount] = useState(0);
-    const [selectedAppetizer, setSelectedAppetizer] = useState(null);
     const [warningMessage, setWarningMessage] = useState('');
     const [menuItems, setMenuItems] = useState({
         appetizers: [],
@@ -38,23 +38,20 @@ const OrderPage = () => {
     useEffect(() => {
         const fetchMenuItems = async () => {
             try {
-                const response = await fetch('/api/menu');
+                const response = await fetch('/api/menu_items');
+                if (!response.ok) throw new Error('Failed to fetch menu items');
                 const data = await response.json();
-                if (response.ok) {
-                    setMenuItems({
-                        appetizers: data.menuItems.filter(item => item.category.toLowerCase() === 'appetizer'),
-                        entrees: data.menuItems.filter(item => item.category.toLowerCase() === 'entree'),
-                        sides: data.menuItems.filter(item => item.category.toLowerCase() === 'side'),
-                        drinks: data.menuItems.filter(item => item.category.toLowerCase() === 'drink')
-                    });
-                } else {
-                    console.error('Failed to fetch menu items:', data.error);
-                }
+                setMenuItems({
+                    appetizers: data.menuItems.filter(item => item.category.toLowerCase() === 'appetizer'),
+                    entrees: data.menuItems.filter(item => item.category.toLowerCase() === 'entree'),
+                    sides: data.menuItems.filter(item => item.category.toLowerCase() === 'side'),
+                    drinks: data.menuItems.filter(item => item.category.toLowerCase() === 'drink')
+                });
             } catch (error) {
                 console.error('Error fetching menu items:', error);
+                setWarningMessage('Error fetching menu items. Please try again later.');
             }
         };
-
         fetchMenuItems();
     }, []);
 
@@ -82,7 +79,7 @@ const OrderPage = () => {
         setEntreeCount(0);
         setSideCount(0);
         setWarningMessage('');
-        setCurrentMenu('entreeAndSide');
+        setCurrentMenu('mealSelect');
     };
 
     // Add entree or side to the current meal
@@ -113,24 +110,40 @@ const OrderPage = () => {
     // Handle selecting an item to choose size
     const handleSelectItemForSize = async (item) => {
         try {
-            const response = await fetch(`/api/menu?item_id=${item.id}`);
+            const response = await fetch(`/api/item_sizes?item_id=${item.id}`);
+            if (!response.ok) throw new Error('Failed to fetch item sizes');
+
             const data = await response.json();
+            console.log(`Fetching item sizes for item ID: ${item.id}`);
             console.log('Fetch response:', data);
-        
-            if (response.ok && Array.isArray(data)) {
-                setSelectedItem({ ...item, item_sizes: data.map(item_sizes => ({
-                    size: item_sizes.size,
-                    price: item_sizes.price,
-                    calories: item_sizes.calories
-                })) });
+
+            if (Array.isArray(data) && data.length > 0) {
+                // Set the selected item including its available sizes
+                const updatedItem = {
+                    ...item,
+                    sizes: data.map((item_size) => ({
+                        id: item_size.id,
+                        size: item_size.size,
+                        price: item_size.price,
+                        calories: item_size.calories,
+                    })),
+                };
+                
+                // Update the selected item state
+                setSelectedItem(updatedItem);
+                console.log('Selected item:', updatedItem);
+
+                // Set the current menu to size selection
                 setCurrentMenu('sizeSelection');
             } else {
-                console.error('Failed to fetch item sizes or data format is incorrect:', data?.error || 'Unexpected response format', data);
+                throw new Error('No available sizes found for the selected item');
             }
         } catch (error) {
             console.error('Error fetching item sizes:', error);
-        }        
+            setWarningMessage('No available sizes found for the selected item.');
+        }
     };
+
 
     // Handle adding item with selected size
     const handleAddItemWithSize = (size) => {
@@ -170,14 +183,19 @@ const OrderPage = () => {
                                             key={food} 
                                             className="btn btn-outline-primary w-100 mb-2" 
                                             onClick={() => {
-                                                if (food === 'Appetizers') {
-                                                    setCurrentMenu('appetizer');
-                                                } else if (food === 'Drinks') {
-                                                    setCurrentMenu('drink');
-                                                } else if (food === 'Entrees') {
-                                                    setCurrentMenu('entree');
-                                                } else if (food === 'Sides') {
-                                                    setCurrentMenu('side');
+                                                switch (food) {
+                                                    case 'Appetizers':
+                                                        setCurrentMenu('appetizer');
+                                                        break;
+                                                    case 'Entrees':
+                                                        setCurrentMenu('entree');
+                                                        break;
+                                                    case 'Sides':
+                                                        setCurrentMenu('side');
+                                                        break;
+                                                    case 'Drinks':
+                                                        setCurrentMenu('drink');
+                                                        break;
                                                 }
                                             }}
                                         >
@@ -190,7 +208,7 @@ const OrderPage = () => {
                     </div>
                 )}
                 
-                {currentMenu === 'entreeAndSide' && selectedMealType && (
+                {currentMenu === 'mealSelect' && selectedMealType && (
                     <div className="row">
                         <h3 className="text-center">Entrees & Sides</h3>
                         <div className="col-md-6">
@@ -210,36 +228,27 @@ const OrderPage = () => {
                 )}
 
                 {currentMenu === 'appetizer' && (
-                    <div className="row justify-content-center">
-                        <div className="col-md-8">
-                            <div className="card mb-4">
-                                <div className="card-body">
-                                    <h4 className="card-title text-center">Appetizers</h4>
-                                    {menuItems.appetizers.map((item) => (
-                                        <button
-                                            key={item.id}
-                                            className="btn btn-outline-primary w-100 mb-2"
-                                            onClick={() => handleSelectItemForSize(item)}
-                                        >
-                                            {item.name}
-                                        </button>
-                                    ))}
-                                    <button className="btn btn-secondary w-100" onClick={() => setCurrentMenu('main')}>Back</button>
-                                </div>
-                            </div>
+                    <div className="row">
+                        <h3 className="text-center">Appetizers</h3>
+                        <div className="col">
+                            <Appetizer 
+                                menuItems={menuItems.appetizers}
+                                handleAddToCurrentMeal={(item) => handleSelectItemForSize(item)}
+                            />
                         </div>
+                        <button onClick={() => setCurrentMenu('main')} className="btn btn-secondary mt-3">Back</button>
                     </div>
                 )}
 
                 {currentMenu === 'entree' && (
                     <div className="row">
                         <h3 className="text-center">Entrees</h3>
-                            <div className="col" key={Entree.id}>
-                                <Entree 
-                                    menuItems={menuItems.entrees} 
-                                    handleAddToCurrentMeal={(item) => handleSelectItemForSize(item)}
-                                />
-                            </div>
+                        <div className="col">
+                            <Entree 
+                                menuItems={menuItems.entrees} 
+                                handleAddToCurrentMeal={(item) => handleSelectItemForSize(item)}
+                            />
+                        </div>
                         <button onClick={() => setCurrentMenu('main')} className="btn btn-secondary mt-3">Back</button>
                     </div>
                 )}
@@ -247,12 +256,12 @@ const OrderPage = () => {
                 {currentMenu === 'side' && (
                     <div className="row">
                         <h3 className="text-center">Sides</h3>
-                            <div className="col" key={Side.id}>
-                                <Side 
-                                    menuItems={menuItems.sides} 
-                                    handleAddToCurrentMeal={(item) => handleSelectItemForSize(item)}
-                                />
-                            </div>
+                        <div className="col">
+                            <Side 
+                                menuItems={menuItems.sides} 
+                                handleAddToCurrentMeal={(item) => handleSelectItemForSize(item)}
+                            />
+                        </div>
                         <button onClick={() => setCurrentMenu('main')} className="btn btn-secondary mt-3">Back</button>
                     </div>
                 )}
@@ -260,12 +269,12 @@ const OrderPage = () => {
                 {currentMenu === 'drink' && (
                     <div className="row">
                         <h3 className="text-center">Drinks</h3>
-                            <div className="col" key={Drink}>
-                                <Drink 
-                                    menuItems={menuItems.drinks} 
-                                    handleAddToCurrentMeal={(item) => handleSelectItemForSize(item)}
-                                />
-                            </div>
+                        <div className="col">
+                            <Drink 
+                                menuItems={menuItems.drinks} 
+                                handleAddToCurrentMeal={(item) => handleSelectItemForSize(item)}
+                            />
+                        </div>
                         <button onClick={() => setCurrentMenu('main')} className="btn btn-secondary mt-3">Back</button>
                     </div>
                 )}

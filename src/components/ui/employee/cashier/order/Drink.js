@@ -4,7 +4,6 @@ import React from 'react';
 const Drink = ({ menuItems, handleAddToCurrentMeal }) => (
     <div className="card mb-4">
         <div className="card-body">
-            <h4 className="card-title">Drinks</h4>
             <div className="row">
                 {menuItems.map((Drink) => (
                     <div key={Drink.id} className="col-md-6 mb-3">

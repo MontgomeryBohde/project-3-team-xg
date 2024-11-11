@@ -9,19 +9,15 @@ export async function GET() {
   try {
     await client.connect();
 
-    // Querying menu_items table
     const menuItemsResult = await client.query('SELECT * FROM menu_items;');
-    const itemSizesResult = await client.query('SELECT * FROM item_sizes;');
 
-    // Combine results if needed, or return them separately
     const menuItems = menuItemsResult.rows;
-    const itemSizes = itemSizesResult.rows;
 
     await client.end();
 
-    return NextResponse.json({ menuItems, itemSizes });
+    return NextResponse.json({ menuItems });
   } catch (error) {
     console.error('Database query error:', error);
-    return NextResponse.json({ error: 'Failed to fetch menu items or item sizes' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to fetch menu items' }, { status: 500 });
   }
 }
