@@ -58,6 +58,7 @@ const OrderInfo = () => {
                 </button>
                 <button onClick={nextPage} disabled={currentPage === Math.ceil(orders.length / numPerPage)}>
                     Next Page
+                    
                 </button>
             </div>
             <div className="page-info">
