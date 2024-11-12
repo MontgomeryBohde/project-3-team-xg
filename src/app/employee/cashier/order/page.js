@@ -210,12 +210,14 @@ const OrderPage = () => {
                             <Entree 
                                 menuItems={menuItems.entrees} 
                                 handleAddToCurrentMeal={(item) => handleAddToCurrentMeal(item, 'entree')}
+                                currentMenu={currentMenu}
                             />
                         </div>
                         <div className="col-md-6">
                             <Side 
                                 menuItems={menuItems.sides} 
                                 handleAddToCurrentMeal={(item) => handleAddToCurrentMeal(item, 'side')}
+                                currentMenu={currentMenu}
                             />
                         </div>
                         <button onClick={() => setCurrentMenu('main')} className="btn btn-secondary mt-3">Back</button>
@@ -297,6 +299,7 @@ const OrderPage = () => {
                         const updatedCart = cart.filter((_, i) => i !== index);
                         setCart(updatedCart);
                     }}
+                    currentMenu={currentMenu}
                 />
 
                 {cart.length > 0 && currentMenu === 'main' && (

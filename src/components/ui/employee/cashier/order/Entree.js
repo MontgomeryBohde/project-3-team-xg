@@ -1,17 +1,23 @@
 // Entree.js
 import React from 'react';
 
-const Entree = ({ menuItems, handleAddToCurrentMeal }) => (
+const Entree = ({ menuItems, handleAddToCurrentMeal, handleAddToCart, currentMenu }) => (
     <div className="card mb-4">
         <div className="card-body">
             <div className="row">
-                {menuItems.map((Entree) => (
-                    <div key={Entree.id} className="col-md-6 mb-3">
+                {menuItems.map((entree) => (
+                    <div key={entree.id} className="col-md-6 mb-3">
                         <button
                             className="btn btn-outline-primary w-100"
-                            onClick={() => handleAddToCurrentMeal(Entree)}
+                            onClick={() => {
+                                if (currentMenu === 'mealSelect' && handleAddToCurrentMeal) {
+                                    handleAddToCurrentMeal(entree);
+                                } else if (handleAddToCart) {
+                                    handleAddToCart(entree);
+                                }
+                            }}
                         >
-                            {Entree.name}
+                            {entree.name}
                         </button>
                     </div>
                 ))}

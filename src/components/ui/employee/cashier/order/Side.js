@@ -1,16 +1,22 @@
 // Side.js
 import React from 'react';
 
-const Side = ({ menuItems, handleAddToCurrentMeal }) => (
+const Side = ({ menuItems, handleAddToCurrentMeal, handleAddToCart, currentMenu }) => (
     <div className="card mb-4">
         <div className="card-body">
-            {menuItems.map((Side) => (
+            {menuItems.map((side) => (
                 <button
-                    key={Side.id}
+                    key={side.id}
                     className="btn btn-outline-primary w-100 mb-2"
-                    onClick={() => handleAddToCurrentMeal(Side)}
+                    onClick={() => {
+                        if (currentMenu === 'mealSelect' && handleAddToCurrentMeal) {
+                            handleAddToCurrentMeal(side);
+                        } else if (handleAddToCart) {
+                            handleAddToCart(side);
+                        }
+                    }}
                 >
-                    {Side.name}
+                    {side.name}
                 </button>
             ))}
         </div>

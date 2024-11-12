@@ -1,7 +1,7 @@
 // src/components/ui/employee/cashier/order/Cart.js
 import React from 'react';
 
-const Cart = ({ cartItems, showQuantityControls, handleQuantityChange, handleRemoveItem }) => {
+const Cart = ({ cartItems, showQuantityControls, handleQuantityChange, handleRemoveItem, currentMenu }) => {
     const renderSubItems = (subItems) => (
         <ul className="list-group list-group-flush">
             {subItems.map((subItem, subIndex) => (
@@ -16,14 +16,24 @@ const Cart = ({ cartItems, showQuantityControls, handleQuantityChange, handleRem
         <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
             <div className="d-flex flex-column">
                 <div>
-                    <strong>{item.name}</strong> {item.items && item.items.length > 0 ? '' : <span className="text-muted">- {item.size}</span>} <span className="text-success">- ${item.price ? (item.price * item.quantity).toFixed(2) : '0.00'}</span>
+                    <strong>{item.name}</strong>
+                    {/* Display size only if it is not a meal and size is defined */}
+                    {item.size && currentMenu !== 'mealSelect' && (
+                        <span className="text-muted"> - {item.size}</span>
+                    )}
+                    <span className="text-success"> - ${item.price ? (item.price * item.quantity).toFixed(2) : '0.00'}</span>
                 </div>
-                {item.items && item.items.length > 0 && renderSubItems(item.items)}
+                {item.items && renderSubItems(item.items)}
             </div>
             <div className="d-flex align-items-center ms-auto">
                 {showQuantityControls && (
                     <div className="quantity-controls d-flex align-items-center me-3">
-                        <button className="btn btn-outline-secondary btn-sm me-2" onClick={() => handleQuantityChange(index, Math.max(item.quantity - 1, 1))}>-</button>
+                        <button
+                            className="btn btn-outline-secondary btn-sm me-2"
+                            onClick={() => handleQuantityChange(index, Math.max(item.quantity - 1, 1))}
+                        >
+                            -
+                        </button>
                         <input
                             type="number"
                             className="form-control form-control-sm text-center"
@@ -31,7 +41,12 @@ const Cart = ({ cartItems, showQuantityControls, handleQuantityChange, handleRem
                             value={item.quantity}
                             onChange={(e) => handleQuantityChange(index, Math.max(parseInt(e.target.value) || 1, 1))}
                         />
-                        <button className="btn btn-outline-secondary btn-sm ms-2" onClick={() => handleQuantityChange(index, item.quantity + 1)}>+</button>
+                        <button
+                            className="btn btn-outline-secondary btn-sm ms-2"
+                            onClick={() => handleQuantityChange(index, item.quantity + 1)}
+                        >
+                            +
+                        </button>
                     </div>
                 )}
                 {showQuantityControls && handleRemoveItem && (
@@ -40,6 +55,7 @@ const Cart = ({ cartItems, showQuantityControls, handleQuantityChange, handleRem
             </div>
         </li>
     );
+    
 
     return (
         <div className="cart-container card p-4 mb-4">
