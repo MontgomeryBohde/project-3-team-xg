@@ -1,7 +1,7 @@
 // Drink.js
 import React from 'react';
 
-const Drink = ({ menuItems, handleAddToCurrentMeal }) => (
+const Drink = ({ menuItems, handleAddToCart }) => (
     <div className="card mb-4">
         <div className="card-body">
             <div className="row">
@@ -10,7 +10,7 @@ const Drink = ({ menuItems, handleAddToCurrentMeal }) => (
                         <button
                             key={Drink.id}
                             className="btn btn-outline-primary w-100"
-                            onClick={() => handleAddToCurrentMeal(Drink)}
+                            onClick={() => handleAddToCart(Drink)}
                         >
                             {Drink.name}
                         </button>

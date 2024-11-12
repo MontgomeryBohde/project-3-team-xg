@@ -1,7 +1,7 @@
 // Appetizer.js
 import React from 'react';
 
-const Appetizer = ({ menuItems, handleAddToCurrentMeal }) => (
+const Appetizer = ({ menuItems, handleAddToCart }) => (
     <div className="card mb-4 shadow-sm">
         <div className="card-body md">
             <div className="row">
@@ -9,7 +9,7 @@ const Appetizer = ({ menuItems, handleAddToCurrentMeal }) => (
                     <div key={appetizer.id} className="col-md-6 mb-3">
                         <button
                             className="btn btn-outline-primary w-100 py-3"
-                            onClick={() => handleAddToCurrentMeal(appetizer)}
+                            onClick={() => handleAddToCart(appetizer)}
                         >
                             {appetizer.name}
                         </button>

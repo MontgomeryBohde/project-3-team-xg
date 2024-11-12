@@ -67,14 +67,19 @@ const OrderPage = () => {
     }, [cart]);
 
     // Add item to cart
-    const handleAddToCart = (item, size = null) => {
-        setCart([...cart, { ...item, size, quantity: 1 }]);
-        setCurrentMenu('main');
+    const handleAddToCart = async (item, size, price) => {
+        try {
+            setCart([...cart, { ...item, size: size, price: price, quantity: 1 }]);
+            setCurrentMenu('main');
+        } catch (error) {
+            console.error('Error adding item to cart:', error);
+            setWarningMessage('Error adding item to cart. Please try again later.');
+        }
     };
 
     // Add meal to cart with size
     const handleAddMealToCart = (mealType) => {
-        setCart([...cart, { ...mealType, items: [], quantity: 1 }]);
+        setCart([...cart, { ...mealType, items: [], price: mealType.price, quantity: 1 }]);
         setSelectedMealType(mealType);
         setEntreeCount(0);
         setSideCount(0);
@@ -129,11 +134,8 @@ const OrderPage = () => {
                     })),
                 };
                 
-                // Update the selected item state
                 setSelectedItem(updatedItem);
                 console.log('Selected item:', updatedItem);
-
-                // Set the current menu to size selection
                 setCurrentMenu('sizeSelection');
             } else {
                 throw new Error('No available sizes found for the selected item');
@@ -142,13 +144,6 @@ const OrderPage = () => {
             console.error('Error fetching item sizes:', error);
             setWarningMessage('No available sizes found for the selected item.');
         }
-    };
-
-
-    // Handle adding item with selected size
-    const handleAddItemWithSize = (size) => {
-        handleAddToCart({ ...selectedItem, size });
-        setSelectedItem(null);
     };
 
     return (
@@ -233,7 +228,7 @@ const OrderPage = () => {
                         <div className="col">
                             <Appetizer 
                                 menuItems={menuItems.appetizers}
-                                handleAddToCurrentMeal={(item) => handleSelectItemForSize(item)}
+                                handleAddToCart={(item) => handleSelectItemForSize(item)}
                             />
                         </div>
                         <button onClick={() => setCurrentMenu('main')} className="btn btn-secondary mt-3">Back</button>
@@ -246,7 +241,7 @@ const OrderPage = () => {
                         <div className="col">
                             <Entree 
                                 menuItems={menuItems.entrees} 
-                                handleAddToCurrentMeal={(item) => handleSelectItemForSize(item)}
+                                handleAddToCart={(item) => handleSelectItemForSize(item)}
                             />
                         </div>
                         <button onClick={() => setCurrentMenu('main')} className="btn btn-secondary mt-3">Back</button>
@@ -259,7 +254,7 @@ const OrderPage = () => {
                         <div className="col">
                             <Side 
                                 menuItems={menuItems.sides} 
-                                handleAddToCurrentMeal={(item) => handleSelectItemForSize(item)}
+                                handleAddToCart={(item) => handleSelectItemForSize(item)}
                             />
                         </div>
                         <button onClick={() => setCurrentMenu('main')} className="btn btn-secondary mt-3">Back</button>
@@ -272,7 +267,7 @@ const OrderPage = () => {
                         <div className="col">
                             <Drink 
                                 menuItems={menuItems.drinks} 
-                                handleAddToCurrentMeal={(item) => handleSelectItemForSize(item)}
+                                handleAddToCart={(item) => handleSelectItemForSize(item)}
                             />
                         </div>
                         <button onClick={() => setCurrentMenu('main')} className="btn btn-secondary mt-3">Back</button>
@@ -284,7 +279,7 @@ const OrderPage = () => {
                         <div className="col-md-8">
                             <SizeSelection
                                 item={selectedItem}
-                                handleAddItemWithSize={handleAddItemWithSize}
+                                handleAddToCart={handleAddToCart}
                             />
                         </div>
                     </div>
