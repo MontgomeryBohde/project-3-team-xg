@@ -151,15 +151,16 @@ const OrderPage = () => {
             <EmployeeLogInHeader />
             <div className="container mt-4">
                 {warningMessage && <div className="alert alert-warning text-center">{warningMessage}</div>}
-                {currentMenu === 'main' && (
-                    <div className="row">
-                        <div className="col-12 mb-4">
+                <div className="row">
+                    {/* Left Column: Meal Types */}
+                    <div className="col-md-6 mb-4">
+                        {(currentMenu === 'main' || currentMenu === 'mealSelect') && (
                             <div className="meal-types">
                                 <h3>Meal Types</h3>
                                 <div className="menu-grid">
                                     {mealTypes.map((meal) => (
-                                        <button 
-                                            key={meal.name} 
+                                        <button
+                                            key={meal.name}
                                             className="btn btn-outline-primary w-100 mb-2"
                                             onClick={() => handleAddMealToCart(meal)}
                                         >
@@ -168,15 +169,19 @@ const OrderPage = () => {
                                     ))}
                                 </div>
                             </div>
-                        </div>
-                        <div className="col-12">
+                        )}
+                    </div>
+
+                    {/* Right Column: Food Items */}
+                    <div className="col-md-6 mb-4">
+                        {(currentMenu === 'main' || currentMenu === 'mealSelect') && (
                             <div className="food-types">
                                 <h3>Food Items</h3>
                                 <div className="menu-grid">
                                     {['Appetizers', 'Entrees', 'Sides', 'Drinks'].map((food) => (
-                                        <button 
-                                            key={food} 
-                                            className="btn btn-outline-primary w-100 mb-2" 
+                                        <button
+                                            key={food}
+                                            className="btn btn-outline-primary w-100 mb-2"
                                             onClick={() => {
                                                 switch (food) {
                                                     case 'Appetizers':
@@ -199,10 +204,11 @@ const OrderPage = () => {
                                     ))}
                                 </div>
                             </div>
-                        </div>
+                        )}
                     </div>
-                )}
-                
+                </div>
+
+                {/* Dynamic Content Section */}
                 {currentMenu === 'mealSelect' && selectedMealType && (
                     <div className="row">
                         <h3 className="text-center">Entrees & Sides</h3>
@@ -309,7 +315,6 @@ const OrderPage = () => {
                         </Link>
                     </div>
                 )}
-
             </div>
         </div>
     );
