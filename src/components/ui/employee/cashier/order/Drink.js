@@ -9,7 +9,7 @@ const Drink = ({ menuItems, handleAddToCart }) => (
                     <div key={Drink.id} className="col-md-6 mb-3">
                         <button
                             key={Drink.id}
-                            className="btn btn-outline-primary w-100"
+                            className="btn btn-outline-primary w-100 btn-lg"
                             onClick={() => handleAddToCart(Drink)}
                         >
                             {Drink.name}

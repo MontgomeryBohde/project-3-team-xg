@@ -8,9 +8,9 @@ const Entree = ({ menuItems, handleAddToCurrentMeal, handleAddToCart, currentMen
                 {menuItems.map((entree) => (
                     <div key={entree.id} className="col-md-6 mb-3">
                         <button
-                            className="btn btn-outline-primary w-100"
+                            className="btn btn-outline-primary w-100 h-100 btn-lg"
                             onClick={() => {
-                                if (currentMenu === 'mealSelect' && handleAddToCurrentMeal) {
+                                if (currentMenu === 'mealSelection' && handleAddToCurrentMeal) {
                                     handleAddToCurrentMeal(entree);
                                 } else if (handleAddToCart) {
                                     handleAddToCart(entree);

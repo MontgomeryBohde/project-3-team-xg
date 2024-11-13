@@ -7,9 +7,9 @@ const Side = ({ menuItems, handleAddToCurrentMeal, handleAddToCart, currentMenu 
             {menuItems.map((side) => (
                 <button
                     key={side.id}
-                    className="btn btn-outline-primary w-100 mb-2"
+                    className="btn btn-outline-primary w-100 mb-3 btn-lg"
                     onClick={() => {
-                        if (currentMenu === 'mealSelect' && handleAddToCurrentMeal) {
+                        if (currentMenu === 'mealSelection' && handleAddToCurrentMeal) {
                             handleAddToCurrentMeal(side);
                         } else if (handleAddToCart) {
                             handleAddToCart(side);

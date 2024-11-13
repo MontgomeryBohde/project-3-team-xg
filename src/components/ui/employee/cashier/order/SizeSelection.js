@@ -13,7 +13,7 @@ const SizeSelection = ({ item, handleAddToCart }) => {
 			{item.sizes && item.sizes.map((size) => (
 				<button
 					key={size.id} // Use a unique identifier for each size if available
-					className="btn btn-outline-primary w-100 mb-2"
+					className="btn btn-outline-primary w-100 mb-2 btn-lg"
 					onClick={() => handleAddToCart && handleAddToCart(item, size.size, size.price)}
 				>
 				{size.size} - ${size.price} {/* Update to display the size details appropriately */}

@@ -8,7 +8,7 @@ const Appetizer = ({ menuItems, handleAddToCart }) => (
                 {menuItems.map((appetizer) => (
                     <div key={appetizer.id} className="col-md-6 mb-3">
                         <button
-                            className="btn btn-outline-primary w-100 py-3"
+                            className="btn btn-outline-primary w-100 py-3 btn-lg"
                             onClick={() => handleAddToCart(appetizer)}
                         >
                             {appetizer.name}
