@@ -36,14 +36,15 @@ const CustomerMealSelect = () => {
     { name: "Bigger Plate", sides: 1, entrees: 3, price: 11.75 },
   ];
   const [meal, setMeal] = useState("Bowl");
-  /*
-  // TODO: define selected meal in menu page & store in local memory
   useEffect(() => {
-    // Retrieve selected meal data from local storage
-    const selected = localStorage.getItem('selectedMeal');
-    if (selected) {
-      setMeal(JSON.parse(selected));
-  } }, []); */
+    // Retrieve 'selectedMeal' from localStorage when the component mounts
+    const storedMeal = localStorage.getItem('selectedMeal');
+
+    // If a value is found in localStorage, update the state
+    if (storedMeal) {
+      setMeal(storedMeal);
+    }
+  }, []);  // Empty dependency array ensures this runs once on mount
 
   // Update price, numSides, and numEntrees based on selected meal
   const [mealPrice, setMealPrice] = useState(8.30);
@@ -124,7 +125,7 @@ const canAddEntree = () => {
 
   // Handle cancel action
   const handleCancel = () => {
-    router.push("/customer/menu"); // TODO: Navigate to the menu page
+    router.push("/customer/menuselection"); // TODO: Navigate to the menu page
   };
 
   // Handle confirm action
@@ -144,7 +145,7 @@ const canAddEntree = () => {
 
       localStorage.setItem("cart", JSON.stringify([...cart, mealCartItem])); // Save cart to localStorage
 
-      router.push("/customer/menu"); // Navigate to the menu page
+      router.push("/customer/menuselection"); // Navigate to the menu page
     } else {
       // Optional: show an error or alert if the user hasn't selected the correct number of items
       alert("Not enough items selected!");

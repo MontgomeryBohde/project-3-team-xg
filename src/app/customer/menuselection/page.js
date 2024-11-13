@@ -117,6 +117,11 @@ const MenuSelectionPage = () => {
         localStorage.setItem("cart", JSON.stringify(updatedCart));
     };
 
+    const setMealType = (mealType) => {
+        // Store the selected meal type in localStorage
+        localStorage.setItem('selectedMeal', mealType);
+      };
+
     const renderItems = (items) => (
         items.map((item, index) => (
             <div key={index} className="col-4 col-md-3 col-lg-2 mb-3">
@@ -263,22 +268,28 @@ const MenuSelectionPage = () => {
                     <h3>Choose Your Meal</h3>
                     <div className="row mb-4">
                         <div className="col-4">
-                            <Link href="PLACEHOLD">
-                                <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}>
+                            <Link href="meal">
+                                <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}
+                                onClick={() => setMealType('Bowl')}
+                                >
                                     Bowl
                                 </button>
                             </Link>
                         </div>
                         <div className="col-4">
-                            <Link href="PLACEHOLD">
-                                <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}>
+                            <Link href="meal">
+                                <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}
+                                onClick={() => setMealType('Plate')}
+                                >
                                     Plate
                                 </button>
                             </Link>
                         </div>
                         <div className="col-4">
-                            <Link href="PLACEHOLD">
-                                <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}>
+                            <Link href="meal">
+                                <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}
+                                onClick={() => setMealType('Bigger Plate')}
+                                >
                                     Bigger Plate
                                 </button>
                             </Link>
