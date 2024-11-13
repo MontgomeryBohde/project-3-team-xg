@@ -32,6 +32,13 @@ export default function Menu() {
         setSelectedItem(category);
     };
 
+    const handleNavigation = (sectionId) => {
+        const section = document.getElementById(sectionId);
+        if (section) {
+            section.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+
     const addItem = () => {
         // Add the new item to the correct array based on the selected category
         switch (itemCategory) {
@@ -98,15 +105,24 @@ export default function Menu() {
     };
 
     return (
-        <div className="app-container">
-            <header className="header-container">
-                <EmployeeLogInHeader />
-            </header>
-    
-            <main className="menu-container">
-                <h1>Menu</h1>
-    
-                <section className="section">
+        <div className="menu-container">
+            <EmployeeLogInHeader />
+
+            {/* Navigation Bar */}
+            <nav className="navbar">
+                <ul className="nav-list">
+                    <li className = "nav-btn"  onClick={() => handleNavigation('entrees')}>Entrees</li>
+                    <li className = "nav-btn" onClick={() => handleNavigation('sides')}>Sides</li>
+                    <li className = "nav-btn" onClick={() => handleNavigation('appetizers')}>Appetizers</li>
+                    <li className = "nav-btn" onClick={() => handleNavigation('drinks')}>Drinks</li>
+                    <li className = "nav-btn" onClick={() => handleNavigation('seasonal')}>Seasonal</li>
+                </ul>
+            </nav>
+
+            <h1>Menu</h1>
+
+            <div className="content">
+                <section id="entrees" className="section">
                     <h2>Entrees</h2>
                     <div className="button-grid">
                         {entrees.map((item, index) => (
@@ -115,10 +131,10 @@ export default function Menu() {
                             </button>
                         ))}
                     </div>
-                    <button className="item-button" onClick={() => handlePopup("", "Entree")}>Add New Item</button>
+                    <button className="item-button" onClick={() => handlePopup("", "Entree")}> Add New Item </button>
                 </section>
-    
-                <section className="section">
+
+                <section id="sides" className="section">
                     <h2>Sides</h2>
                     <div className="button-grid">
                         {sides.map((item, index) => (
@@ -127,10 +143,10 @@ export default function Menu() {
                             </button>
                         ))}
                     </div>
-                    <button className="item-button" onClick={() => handlePopup("", "Side")}>Add New Item</button>
+                    <button className="item-button" onClick={() => handlePopup("", "Side")}> Add New Item </button>
                 </section>
-    
-                <section className="section">
+
+                <section id="appetizers" className="section">
                     <h2>Appetizers</h2>
                     <div className="button-grid">
                         {appetizers.map((item, index) => (
@@ -139,10 +155,10 @@ export default function Menu() {
                             </button>
                         ))}
                     </div>
-                    <button className="item-button" onClick={() => handlePopup("", "Appetizer")}>Add New Item</button>
+                    <button className="item-button" onClick={() => handlePopup("", "Appetizer")}> Add New Item </button>
                 </section>
-    
-                <section className="section">
+
+                <section id="drinks" className="section">
                     <h2>Drinks</h2>
                     <div className="button-grid">
                         {drinks.map((item, index) => (
@@ -151,10 +167,10 @@ export default function Menu() {
                             </button>
                         ))}
                     </div>
-                    <button className="item-button" onClick={() => handlePopup("", "Drink")}>Add New Item</button>
+                    <button className="item-button" onClick={() => handlePopup("", "Drink")}> Add New Item </button>
                 </section>
-    
-                <section className="section">
+
+                <section id="seasonal" className="section">
                     <h2>Seasonal</h2>
                     <div className="button-grid">
                         {seasonal.map((item, index) => (
@@ -163,38 +179,87 @@ export default function Menu() {
                             </button>
                         ))}
                     </div>
-                    <button className="item-button" onClick={() => handlePopup("", "Seasonal")}>Add New Item</button>
+                    <button className="item-button" onClick={() => handlePopup("", "Seasonal")}> Add New Item </button>
                 </section>
-    
-                {selectedItem && (
-                    <div className="popup">
-                        <h3>Add New Item</h3>
-                        <label>
-                            Name:
-                            <input type="text" value={itemName} onChange={(e) => setItemName(e.target.value)} />
-                        </label>
-                        <label>
-                            Size:
-                            <input type="text" value={itemSize} onChange={(e) => setItemSize(e.target.value)} />
-                        </label>
-                        <label>
-                            Category:
-                            <select value={itemCategory} onChange={(e) => setItemCategory(e.target.value)}>
-                                <option value="Entree">Entree</option>
-                                <option value="Side">Side</option>
-                                <option value="Appetizer">Appetizer</option>
-                                <option value="Drink">Drink</option>
-                                <option value="Seasonal">Seasonal</option>
-                            </select>
-                        </label>
-                        <button onClick={addItem}>Add</button>
-                        <button onClick={removeItem}>Remove</button>
-                        <button onClick={() => setSelectedItem(null)}>Cancel</button>
-                    </div>
-                )}
-    
-                {selectedItem && <div className="overlay" onClick={() => setSelectedItem(null)} />}
-            </main>
+            </div>
+
+            {selectedItem && (
+                <div className="popup">
+                    <h3>Add New Item</h3>
+                    <label>
+                        Name: 
+                        <input type="text" value={itemName} onChange={(e) => setItemName(e.target.value)} />
+                    </label>
+                    <label>
+                        Size: 
+                        <input type="text" value={itemSize} onChange={(e) => setItemSize(e.target.value)} />
+                    </label>
+                    <label>
+                        Category:
+                        <select value={itemCategory} onChange={(e) => setItemCategory(e.target.value)}>
+                            <option value="Entree">Entree</option>
+                            <option value="Side">Side</option>
+                            <option value="Appetizer">Appetizer</option>
+                            <option value="Drink">Drink</option>
+                            <option value="Seasonal">Seasonal</option>
+                        </select>
+                    </label>
+                    <label>
+                        Inventory Item IDs:
+                        <input type="text" value={inventoryIds} onChange={(e) => setInventoryIds(e.target.value)} />
+                    </label>
+                    <label>
+                        Price:
+                        <input type="number" value={itemPrice} onChange={(e) => setItemPrice(e.target.value)} />
+                    </label>
+                    <button onClick={addItem}>Add</button>
+                    <button onClick={removeItem}>Remove</button>
+                    <button onClick={() => setSelectedItem(null)}>Cancel</button>
+                </div>
+            )}
+
+            <style jsx>{`
+                .popup {
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background-color: white;
+                    padding: 20px;
+                    border: 1px solid #ccc;
+                    border-radius: 5px;
+                    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+                    z-index: 1000;
+                }
+
+                .popup label {
+                    display: block;
+                    margin: 10px 0;
+                }
+
+                .popup button {
+                    margin-top: 10px;
+                    margin-right: 5px;
+                }
+
+                .popup input, .popup select {
+                    margin-left: 10px;
+                }
+
+                /* Overlay to darken the background when popup is active */
+                .overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(0, 0, 0, 0.5);
+                    z-index: 999;
+                }
+                
+            `}</style>
+            
+            {selectedItem && <div className="overlay" onClick={() => setSelectedItem(null)} />}
         </div>
     );    
 }
