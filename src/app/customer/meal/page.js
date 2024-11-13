@@ -7,41 +7,67 @@ import "bootstrap/dist/css/bootstrap.css"; // Bootstrap is already included
 import "./meal-select.css"; 
 
 const CustomerMealSelect = () => {
-  const [entrees, setEntrees] = useState([
-    "Orange Chicken", "Black Pepper Sirloin Steak", "Honey Walnut Shrimp",
-    "Grilled Teriyaki Chicken", "Kung Pao Chicken", "Honey Sesame Chicken Breast",
-    "Beijing Beef", "Mushroom Chicken", "SweetFire Chicken Breast",
-    "String Bean Chicken Breast", "Broccoli Beef", "Black Pepper Chicken", "Super Greens",
-  ]);
-  const [sides, setSides] = useState(["White Steamed Rice", "Fried Rice", "Chow Mein", "Super Greens"]);
+  const [entrees, setEntrees] = useState([]);
+  const [sides, setSides] = useState([]);
 
+  // Fetch entrees and sides from the database using the API endpoint
+  useEffect(() => {
+  const fetchMenuItems = async () => {
+    try {
+      const response = await fetch('/api/menu_items');
+      if (!response.ok) throw new Error('Failed to fetch menu items');
+      const data = await response.json();
+
+      // Filter and set entrees and sides
+      setEntrees(data.menuItems.filter(item => item.category.toLowerCase() === 'entree').map(item => item.name));
+      setSides(data.menuItems.filter(item => item.category.toLowerCase() === 'side').map(item => item.name));
+    } catch (error) {
+      console.error('Error fetching menu items:', error);
+      alert('Error fetching menu items. Please try again later.');
+    }
+  };
+
+  fetchMenuItems();
+}, []);
+
+  const mealTypes = [
+    { name: "Bowl", sides: 1, entrees: 1, price: 8.30 },
+    { name: "Plate", sides: 1, entrees: 2, price: 10.00 },
+    { name: "Bigger Plate", sides: 1, entrees: 3, price: 11.75 },
+  ];
   const [meal, setMeal] = useState("Bowl");
   /*
   // TODO: define selected meal in menu page & store in local memory
   useEffect(() => {
     // Retrieve selected meal data from local storage
-    const storedEmployee = localStorage.getItem('selectedMeal');
-    if (selectedMeal) {
-      setMeal(JSON.parse(selectedMeal));
+    const selected = localStorage.getItem('selectedMeal');
+    if (selected) {
+      setMeal(JSON.parse(selected));
   } }, []); */
-  const [numEntrees, setNumEntrees] = useState(null);
+
+  // Update price, numSides, and numEntrees based on selected meal
+  const [mealPrice, setMealPrice] = useState(8.30);
+  const [numSides, setNumSides] = useState(1);
+  const [numEntrees, setNumEntrees] = useState(1);
+  useEffect(() => {
+    // Find the selected meal type from the mealTypes array
+    const selectedMeal = mealTypes.find((item) => item.name === meal);
+  
+    if (selectedMeal) {
+      // Update state based on the selected meal type
+      setMealPrice(selectedMeal.price);
+      setNumSides(selectedMeal.sides);
+      setNumEntrees(selectedMeal.entrees);
+    }
+  }, [meal]);
+
+
   const [selectedSides, setSelectedSides] = useState([]);
   const [selectedEntrees, setSelectedEntrees] = useState([]);
 
   const [cart, setCart] = useState([]); // Cart to hold both simple and complex objects
 
   const router = useRouter();
-
-  // Update numEntrees based on selected meal
-  useEffect(() => {
-    if (meal === "Bowl") {
-      setNumEntrees(1);
-    } else if (meal === "Plate") {
-      setNumEntrees(2);
-    } else if (meal === "Bigger Plate") {
-      setNumEntrees(3);
-    }
-  }, [meal]);
 
   // Handle item button press
   const handlePressed = (item, type) => {
@@ -104,18 +130,19 @@ const canAddEntree = () => {
   // Handle confirm action
   const handleConfirm = () => {
     // Check if the number of selected items equals the expected number of entrees + 1 (for sides)
-    if (selectedEntrees.length === numEntrees && selectedSides.length === 1) {
+    if (selectedEntrees.length === numEntrees && selectedSides.length === numSides) {
       // Add selected items to the cart as a complex object
       const mealCartItem = {
         mealItem: meal,
         entrees: selectedEntrees,
         sides: selectedSides,
         quantity: 1, // Adjust quantity if needed
+        price: mealPrice,
       };
       
       setCart([...cart, mealCartItem]); // Add the complex meal object to the cart
 
-      localStorage.setItem("Cart", JSON.stringify([...cart, mealCartItem])); // Save cart to localStorage
+      localStorage.setItem("cart", JSON.stringify([...cart, mealCartItem])); // Save cart to localStorage
 
       router.push("/customer/menu"); // Navigate to the menu page
     } else {
