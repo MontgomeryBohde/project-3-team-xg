@@ -5,7 +5,7 @@ import { FaUtensils, FaShoppingCart, FaDrumstickBite, FaCarrot, FaConciergeBell,
 import Link from "next/link";
 import './menuselection.css';
 
-const MenuSelectionPage = () => {
+const MealSelectionPage = () => {
     
     const entrees = [
         { name: "Hot Ones Blazing Bourbon Chicken", image: " https://olo-images-live.imgix.net/50/503be498564c415eb59e4e37120117b0.png?auto=format%2Ccompress&q=60&cs=tinysrgb&w=810&h=540&fit=crop&fm=png32&s=91acd3adc699123bb269b094fb843769"},
@@ -63,7 +63,7 @@ const MenuSelectionPage = () => {
     const [selectedSize, setSelectedSize] = useState({});
 
     useEffect(() => {
-        const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
+        const savedCart = JSON.parse(sessionStorage.getItem("cart")) || [];
         setCart(savedCart);
     }, []);
 
@@ -77,45 +77,41 @@ const MenuSelectionPage = () => {
         }
     };
 
-    //allow inputting whatever quantity of item 
-    const [selectedQuantity, setSelectedQuantity] = useState({});
-
-    const handleQuantityChange = (mealName, quantity) => {
-        setSelectedQuantity(prevQuantity => ({
-            ...prevQuantity,
-            [mealName]: quantity
-        }));
-    };
-
     const handleAddToCart = (mealName, items) => {
-        const item = items.find((item) => item.name === mealName);
-        const defaultSize = item?.sizeType === "special" ? null : item?.sizeType === "mediumOnly"
-            ? "Medium"
-            : item?.sizeType === "side"
-            ? "Medium"
-            : "Small"; // for regular items the default is small
+   
+    const item = items.find((item) => item.name === mealName);
+    const defaultSize = item?.sizeType === "special" ? null : item?.sizeType === "mediumOnly"
+        ? "Medium"
+        : item?.sizeType === "side"
+        ? "Medium"
+        : "Small"; //for regular items the default is small
 
-        const size = selectedSize[mealName] || defaultSize;
-        const quantity = selectedQuantity[mealName] || 1; // default quantity to 1 if not specified
-        const existingItem = cart.find(item => item.name === mealName && item.size === size);
+    
+    const size = selectedSize[mealName] || defaultSize;
+    const existingItem = cart.find(item => item.name === mealName && item.size === size);
 
-        let updatedCart;
-        if (existingItem) {
-            // if item already exists in the cart, increase the quantity
-            updatedCart = cart.map(item => 
-                item.name === mealName && item.size === size
-                    ? { ...item, quantity: item.quantity + quantity }
-                    : item
-            );
-        } else {
-            // else just add new item
-            updatedCart = [...cart, { name: mealName, size: size, quantity }];
-        }
+    let updatedCart;
+    if (existingItem) {
+        //if item already exists in the cart, increase the quantity
+        updatedCart = cart.map(item => 
+            item.name === mealName && item.size === size
+                ? { ...item, quantity: item.quantity + 1 }
+                : item
+        );
+    } else {
+        //else just add new item
+        updatedCart = [...cart, { name: mealName, size: size, quantity: 1 }];
+    }
 
-        // update cart and save to localStorage
-        setCart(updatedCart);
-        localStorage.setItem("cart", JSON.stringify(updatedCart));
-    };
+    //update cart and save to sessionStorage
+    setCart(updatedCart);
+    sessionStorage.setItem("cart", JSON.stringify(updatedCart));
+};
+
+const setMealType = (mealType) => {
+    // Store the selected meal type in localStorage
+    localStorage.setItem('selectedMeal', mealType);
+  };
 
     const renderItems = (items) => (
         items.map((item, index) => (
@@ -130,56 +126,47 @@ const MenuSelectionPage = () => {
                     <div className="card-body text-center">
                         <p className="card-text">{item.name}</p>
 
-                        {item.sizeType !== "special" && (
-                            <select 
-                                className="form-select mb-2"
-                                onChange={(e) => handleSizeChange(item.name, e.target.value)}
-                            >
-                                {item.sizeType === "mediumOnly" ? (
+                    {item.sizeType !== "special" && (
+                        <select 
+                            className="form-select mb-2"
+                            onChange={(e) => handleSizeChange(item.name, e.target.value)}
+                        >
+                            {item.sizeType === "mediumOnly" ? (
+    
+                                <option value="Medium">Medium</option>
+                            ) : item.sizeType === "side" ? (
+                               
+                                <>
                                     <option value="Medium">Medium</option>
-                                ) : item.sizeType === "side" ? (
-                                    <>
-                                        <option value="Medium">Medium</option>
-                                        <option value="Large">Large</option>
-                                    </>
-                                ) 
-                                : item.sizeType === "app" ? (     
-                                    <>
-                                        <option value="Small">Small</option>
-                                        <option value="Large">Large</option>
-                                    </>
-                                ) : (
-                                    <>
-                                        <option value="Small">Small</option>
-                                        <option value="Medium">Medium</option>
-                                        <option value="Large">Large</option>
-                                    </>
-                                )}
-                            </select>
-                        )}
+                                    <option value="Large">Large</option>
+                                </>
+                            ) 
+                            : item.sizeType === "app" ? (     
+                                <>
+                                    <option value="Small">Small</option>
+                                    <option value="Large">Large</option>
+                                </>
+                                ): (
+                                <>
+                                    <option value="Small">Small</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Large">Large</option>
+                                </>
+                            )}
+                        </select>
+                    )}
 
-                        {/* Quantity Selector */}
-                        <input 
-                            type="number" 
-                            min="1" 
-                            value={selectedQuantity[item.name] || 1}
-                            onChange={(e) => handleQuantityChange(item.name, parseInt(e.target.value))}
-                            className="form-control mb-2"
-                            placeholder="Quantity"
-                        />
-
-                        <button 
-                            className="btn btn-danger"
-                            onClick={() => handleAddToCart(item.name, items)}
-                        > 
-                            Add to Cart
-                        </button>
-                    </div>
+                    <button 
+                        className="btn btn-danger"
+                        onClick={() => handleAddToCart(item.name, items)}
+                    > 
+                        Add to Cart
+                    </button>
                 </div>
             </div>
-        ))
-    );
-
+        </div>
+    ))
+);
 
     
 
@@ -189,14 +176,6 @@ const MenuSelectionPage = () => {
             element.scrollIntoView({ behavior: "smooth" });
         }
     };
-  
-
-   
-
-    useEffect(() => {
-        // Optional: Persist cart in local storage
-        localStorage.setItem('cart', JSON.stringify(cart));
-    }, [cart]);
 
     return (
         <div className="container-fluid">
@@ -263,22 +242,28 @@ const MenuSelectionPage = () => {
                     <h3>Choose Your Meal</h3>
                     <div className="row mb-4">
                         <div className="col-4">
-                            <Link href="PLACEHOLD">
-                                <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}>
+                            <Link href="meal">
+                                <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}
+                                onClick={() => setMealType('Bowl')}
+                                >
                                     Bowl
                                 </button>
                             </Link>
                         </div>
                         <div className="col-4">
-                            <Link href="PLACEHOLD">
-                                <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}>
+                            <Link href="meal">
+                                <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}
+                                onClick={() => setMealType('Plate')}
+                                >
                                     Plate
                                 </button>
                             </Link>
                         </div>
                         <div className="col-4">
-                            <Link href="PLACEHOLD">
-                                <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}>
+                            <Link href="meal">
+                                <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}
+                                onClick={() => setMealType('Bigger Plate')}
+                                >
                                     Bigger Plate
                                 </button>
                             </Link>
@@ -328,4 +313,4 @@ const MenuSelectionPage = () => {
     );
 };
 
-export default MenuSelectionPage;
+export default MealSelectionPage;
