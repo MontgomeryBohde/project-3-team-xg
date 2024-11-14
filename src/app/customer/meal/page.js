@@ -38,7 +38,7 @@ const CustomerMealSelect = () => {
   const [meal, setMeal] = useState("Bowl");
   useEffect(() => {
     // Retrieve 'selectedMeal' from sessionStorage when the component mounts
-    const storedMeal = sessionStorage.getItem('selectedMeal');
+    const storedMeal = localStorage.getItem('selectedMeal');
 
     // If a value is found in sessionStorage, update the state
     if (storedMeal) {
@@ -66,7 +66,10 @@ const CustomerMealSelect = () => {
   const [selectedSides, setSelectedSides] = useState([]);
   const [selectedEntrees, setSelectedEntrees] = useState([]);
 
-  const [cart, setCart] = useState([]); // Cart to hold both simple and complex objects
+  const [cart, setCart] = useState(() => { // retrive initially from sessionstorage
+    const storedCart = sessionStorage.getItem('cart');
+    return storedCart ? JSON.parse(storedCart) : [];
+  });
 
   const router = useRouter();
 
@@ -144,10 +147,10 @@ const canAddEntree = () => {
       console.log("addedtocart");
   
       // Update the cart state and then sessionStorage
-      setCart(prevCart => {
-        const updatedCart = [...prevCart, mealCartItem]; // Create a new cart array with the new item
-        sessionStorage.setItem("cart", JSON.stringify(updatedCart)); // Save the updated cart to sessionStorage
-        return updatedCart; // Return the updated cart as the new state
+      setCart((prevCart) => {
+        const updatedCart = [...prevCart, mealCartItem];
+        sessionStorage.setItem("cart", JSON.stringify(updatedCart));
+        return updatedCart;
       });
   
       // Wait a moment to ensure cart is updated in sessionStorage
