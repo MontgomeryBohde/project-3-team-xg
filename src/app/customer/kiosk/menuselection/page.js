@@ -3,7 +3,9 @@ import React, { useState, useEffect } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FaUtensils, FaShoppingCart, FaDrumstickBite, FaCarrot, FaConciergeBell, FaGlassCheers, FaGift, FaTruck } from "react-icons/fa";
 import Link from "next/link";
+import Head from "next/head";
 import './menuselection.css';
+import CustomerHeader from "@/components/ui/customer/header/CustomerHeader";
 
 const MealSelectionPage = () => {
 
@@ -178,138 +180,144 @@ const MealSelectionPage = () => {
     };
 
     return (
-        <div className="container-fluid">
-            <div className="row">
-                <nav className="col-md-2 d-none d-md-block bg-light sidebar" style={{ height: '100vh', fontSize: '1.5rem' }}>
-                    <div className="position-fixed">
-                        <ul className="nav flex-column">
-                            <li className="nav-item">
-                                <a className="nav-link active" onClick={() => handleScrollToSection('meals')} style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
-                                    <FaUtensils className="me-2" style={{ fontSize: '2rem' }} />
-                                    <span>Meals</span>
-                                </a>
-                            </li>
-                            <li className="nav-item">
-                                <a className="nav-link" onClick={() => handleScrollToSection('A La Carte')} style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
-                                    <FaDrumstickBite className="me-2" style={{ fontSize: '2rem' }} />
-                                    <span>A La Carte</span>
-                                </a>
-                            </li>
-                            <li className="nav-item">
-                                <a className="nav-link" onClick={() => handleScrollToSection('sides')} style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
-                                    <FaCarrot className="me-2" style={{ fontSize: '2rem' }} />
-                                    <span>Sides</span>
-                                </a>
-                            </li>
-                            <li className="nav-item">
-                                <a className="nav-link" onClick={() => handleScrollToSection('appetizers')} style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
-                                    <FaConciergeBell className="me-2" style={{ fontSize: '2rem' }} />
-                                    <span>Appetizers</span>
-                                </a>
-                            </li>
-                            <li className="nav-item">
-                                <a className="nav-link" onClick={() => handleScrollToSection('drinks')} style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
-                                    <FaGlassCheers className="me-2" style={{ fontSize: '2rem' }} />
-                                    <span>Drinks</span>
-                                </a>
-                            </li>
-                            <li className="nav-item">
-                                <a className="nav-link" onClick={() => handleScrollToSection('deals')} style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
-                                    <FaGift className="me-2" style={{ fontSize: '2rem' }} />
-                                    <span>Deals</span>
-                                </a>
-                            </li>
-                            <li className="nav-item">
-                                <a className="nav-link" onClick={() => handleScrollToSection('catering')} style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
-                                    <FaTruck className="me-2" style={{ fontSize: '2rem' }} />
-                                    <span>Catering</span>
-                                </a>
-                            </li>
-                            <li className="nav-item">
-                                <Link href="/customer/kiosk/cart">
-                                    <span style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
-                                        <FaShoppingCart className="me-2" style={{ fontSize: '2rem', color: 'red' }} />
-                                        <span style={{ color: 'red' }}>View Cart {cart.length > 0 && `(${cart.length})`}</span>
-                                    </span>
-                                </Link>
-                            </li>
-                        </ul>
-                    </div>
-                </nav>
-                <main className="col-md-10 ms-sm-auto col-lg-10 px-md-4">
-                    <div className="py-3" id="meals">
-                        <h2>Meals</h2>
-                        <h3>Choose Your Meal</h3>
-                        <div className="row mb-4">
-                            <div className="col-4">
-                                <Link href="meal">
-                                    <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}
-                                        onClick={() => setMealType('Bowl')}
-                                    >
-                                        Bowl
-                                    </button>
-                                </Link>
-                            </div>
-                            <div className="col-4">
-                                <Link href="meal">
-                                    <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}
-                                        onClick={() => setMealType('Plate')}
-                                    >
-                                        Plate
-                                    </button>
-                                </Link>
-                            </div>
-                            <div className="col-4">
-                                <Link href="meal">
-                                    <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}
-                                        onClick={() => setMealType('Bigger Plate')}
-                                    >
-                                        Bigger Plate
-                                    </button>
-                                </Link>
+        <>
+            <Head>
+                <title>Customer Menu Selection</title>
+            </Head>
+            <CustomerHeader />
+            <div className="container-fluid">
+                <div className="row">
+                    <nav className="col-md-2 d-none d-md-block bg-light sidebar" style={{ height: '100vh', fontSize: '1.5rem' }}>
+                        <div className="position-fixed">
+                            <ul className="nav flex-column">
+                                <li className="nav-item">
+                                    <a className="nav-link active" onClick={() => handleScrollToSection('meals')} style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
+                                        <FaUtensils className="me-2" style={{ fontSize: '2rem' }} />
+                                        <span>Meals</span>
+                                    </a>
+                                </li>
+                                <li className="nav-item">
+                                    <a className="nav-link" onClick={() => handleScrollToSection('A La Carte')} style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
+                                        <FaDrumstickBite className="me-2" style={{ fontSize: '2rem' }} />
+                                        <span>A La Carte</span>
+                                    </a>
+                                </li>
+                                <li className="nav-item">
+                                    <a className="nav-link" onClick={() => handleScrollToSection('sides')} style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
+                                        <FaCarrot className="me-2" style={{ fontSize: '2rem' }} />
+                                        <span>Sides</span>
+                                    </a>
+                                </li>
+                                <li className="nav-item">
+                                    <a className="nav-link" onClick={() => handleScrollToSection('appetizers')} style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
+                                        <FaConciergeBell className="me-2" style={{ fontSize: '2rem' }} />
+                                        <span>Appetizers</span>
+                                    </a>
+                                </li>
+                                <li className="nav-item">
+                                    <a className="nav-link" onClick={() => handleScrollToSection('drinks')} style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
+                                        <FaGlassCheers className="me-2" style={{ fontSize: '2rem' }} />
+                                        <span>Drinks</span>
+                                    </a>
+                                </li>
+                                <li className="nav-item">
+                                    <a className="nav-link" onClick={() => handleScrollToSection('deals')} style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
+                                        <FaGift className="me-2" style={{ fontSize: '2rem' }} />
+                                        <span>Deals</span>
+                                    </a>
+                                </li>
+                                <li className="nav-item">
+                                    <a className="nav-link" onClick={() => handleScrollToSection('catering')} style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
+                                        <FaTruck className="me-2" style={{ fontSize: '2rem' }} />
+                                        <span>Catering</span>
+                                    </a>
+                                </li>
+                                <li className="nav-item">
+                                    <Link href="/customer/kiosk/cart">
+                                        <span style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
+                                            <FaShoppingCart className="me-2" style={{ fontSize: '2rem', color: 'red' }} />
+                                            <span style={{ color: 'red' }}>View Cart {cart.length > 0 && `(${cart.length})`}</span>
+                                        </span>
+                                    </Link>
+                                </li>
+                            </ul>
+                        </div>
+                    </nav>
+                    <main className="col-md-10 ms-sm-auto col-lg-10 px-md-4">
+                        <div className="py-3" id="meals">
+                            <h2>Meals</h2>
+                            <h3>Choose Your Meal</h3>
+                            <div className="row mb-4">
+                                <div className="col-4">
+                                    <Link href="meal">
+                                        <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}
+                                            onClick={() => setMealType('Bowl')}
+                                        >
+                                            Bowl
+                                        </button>
+                                    </Link>
+                                </div>
+                                <div className="col-4">
+                                    <Link href="meal">
+                                        <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}
+                                            onClick={() => setMealType('Plate')}
+                                        >
+                                            Plate
+                                        </button>
+                                    </Link>
+                                </div>
+                                <div className="col-4">
+                                    <Link href="meal">
+                                        <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}
+                                            onClick={() => setMealType('Bigger Plate')}
+                                        >
+                                            Bigger Plate
+                                        </button>
+                                    </Link>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div className="py-3" id="A La Carte">
-                        <h2>A La Carte</h2>
-                        <div className="row">
-                            {renderItems(entrees)}
+                        <div className="py-3" id="A La Carte">
+                            <h2>A La Carte</h2>
+                            <div className="row">
+                                {renderItems(entrees)}
+                            </div>
                         </div>
-                    </div>
-                    <div className="py-3" id="sides">
-                        <h2>Sides</h2>
-                        <div className="row">
-                            {renderItems(sides, "side")} {/*Send true that this is a side so it only shows med and large */}
+                        <div className="py-3" id="sides">
+                            <h2>Sides</h2>
+                            <div className="row">
+                                {renderItems(sides, "side")} {/*Send true that this is a side so it only shows med and large */}
+                            </div>
                         </div>
-                    </div>
-                    <div className="py-3" id="appetizers">
-                        <h2>Appetizers</h2>
-                        <div className="row">
-                            {renderItems(appetizers, "side")} {/*Send true that this is an app so it only shows small and large */}
+                        <div className="py-3" id="appetizers">
+                            <h2>Appetizers</h2>
+                            <div className="row">
+                                {renderItems(appetizers, "side")} {/*Send true that this is an app so it only shows small and large */}
+                            </div>
                         </div>
-                    </div>
-                    <div className="py-3" id="drinks">
-                        <h2>Drinks</h2>
-                        <div className="row">
-                            {renderItems(drinks)}
+                        <div className="py-3" id="drinks">
+                            <h2>Drinks</h2>
+                            <div className="row">
+                                {renderItems(drinks)}
+                            </div>
                         </div>
-                    </div>
-                    <div className="py-3" id="deals">
-                        <h2>Deals</h2>
-                        <div className="row">
-                            {renderItems(deals)}
+                        <div className="py-3" id="deals">
+                            <h2>Deals</h2>
+                            <div className="row">
+                                {renderItems(deals)}
+                            </div>
                         </div>
-                    </div>
-                    <div className="py-3" id="catering">
-                        <h2>Catering</h2>
-                        <div className="row">
-                            {renderItems(catering)}
+                        <div className="py-3" id="catering">
+                            <h2>Catering</h2>
+                            <div className="row">
+                                {renderItems(catering)}
+                            </div>
                         </div>
-                    </div>
-                </main>
+                    </main>
+                </div>
             </div>
-        </div>
+        </>
     );
 };
 
