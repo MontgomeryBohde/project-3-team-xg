@@ -156,7 +156,7 @@ const CustomerMealSelect = () => {
 			setTimeout(() => {
 				const updatedCart = JSON.parse(sessionStorage.getItem("cart"));
 				console.log(updatedCart[0]); // Log the first item from the updated cart
-				router.push("/customer/menuselection"); // Navigate after cart update
+				router.push("/customer/kiosk/menuselection"); // Navigate after cart update
 			}, 500); // Adjust the timeout as needed
 		} else {
 			// Optional: show an error or alert if the user hasn't selected the correct number of items
@@ -209,7 +209,7 @@ const CustomerMealSelect = () => {
 							return (
 								<div key={index} className="col">
 									<button
-										className={`btn btn-outline-secondary w-100 h-100 ${isSelected ? "btn-selected" : ""}`}
+										className={`btn btn-outline-secondary w-100 ${isSelected ? "btn-selected" : ""}`}
 										onClick={() => {
 											if (!isSelected && selectedEntrees.length < numEntrees) {
 												handlePressed(item, "Entree");
@@ -222,13 +222,16 @@ const CustomerMealSelect = () => {
 									</button>
 									{isSelected && numEntrees > 1 && (
 										<div className="quantity-slider">
-											<button className="btn btn-outline-secondary" onClick={() => handleQuantityChange(item, -1)}>-</button>
-											<span>{1}</span>
 											<button
 												className="btn btn-outline-secondary"
-												onClick={() =>
-													selectedEntrees.length < numEntrees && handleQuantityChange(item, 1)
-												}
+												onClick={() => handleQuantityChange(item, -1)}
+											>
+												-
+											</button>
+											<span>{selectedEntrees.filter(entree => entree === item).length}</span>
+											<button
+												className="btn btn-outline-secondary"
+												onClick={() => selectedEntrees.length < numEntrees && handleQuantityChange(item, 1)}
 											>
 												+
 											</button>

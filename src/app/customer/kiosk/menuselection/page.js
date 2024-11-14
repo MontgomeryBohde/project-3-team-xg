@@ -117,7 +117,7 @@ const MealSelectionPage = () => {
 
     const renderItems = (items) => (
         items.map((item, index) => (
-            <div key={index} className="col-4 col-md-3 col-lg-2 mb-3">
+            <div key={index} className="col-6 col-md-4 col-lg-3 mb-3">
                 <div className="card">
                     <img
                         src={item.image}

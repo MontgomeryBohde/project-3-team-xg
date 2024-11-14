@@ -73,6 +73,18 @@ ul {
   align-items: center;
   margin-top: 5px;
 }
+.quantity-slider button {
+  width: 30px;
+  height: 30px;
+  font-size: 18px;
+  padding: 0;
+}
+.quantity-slider span {
+  font-size: 18px;
+  padding: 0 10px;
+  width: 40px;
+  text-align: center;
+}
 
 /* Fixed buttons for confirm and cancel */
 .order-confirm {
