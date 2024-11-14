@@ -1,17 +1,14 @@
-// src/components/ui/employee/header/EmployeeHeader.js
-"use client";
-
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import './EmployeeHeader.css';
+import './CustomerHeader.css';
 import getWeather from '@/backend/weather';
 
-const EmployeeHeader = () => {
-  const [employee, setEmployee] = useState('');
+const CustomerHeader = () => {
+  const [customer, setCustomer] = useState('');
   const [currentTemperature, setCurrentTemperature] = useState('');
   const [currentWeatherCondition, setCurrentWeatherCondition] = useState('');
   const [currentWeatherIcon, setCurrentWeatherIcon] = useState('');
@@ -19,10 +16,10 @@ const EmployeeHeader = () => {
   const router = useRouter();
 
   useEffect(() => {
-    // Retrieve employee data from local storage
-    const storedEmployee = window.localStorage.getItem('loggedInEmployeeName');
-    if (storedEmployee) {
-      setEmployee(storedEmployee);
+    // Retrieve customer data from local storage
+    const storedCustomer = window.localStorage.getItem('loggedInCustomerName');
+    if (storedCustomer) {
+      setCustomer(storedCustomer);
     }
 
     const updateTime = () => {
@@ -48,17 +45,17 @@ const EmployeeHeader = () => {
     const intervalId = setInterval(updateTime, 60000); // Update time every minute
 
     return () => clearInterval(intervalId); // Cleanup interval on component unmount
-  }, [employee]);
+  }, [customer]);
 
   const handleHomePush = () => {
-    router.push("/employee");
+    router.push("/customer");
   };
 
   return (
     <header className="bg-danger text-white p-2 d-flex align-items-center justify-content-between">
       <div className="d-flex align-items-center">
         <Image src="/panda-icon.png" alt="Panda Icon" width={50} height={50} onClick={handleHomePush} style={{ cursor: 'pointer' }}/>
-        <h4 className="mb-0">{employee ? `Welcome, ${employee}` : 'Welcome'}</h4>
+        <h4 className="mb-0">{customer ? `Welcome, ${customer}` : 'Welcome'}</h4>
       </div>
       <div className="d-flex align-items-center">
         <i className={`bi bi-${currentWeatherIcon} me-2`} style={{ fontSize: '2rem' }}></i>
@@ -71,4 +68,4 @@ const EmployeeHeader = () => {
   );
 };
 
-export default EmployeeHeader;
+export default CustomerHeader;
