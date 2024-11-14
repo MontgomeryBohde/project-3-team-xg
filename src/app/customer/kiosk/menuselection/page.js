@@ -181,7 +181,7 @@ const MealSelectionPage = () => {
         <div className="container-fluid">
             <div className="row">
                 <nav className="col-md-2 d-none d-md-block bg-light sidebar" style={{ height: '100vh', fontSize: '1.5rem' }}>
-                    <div className="position-sticky">
+                    <div className="position-fixed">
                         <ul className="nav flex-column">
                             <li className="nav-item">
                                 <a className="nav-link active" onClick={() => handleScrollToSection('meals')} style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>

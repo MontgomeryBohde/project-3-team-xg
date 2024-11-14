@@ -1,6 +1,7 @@
 
 .sidebar .nav-link {
     color: black !important;
+    cursor: pointer;
 }
 .sidebar .nav-link:hover {
     color: black !important;
