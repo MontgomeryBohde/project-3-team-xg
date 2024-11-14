@@ -5,7 +5,7 @@ import { FaUtensils, FaShoppingCart, FaDrumstickBite, FaCarrot, FaConciergeBell,
 import Link from "next/link";
 import './menuselection.css';
 
-const MenuSelectionPage = () => {
+const MealSelectionPage = () => {
     
     const entrees = [
         { name: "Hot Ones Blazing Bourbon Chicken", image: " https://olo-images-live.imgix.net/50/503be498564c415eb59e4e37120117b0.png?auto=format%2Ccompress&q=60&cs=tinysrgb&w=810&h=540&fit=crop&fm=png32&s=91acd3adc699123bb269b094fb843769"},
@@ -77,109 +77,92 @@ const MenuSelectionPage = () => {
         }
     };
 
-    //allow inputting whatever quantity of item 
-    const [selectedQuantity, setSelectedQuantity] = useState({});
-
-    const handleQuantityChange = (mealName, quantity) => {
-        setSelectedQuantity(prevQuantity => ({
-            ...prevQuantity,
-            [mealName]: quantity
-        }));
-    };
-
     const handleAddToCart = (mealName, items) => {
-        const item = items.find((item) => item.name === mealName);
-        const defaultSize = item?.sizeType === "special" ? null : item?.sizeType === "mediumOnly"
-            ? "Medium"
-            : item?.sizeType === "side"
-            ? "Medium"
-            : "Small"; // for regular items the default is small
+   
+    const item = items.find((item) => item.name === mealName);
+    const defaultSize = item?.sizeType === "special" ? null : item?.sizeType === "mediumOnly"
+        ? "Medium"
+        : item?.sizeType === "side"
+        ? "Medium"
+        : "Small"; //for regular items the default is small
 
-        const size = selectedSize[mealName] || defaultSize;
-        const quantity = selectedQuantity[mealName] || 1; // default quantity to 1 if not specified
-        const existingItem = cart.find(item => item.name === mealName && item.size === size);
+    
+    const size = selectedSize[mealName] || defaultSize;
+    const existingItem = cart.find(item => item.name === mealName && item.size === size);
 
-        let updatedCart;
-        if (existingItem) {
-            // if item already exists in the cart, increase the quantity
-            updatedCart = cart.map(item => 
-                item.name === mealName && item.size === size
-                    ? { ...item, quantity: item.quantity + quantity }
-                    : item
-            );
-        } else {
-            // else just add new item
-            updatedCart = [...cart, { name: mealName, size: size, quantity }];
-        }
+    let updatedCart;
+    if (existingItem) {
+        //if item already exists in the cart, increase the quantity
+        updatedCart = cart.map(item => 
+            item.name === mealName && item.size === size
+                ? { ...item, quantity: item.quantity + 1 }
+                : item
+        );
+    } else {
+        //else just add new item
+        updatedCart = [...cart, { name: mealName, size: size, quantity: 1 }];
+    }
 
-        // update cart and save to localStorage
-        setCart(updatedCart);
-        localStorage.setItem("cart", JSON.stringify(updatedCart));
-    };
+    //update cart and save to localStorage
+    setCart(updatedCart);
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+};
 
-    const renderItems = (items) => (
-        items.map((item, index) => (
-            <div key={index} className="col-4 col-md-3 col-lg-2 mb-3">
-                <div className="card">
-                    <img 
-                        src={item.image} 
-                        className="card-img-top" 
-                        alt={item.name} 
-                        style={{ width: '290px', height: '200px', objectFit: 'cover' }} 
-                    />
-                    <div className="card-body text-center">
-                        <p className="card-text">{item.name}</p>
 
-                        {item.sizeType !== "special" && (
-                            <select 
-                                className="form-select mb-2"
-                                onChange={(e) => handleSizeChange(item.name, e.target.value)}
-                            >
-                                {item.sizeType === "mediumOnly" ? (
+const renderItems = (items) => (
+    items.map((item, index) => (
+        <div key={index} className="col-4 col-md-3 col-lg-2 mb-3">
+            <div className="card">
+                <img 
+                    src={item.image} 
+                    className="card-img-top" 
+                    alt={item.name} 
+                    style={{ width: '290px', height: '200px', objectFit: 'cover' }} 
+                />
+                <div className="card-body text-center">
+                    <p className="card-text">{item.name}</p>
+
+                    {item.sizeType !== "special" && (
+                        <select 
+                            className="form-select mb-2"
+                            onChange={(e) => handleSizeChange(item.name, e.target.value)}
+                        >
+                            {item.sizeType === "mediumOnly" ? (
+    
+                                <option value="Medium">Medium</option>
+                            ) : item.sizeType === "side" ? (
+                               
+                                <>
                                     <option value="Medium">Medium</option>
-                                ) : item.sizeType === "side" ? (
-                                    <>
-                                        <option value="Medium">Medium</option>
-                                        <option value="Large">Large</option>
-                                    </>
-                                ) 
-                                : item.sizeType === "app" ? (     
-                                    <>
-                                        <option value="Small">Small</option>
-                                        <option value="Large">Large</option>
-                                    </>
-                                ) : (
-                                    <>
-                                        <option value="Small">Small</option>
-                                        <option value="Medium">Medium</option>
-                                        <option value="Large">Large</option>
-                                    </>
-                                )}
-                            </select>
-                        )}
+                                    <option value="Large">Large</option>
+                                </>
+                            ) 
+                            : item.sizeType === "app" ? (     
+                                <>
+                                    <option value="Small">Small</option>
+                                    <option value="Large">Large</option>
+                                </>
+                                ): (
+                                <>
+                                    <option value="Small">Small</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Large">Large</option>
+                                </>
+                            )}
+                        </select>
+                    )}
 
-                        {/* Quantity Selection */}
-                        <input 
-                            type="number" 
-                            min="1" 
-                            value={selectedQuantity[item.name] || 1}
-                            onChange={(e) => handleQuantityChange(item.name, parseInt(e.target.value))}
-                            className="form-control mb-2"
-                            placeholder="Quantity"
-                        />
-
-                        <button 
-                            className="btn btn-danger"
-                            onClick={() => handleAddToCart(item.name, items)}
-                        > 
-                            Add to Cart
-                        </button>
-                    </div>
+                    <button 
+                        className="btn btn-danger"
+                        onClick={() => handleAddToCart(item.name, items)}
+                    > 
+                        Add to Cart
+                    </button>
                 </div>
             </div>
-        ))
-    );
-
+        </div>
+    ))
+);
 
     
 
@@ -189,14 +172,6 @@ const MenuSelectionPage = () => {
             element.scrollIntoView({ behavior: "smooth" });
         }
     };
-  
-
-   
-
-    useEffect(() => {
-        
-        localStorage.setItem('cart', JSON.stringify(cart));
-    }, [cart]);
 
     return (
         <div className="container-fluid">
@@ -247,38 +222,45 @@ const MenuSelectionPage = () => {
                                 </a>
                             </li>
                             <li className="nav-item">
-                                <Link href="/customer/cart">
-                                    <span style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
-                                        <FaShoppingCart className="me-2" style={{ fontSize: '2rem', color: 'red' }} />
-                                        <span style={{ color: 'red' }}>View Cart</span>
-                                    </span>
-                                </Link>
+                            <Link href="/customer/cart">
+                            <span style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
+                                <FaShoppingCart className="me-2" style={{ fontSize: '2rem', color: 'red' }} />
+                                <span style={{ color: 'red' }}>View Cart</span>
+                            </span>
+                            </Link>
                             </li>
                         </ul>
                     </div>
                 </nav>
                 <main className="col-md-10 ms-sm-auto col-lg-10 px-md-4">
-                    <div className="py-3" id="meals">
-                        <h2>Meals</h2>
-                        <h3>Choose Your Meal</h3>
-                        <div className="row mb-4">
-                            <div className="col-4">
-                                <Link href="PLACEHOLD">
-                                    <button className="btn btn-outline-dark w-100" style={{ height: '100px', borderRadius: '5px' }}>Bowl</button>
-                                </Link>
-                            </div>
-                            <div className="col-4">
-                                <Link href="PLACEHOLD">
-                                    <button className="btn btn-outline-dark w-100" style={{ height: '100px', borderRadius: '5px' }}>Plate</button>
-                                </Link>
-                            </div>
-                            <div className="col-4">
-                                <Link href="PLACEHOLD">
-                                    <button className="btn btn-outline-dark w-100" style={{ height: '100px', borderRadius: '5px' }}>Bigger Plate</button>
-                                </Link>
-                            </div>
+                <div className="py-3" id="Meals">
+                    <h2>Meals</h2>
+                    <h3>Choose Your Meal</h3>
+                    <div className="row mb-4">
+                        <div className="col-4">
+                            <Link href="PLACEHOLD">
+                                <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}>
+                                    Bowl
+                                </button>
+                            </Link>
+                        </div>
+                        <div className="col-4">
+                            <Link href="PLACEHOLD">
+                                <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}>
+                                    Plate
+                                </button>
+                            </Link>
+                        </div>
+                        <div className="col-4">
+                            <Link href="PLACEHOLD">
+                                <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}>
+                                    Bigger Plate
+                                </button>
+                            </Link>
                         </div>
                     </div>
+                </div>
+
                     <div className="py-3" id="A La Carte">
                         <h2>A La Carte</h2>
                         <div className="row">
@@ -288,13 +270,13 @@ const MenuSelectionPage = () => {
                     <div className="py-3" id="sides">
                         <h2>Sides</h2>
                         <div className="row">
-                            {renderItems(sides, "side")}
+                            {renderItems(sides, "side")} {/*Send true that this is a side so it only shows med and large */}
                         </div>
                     </div>
                     <div className="py-3" id="appetizers">
                         <h2>Appetizers</h2>
                         <div className="row">
-                            {renderItems(appetizers, "side")}
+                            {renderItems(appetizers, "side")} {/*Send true that this is an app so it only shows small and large */}
                         </div>
                     </div>
                     <div className="py-3" id="drinks">
@@ -319,7 +301,6 @@ const MenuSelectionPage = () => {
             </div>
         </div>
     );
-    
 };
 
-export default MenuSelectionPage;
+export default MealSelectionPage;
