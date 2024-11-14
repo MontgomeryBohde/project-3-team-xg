@@ -1,15 +1,21 @@
 /* Center the content excluding EmployeeHeader */
-body {
+/* body {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
   margin: 0;
-  background-color: #f4f4f4; /* Optional: background color */
-  flex-direction: column; /* Stack the elements vertically */
-}
+  background-color: #f4f4f4;
+  flex-direction: column;
+} */
 
 .confirm-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  background-color: #f4f4f4;
+  flex-direction: column;
   padding: 20px;
   text-align: center;
   min-height: 300px;  /* Ensure the container has a minimum height */
