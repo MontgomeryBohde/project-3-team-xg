@@ -72,6 +72,14 @@ const CustomerMealSelect = () => {
 
 	const router = useRouter();
 
+	// Check if running on client-side to use sessionStorage
+	useEffect(() => {
+		if (typeof window !== "undefined") {
+			const storedCart = sessionStorage.getItem('cart');
+			setCart(storedCart ? JSON.parse(storedCart) : []);
+		}
+	}, []);
+
 	// Handle item button press
 	const handlePressed = (item, type) => {
 		if (type === "Side") {
@@ -203,7 +211,7 @@ const CustomerMealSelect = () => {
 				<section className="section">
 					<h2>Entrees</h2>
 					<h4>Select {numEntrees}</h4>
-					<div className="row row-cols-3 g-3"> {/* Bootstrap grid layout with gaps */}
+					<div className="row row-cols-3 g-3">
 						{entrees.map((item, index) => {
 							const isSelected = selectedEntrees.includes(item);
 							return (
@@ -220,24 +228,20 @@ const CustomerMealSelect = () => {
 									>
 										{item}
 									</button>
+
+									{/* Show quantity slider only when selected */}
 									{isSelected && numEntrees > 1 && (
 										<div className="quantity-slider">
 											<button className="btn btn-outline-secondary" onClick={() => handleQuantityChange(item, -1)}>-</button>
 											<span>{1}</span>
-											<button
-												className="btn btn-outline-secondary"
-												onClick={() =>
-													selectedEntrees.length < numEntrees && handleQuantityChange(item, 1)
-												}
-											>
-												+
-											</button>
+											<button className="btn btn-outline-secondary" onClick={() => handleQuantityChange(item, 1)}>+</button>
 										</div>
 									)}
 								</div>
 							);
 						})}
 					</div>
+
 				</section>
 
 
