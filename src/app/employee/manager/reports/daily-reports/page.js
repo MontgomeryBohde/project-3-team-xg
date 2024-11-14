@@ -18,12 +18,12 @@ const Page = () => {
     return (
         <>
             <Head>
-                <title>Reports</title>
+                <title>Daily Reports</title>
             </Head>
             <EmployeeHeader />
             <div className="text-center m-4">
-                <h2 className="m-5">Reports</h2>
-                <div class="d-grid gap-2 col-6 mx-auto">
+                <h2 className="m-5">Daily Reports</h2>
+                <div className="d-grid gap-2 col-6 mx-auto">
                     <button className="btn btn-primary btn-lg m-3" onClick={navigateToXReport}>
                         X-Report
                     </button>
