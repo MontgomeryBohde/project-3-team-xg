@@ -1,0 +1,36 @@
+body { } /* For some reason CSS does not get applied without this*/
+
+.container-fluid {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 90vh;
+}
+
+.row {
+    display: flex;
+    justify-content: center;
+    height: 100%;
+}
+
+.col-4 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-square {
+    width: 300px;
+    height: 200px;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-square a {
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-decoration: none;
+}
