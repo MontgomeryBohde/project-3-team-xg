@@ -119,9 +119,9 @@ const setMealType = (mealType) => {
                 <div className="card">
                     <img 
                         src={item.image} 
-                        className="card-img-top" 
+                        className="card-img-top img-fluid" 
                         alt={item.name} 
-                        style={{ width: '365px', height: '200px', objectFit: 'cover' }} 
+                        style={{ objectFit: 'cover', maxHeight: '200px' }} 
                     />
                     <div className="card-body text-center">
                         <p className="card-text">{item.name}</p>
