@@ -1,7 +1,9 @@
+// src/app/employee/manager/orders/page.js
 "use client";
 import React, { useEffect, useState } from 'react';
 import './OrderInfo.css';
 import OrderCard from './OrderCard';
+import EmployeeLogInHeader from '@/components/ui/employee/header/EmployeeLogInHeader';
 
 const OrderInfo = () => {
     const [orders, setOrders] = useState([]);
@@ -50,6 +52,7 @@ const OrderInfo = () => {
 
     return (
         <div className="order-info-container">
+            <EmployeeLogInHeader />
             <h1 className="title">Order Information</h1>
             <div className="order-cards-container">
                 {currentOrders.map(order => (

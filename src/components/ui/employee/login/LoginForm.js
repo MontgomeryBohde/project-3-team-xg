@@ -1,10 +1,9 @@
-"use client";
 // src/components/ui/employee/login/LoginForm.js
+"use client";
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from "next/navigation";
 import 'bootstrap/dist/css/bootstrap.css';
-import './LoginForm.css';
 
 const LoginForm = () => {
   const [userId, setUserId] = useState('');
@@ -19,7 +18,7 @@ const LoginForm = () => {
       try {
         const response = await fetch('/api/employees');
         if (!response.ok) {
-          throw new Error('Failed to fetch employees');
+            throw new Error('Failed to fetch employees');
         }
         const data = await response.json();
         setEmployees(data);
@@ -44,34 +43,25 @@ const LoginForm = () => {
 
     // Check if the employee exists
     if (!employee) {
-      setError("User ID not found");
-      return;
+		setError("User ID not found");
+		return;
     }
     else // store this employee in local storage
     {
-      localStorage.setItem('loggedInEmployee', JSON.stringify(employee));
+        localStorage.setItem('loggedInEmployee', JSON.stringify(employee));
     }
 
     // Validate password
     if (password !== "1234") {
-      setError("Incorrect password");
-      return;
+		setError("Incorrect password");
+		return;
     }
 
     // Check if the employee is a manager
     if (employee.is_manager) {
-      const navigateToManager = window.confirm(
-        "Do you want to go to the Manager page or Employee page? Click 'OK' for Manager, 'Cancel' for Employee."
-      );
-
-      if (navigateToManager) {
-        router.push('/employee/manager/menu'); // Navigate to manager page
-      } else {
-        router.push('/employee/cashier/order'); // Navigate to general employee page
-      }
+        router.push('/employee/manager');
     } else {
-      // Navigate to cashier page if not a manager
-      router.push('/employee/cashier/order');
+	    router.push('/employee/cashier/order');
     }
 
   };

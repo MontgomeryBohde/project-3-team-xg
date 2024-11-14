@@ -1,12 +1,9 @@
-'use client'
+'use client';
 
 import { useState } from 'react';
-import './menu.css';
-
 import EmployeeLogInHeader from '@/components/ui/employee/header/EmployeeLogInHeader';
 
-
-export default function Menu() {
+const Menu = () => {
     // Hardcoded for now
     const [entrees, setEntrees] = useState([
         "Orange Chicken", "Black Pepper Sirloin Steak", "Honey Walnut Shrimp",
@@ -40,7 +37,6 @@ export default function Menu() {
     };
 
     const addItem = () => {
-        // Add the new item to the correct array based on the selected category
         switch (itemCategory) {
             case 'Entree':
                 setEntrees((prev) => [...prev, itemName]);
@@ -60,16 +56,8 @@ export default function Menu() {
             default:
                 break;
         }
-        
-        // Close the popup and reset the input fields
-        setSelectedItem(null);
-        setItemName('');
-        setItemSize('Medium');
-        setItemCategory('Entree');
-        setInventoryIds('{}');
-        setItemPrice(3.00);
+        resetFields();
     };
-
 
     const removeItem = () => {
         switch (itemCategory) {
@@ -91,12 +79,11 @@ export default function Menu() {
             default:
                 break;
         }
-
-        setSelectedItem(null);
         resetFields();
     };
 
     const resetFields = () => {
+        setSelectedItem(null);
         setItemName('');
         setItemSize('Medium');
         setItemCategory('Entree');
@@ -105,161 +92,154 @@ export default function Menu() {
     };
 
     return (
-        <div className="menu-container">
+        <div className="container-fluid p-0">
             <EmployeeLogInHeader />
 
-            {/* Navigation Bar */}
-            <nav className="navbar">
-                <ul className="nav-list">
-                    <li className = "nav-btn"  onClick={() => handleNavigation('entrees')}>Entrees</li>
-                    <li className = "nav-btn" onClick={() => handleNavigation('sides')}>Sides</li>
-                    <li className = "nav-btn" onClick={() => handleNavigation('appetizers')}>Appetizers</li>
-                    <li className = "nav-btn" onClick={() => handleNavigation('drinks')}>Drinks</li>
-                    <li className = "nav-btn" onClick={() => handleNavigation('seasonal')}>Seasonal</li>
-                </ul>
-            </nav>
+            <div className="d-flex">
+                {/* Sidebar Navigation */}
+                <div className="bg-light p-4" style={{ width: '250px', position: 'sticky', top: '0', height: '100vh' }}>
+                    <ul className="nav flex-column">
+                        <li className="nav-item mb-3">
+                            <button className="btn btn-outline-secondary btn-lg w-100" onClick={() => handleNavigation('entrees')}>Entrees</button>
+                        </li>
+                        <li className="nav-item mb-3">
+                            <button className="btn btn-outline-secondary btn-lg w-100" onClick={() => handleNavigation('sides')}>Sides</button>
+                        </li>
+                        <li className="nav-item mb-3">
+                            <button className="btn btn-outline-secondary btn-lg w-100" onClick={() => handleNavigation('appetizers')}>Appetizers</button>
+                        </li>
+                        <li className="nav-item mb-3">
+                            <button className="btn btn-outline-secondary btn-lg w-100" onClick={() => handleNavigation('drinks')}>Drinks</button>
+                        </li>
+                        <li className="nav-item mb-3">
+                            <button className="btn btn-outline-secondary btn-lg w-100" onClick={() => handleNavigation('seasonal')}>Seasonal</button>
+                        </li>
+                    </ul>
+                </div>
 
-            <h1>Menu</h1>
+                <div className="container mt-4">
+                    <h1 className="text-center mb-4">Menu</h1>
+                    <div className="content">
+                        <section id="entrees" className="mb-5">
+                            <h2 className="text-center">Entrees</h2>
+                            <div className="row">
+                                {entrees.map((item, index) => (
+                                    <div key={index} className="col-md-3 mb-3">
+                                        <button className="btn btn-outline-primary w-100 btn-lg" onClick={() => handlePopup(item, "Entree")}>{item}</button>
+                                    </div>
+                                ))}
+                                <div className="col-md-3 mb-3">
+                                    <button className="btn btn-outline-success w-100 btn-lg" onClick={() => handlePopup("", "Entree")}>Add New Item</button>
+                                </div>
+                            </div>
+                        </section>
 
-            <div className="content">
-                <section id="entrees" className="section">
-                    <h2>Entrees</h2>
-                    <div className="button-grid">
-                        {entrees.map((item, index) => (
-                            <button key={index} className="item-button" onClick={() => handlePopup(item, "Entree")}>
-                                {item}
-                            </button>
-                        ))}
+                        <section id="sides" className="mb-5">
+                            <h2 className="text-center">Sides</h2>
+                            <div className="row">
+                                {sides.map((item, index) => (
+                                    <div key={index} className="col-md-3 mb-3">
+                                        <button className="btn btn-outline-primary w-100 btn-lg" onClick={() => handlePopup(item, "Side")}>{item}</button>
+                                    </div>
+                                ))}
+                                <div className="col-md-3 mb-3">
+                                    <button className="btn btn-outline-success w-100 btn-lg" onClick={() => handlePopup("", "Side")}>Add New Item</button>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section id="appetizers" className="mb-5">
+                            <h2 className="text-center">Appetizers</h2>
+                            <div className="row">
+                                {appetizers.map((item, index) => (
+                                    <div key={index} className="col-md-3 mb-3">
+                                        <button className="btn btn-outline-primary w-100 btn-lg" onClick={() => handlePopup(item, "Appetizer")}>{item}</button>
+                                    </div>
+                                ))}
+                                <div className="col-md-3 mb-3">
+                                    <button className="btn btn-outline-success w-100 btn-lg" onClick={() => handlePopup("", "Appetizer")}>Add New Item</button>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section id="drinks" className="mb-5">
+                            <h2 className="text-center">Drinks</h2>
+                            <div className="row">
+                                {drinks.map((item, index) => (
+                                    <div key={index} className="col-md-3 mb-3">
+                                        <button className="btn btn-outline-primary w-100 btn-lg" onClick={() => handlePopup(item, "Drink")}>{item}</button>
+                                    </div>
+                                ))}
+                                <div className="col-md-3 mb-3">
+                                    <button className="btn btn-outline-success w-100 btn-lg" onClick={() => handlePopup("", "Drink")}>Add New Item</button>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section id="seasonal" className="mb-5">
+                            <h2 className="text-center">Seasonal</h2>
+                            <div className="row">
+                                {seasonal.map((item, index) => (
+                                    <div key={index} className="col-md-3 mb-3">
+                                        <button className="btn btn-outline-primary w-100 btn-lg" onClick={() => handlePopup(item, "Seasonal")}>{item}</button>
+                                    </div>
+                                ))}
+                                <div className="col-md-3 mb-3">
+                                    <button className="btn btn-outline-success w-100 btn-lg" onClick={() => handlePopup("", "Seasonal")}>Add New Item</button>
+                                </div>
+                            </div>
+                        </section>
                     </div>
-                    <button className="item-button" onClick={() => handlePopup("", "Entree")}> Add New Item </button>
-                </section>
-
-                <section id="sides" className="section">
-                    <h2>Sides</h2>
-                    <div className="button-grid">
-                        {sides.map((item, index) => (
-                            <button key={index} className="item-button" onClick={() => handlePopup(item, "Side")}>
-                                {item}
-                            </button>
-                        ))}
-                    </div>
-                    <button className="item-button" onClick={() => handlePopup("", "Side")}> Add New Item </button>
-                </section>
-
-                <section id="appetizers" className="section">
-                    <h2>Appetizers</h2>
-                    <div className="button-grid">
-                        {appetizers.map((item, index) => (
-                            <button key={index} className="item-button" onClick={() => handlePopup(item, "Appetizer")}>
-                                {item}
-                            </button>
-                        ))}
-                    </div>
-                    <button className="item-button" onClick={() => handlePopup("", "Appetizer")}> Add New Item </button>
-                </section>
-
-                <section id="drinks" className="section">
-                    <h2>Drinks</h2>
-                    <div className="button-grid">
-                        {drinks.map((item, index) => (
-                            <button key={index} className="item-button" onClick={() => handlePopup(item, "Drink")}>
-                                {item}
-                            </button>
-                        ))}
-                    </div>
-                    <button className="item-button" onClick={() => handlePopup("", "Drink")}> Add New Item </button>
-                </section>
-
-                <section id="seasonal" className="section">
-                    <h2>Seasonal</h2>
-                    <div className="button-grid">
-                        {seasonal.map((item, index) => (
-                            <button key={index} className="item-button" onClick={() => handlePopup(item, "Seasonal")}>
-                                {item}
-                            </button>
-                        ))}
-                    </div>
-                    <button className="item-button" onClick={() => handlePopup("", "Seasonal")}> Add New Item </button>
-                </section>
+                </div>
             </div>
 
             {selectedItem && (
-                <div className="popup">
-                    <h3>Add New Item</h3>
-                    <label>
-                        Name: 
-                        <input type="text" value={itemName} onChange={(e) => setItemName(e.target.value)} />
-                    </label>
-                    <label>
-                        Size: 
-                        <input type="text" value={itemSize} onChange={(e) => setItemSize(e.target.value)} />
-                    </label>
-                    <label>
-                        Category:
-                        <select value={itemCategory} onChange={(e) => setItemCategory(e.target.value)}>
-                            <option value="Entree">Entree</option>
-                            <option value="Side">Side</option>
-                            <option value="Appetizer">Appetizer</option>
-                            <option value="Drink">Drink</option>
-                            <option value="Seasonal">Seasonal</option>
-                        </select>
-                    </label>
-                    <label>
-                        Inventory Item IDs:
-                        <input type="text" value={inventoryIds} onChange={(e) => setInventoryIds(e.target.value)} />
-                    </label>
-                    <label>
-                        Price:
-                        <input type="number" value={itemPrice} onChange={(e) => setItemPrice(e.target.value)} />
-                    </label>
-                    <button onClick={addItem}>Add</button>
-                    <button onClick={removeItem}>Remove</button>
-                    <button onClick={() => setSelectedItem(null)}>Cancel</button>
+                <div className="modal fade show d-block" tabIndex="-1" role="dialog" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                    <div className="modal-dialog modal-dialog-centered" role="document">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">Add New Item</h5>
+                                <button type="button" className="btn-close" onClick={() => setSelectedItem(null)}></button>
+                            </div>
+                            <div className="modal-body">
+                                <div className="mb-3">
+                                    <label className="form-label">Name:</label>
+                                    <input type="text" className="form-control" value={itemName} onChange={(e) => setItemName(e.target.value)} />
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label">Size:</label>
+                                    <input type="text" className="form-control" value={itemSize} onChange={(e) => setItemSize(e.target.value)} />
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label">Category:</label>
+                                    <select className="form-select" value={itemCategory} onChange={(e) => setItemCategory(e.target.value)}>
+                                        <option value="Entree">Entree</option>
+                                        <option value="Side">Side</option>
+                                        <option value="Appetizer">Appetizer</option>
+                                        <option value="Drink">Drink</option>
+                                        <option value="Seasonal">Seasonal</option>
+                                    </select>
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label">Inventory Item IDs:</label>
+                                    <input type="text" className="form-control" value={inventoryIds} onChange={(e) => setInventoryIds(e.target.value)} />
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label">Price:</label>
+                                    <input type="number" className="form-control" value={itemPrice} onChange={(e) => setItemPrice(e.target.value)} />
+                                </div>
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-success btn-lg" onClick={addItem}>Add</button>
+                                <button type="button" className="btn btn-danger btn-lg" onClick={removeItem}>Remove</button>
+                                <button type="button" className="btn btn-secondary btn-lg" onClick={() => setSelectedItem(null)}>Cancel</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             )}
-
-            <style jsx>{`
-                .popup {
-                    position: fixed;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    background-color: white;
-                    padding: 20px;
-                    border: 1px solid #ccc;
-                    border-radius: 5px;
-                    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-                    z-index: 1000;
-                }
-
-                .popup label {
-                    display: block;
-                    margin: 10px 0;
-                }
-
-                .popup button {
-                    margin-top: 10px;
-                    margin-right: 5px;
-                }
-
-                .popup input, .popup select {
-                    margin-left: 10px;
-                }
-
-                /* Overlay to darken the background when popup is active */
-                .overlay {
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background-color: rgba(0, 0, 0, 0.5);
-                    z-index: 999;
-                }
-                
-            `}</style>
-            
-            {selectedItem && <div className="overlay" onClick={() => setSelectedItem(null)} />}
         </div>
-    );    
+    );
 }
+
+export default Menu;

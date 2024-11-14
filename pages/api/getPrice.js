@@ -39,7 +39,7 @@ export default async function handler(req, res) {
         const result = await client.query(query, values);
         console.log("Fetched prices:", result.rows); 
 
-       
+
         const prices = result.rows.reduce((acc, row) => {
             if (!acc[row.name]) {
                 acc[row.name] = {};

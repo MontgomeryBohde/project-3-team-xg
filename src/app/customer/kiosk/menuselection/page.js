@@ -226,7 +226,7 @@ const setMealType = (mealType) => {
                                 </a>
                             </li>
                             <li className="nav-item">
-                            <Link href="/customer/cart">
+                            <Link href="/customer/kiosk/cart">
                             <span style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
                                 <FaShoppingCart className="me-2" style={{ fontSize: '2rem', color: 'red' }} />
                                 <span style={{ color: 'red' }}>View Cart</span>
