@@ -28,7 +28,7 @@ const Page = () => {
             <EmployeeHeader />
             <div className="text-center m-4">
                 <h2 className="m-5">Reports</h2>
-                <div class="d-grid gap-2 col-6 mx-auto">
+                <div className="d-grid gap-2 col-6 mx-auto">
                     <button className="btn btn-primary btn-lg m-3" onClick={navigateToSales}>
                         Sales Report
                     </button>
