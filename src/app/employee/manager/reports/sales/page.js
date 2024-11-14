@@ -15,10 +15,9 @@ import {
     Title,
     Legend
 } from "chart.js";
-import 'bootstrap/dist/css/bootstrap.css';
 import Head from "next/head";
 
-import EmployeeHeader from "@/components/ui/employee/header/EmployeeHeader";
+import EmployeeLogInHeader from "@/components/ui/employee/header/EmployeeLogInHeader";
 
 ChartJS.register(TimeScale, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -28,7 +27,7 @@ const SalesReport = () => {
             <Head>
                 <title>Sales Report</title>
             </Head>
-            <EmployeeHeader />
+            <EmployeeLogInHeader />
             <div className="container mt-4">
                 <h2 className="text-center">Sales Report</h2>
                 <SalesChart />

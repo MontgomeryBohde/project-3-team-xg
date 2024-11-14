@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import EmployeeHeader from '@/components/ui/employee/header/EmployeeHeader';
+import EmployeeLogInHeader from '@/components/ui/employee/header/EmployeeLogInHeader';
 import Head from 'next/head';
 
 const XReport = () => {
@@ -69,7 +69,7 @@ const XReport = () => {
             <Head>
                 <title>X Report</title>
             </Head>
-            <EmployeeHeader />
+            <EmployeeLogInHeader />
             <div className="container mt-4">
                 <h2 className="text-center">X Report</h2>
 

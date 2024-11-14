@@ -5,7 +5,7 @@
 import React, { useEffect, useState } from 'react';
 import { Bar } from 'react-chartjs-2';  // Importing Bar chart from Chart.js
 import Chart from 'chart.js/auto';      // Automatically registering Chart.js components
-import EmployeeHeader from '@/components/ui/employee/header/EmployeeHeader';
+import EmployeeLogInHeader from '@/components/ui/employee/header/EmployeeLogInHeader';
 import Head from 'next/head';  // Import Head for page metadata
 
 const ProductUsageChart = () => {
@@ -62,7 +62,7 @@ const ProductUsageChart = () => {
             <Head>
                 <title>Menu Popularity</title>
             </Head>
-            <EmployeeHeader />
+            <EmployeeLogInHeader />
             <h2 className="m-4 text-center">Product Usage Report</h2>
 
             {productData.length > 0 ? (

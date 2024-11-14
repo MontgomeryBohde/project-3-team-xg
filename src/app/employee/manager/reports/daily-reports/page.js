@@ -1,7 +1,7 @@
 // src/app/employee/manager/reports/daily-reports/page.js
 "use client";
 import { useRouter } from "next/navigation";
-import EmployeeHeader from "@/components/ui/employee/header/EmployeeHeader";
+import EmployeeLogInHeader from "@/components/ui/employee/header/EmployeeLogInHeader";
 import Head from "next/head";
 
 const Page = () => {
@@ -19,7 +19,7 @@ const Page = () => {
             <Head>
                 <title>Daily Reports</title>
             </Head>
-            <EmployeeHeader />
+            <EmployeeLogInHeader />
             <div className="text-center m-4">
                 <h2 className="m-5">Daily Reports</h2>
                 <div className="d-grid gap-2 col-6 mx-auto">

@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import EmployeeHeader from '@/components/ui/employee/header/EmployeeHeader';
+import EmployeeLogInHeader from '@/components/ui/employee/header/EmployeeLogInHeader';
 import Head from 'next/head';
 
 const MenuPopularity = () => {
@@ -35,7 +35,7 @@ const MenuPopularity = () => {
             <Head>
                 <title>Menu Popularity</title>
             </Head>
-            <EmployeeHeader />
+            <EmployeeLogInHeader />
             <div className="container mt-4">
                 <h2 className="text-center">Most Popular Menu Items</h2>
 

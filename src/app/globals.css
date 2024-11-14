@@ -6,7 +6,7 @@ body, html {
     font-family: 'Arial', sans-serif;
 }
 
-.customer-container, .home-container, .menu-board-container {
+.customer-container, .home-container, .menu-board-container, .mobile-container {
     position: relative;
     background: linear-gradient(to bottom right, #4b0000, #800020); /* Darker gradient with maroon and bordeaux colors */
 }
