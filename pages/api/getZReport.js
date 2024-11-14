@@ -1,5 +1,4 @@
 // pages/api/getZReport.js
-
 import { Pool } from 'pg';
 
 const pool = new Pool({
@@ -45,8 +44,6 @@ export default async function getZReport(req, res) {
                     transaction_count: zReport.transaction_count,
                     cash_total: parseFloat(zReport.cash_total),
                     credit_card_total: parseFloat(zReport.credit_card_total),
-                    total_tips: parseFloat(zReport.total_tips),
-                    refunds: parseFloat(zReport.refunds),
                 });
             } else {
                 res.status(404).json({ error: 'No Z Report data available' });

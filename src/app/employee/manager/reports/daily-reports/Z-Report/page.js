@@ -1,5 +1,4 @@
 // src/app/employee/manager/reports/daily-reports/Z-Report/page.js
-
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -54,7 +53,7 @@ const ZReport = () => {
                             </tr>
                         ) : (
                             <tr>
-                                <td colSpan="6">Loading...</td>
+                                <td colSpan="4">Loading...</td>
                             </tr>
                         )}
                     </tbody>
