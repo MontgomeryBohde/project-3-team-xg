@@ -1,42 +1,48 @@
 /* Center the content excluding EmployeeHeader */
 body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    background-color: #f4f4f4; /* Optional: background color */
-    flex-direction: column; /* Stack the elements vertically */
-  }
-  
-  .confirm-content h1 {
-    margin: 10px 0;
-    text-align: center;
-    font-size: 3.5rem;
-  }
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  background-color: #f4f4f4; /* Optional: background color */
+  flex-direction: column; /* Stack the elements vertically */
+}
 
-  .confirm-content h2 {
-    margin: 10px 0;
-    text-align: center;
-    font-size: 1.3rem;
-  }
+.confirm-content {
+  padding: 20px;
+  text-align: center;
+  min-height: 300px;  /* Ensure the container has a minimum height */
+  transition: opacity 0.5s ease;
+}
 
-  .confirm-content h3 {
-    margin: 10px 0;
-    text-align: center;
-    padding-top: 30px;
-  }
+.confirm-content h1 {
+  margin: 10px 0;
+  text-align: center;
+  font-size: 3.5rem;
+}
 
-  .confirm-content h4 {
-    text-align: center;
-    padding-top: 30px;
-  }
-  
-  .confirm-content img {
-    margin-top: 20px;
-    align-items: center;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  
+.confirm-content h2 {
+  margin: 10px 0;
+  text-align: center;
+  font-size: 1.3rem;
+}
+
+.confirm-content h3 {
+  margin: 10px 0;
+  text-align: center;
+  padding-top: 30px;
+}
+
+.confirm-content h4 {
+  text-align: center;
+  padding-top: 30px;
+}
+
+.confirm-content img {
+  margin-top: 20px;
+  align-items: center;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
