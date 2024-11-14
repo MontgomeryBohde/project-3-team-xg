@@ -53,7 +53,7 @@ const CustomerPage = () => {
                 {/* Back Button */}
                 <div className="mt-5">
                     <button className="btn btn-secondary btn-sm mb-2" onClick={navigateToMainPage}>
-                        Back to Customer Page
+                        Back
                     </button>
                 </div>
             </div>

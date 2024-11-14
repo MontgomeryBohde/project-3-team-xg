@@ -31,7 +31,7 @@ const MobilePage = () => {
                 
                 {/* Start Meal Selection Button */}                
                 <button className="btn btn-outline-light btn-lg px-5 py-3 Mobile-button mb-4" onClick={navigateToMeal}>
-                    Start Meal Selection
+                    Start making your order
                 </button>
 
                 {/* Back Button */}

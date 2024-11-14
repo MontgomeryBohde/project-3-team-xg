@@ -56,7 +56,7 @@ const MenuBoardPage = () => {
                     </div>
                 </div>
                 <button className="btn btn-outline-light btn-lg mt-5" onClick={navigateBack}>
-                    Back to Customer Page
+                    Back
                 </button>
             </div>
 

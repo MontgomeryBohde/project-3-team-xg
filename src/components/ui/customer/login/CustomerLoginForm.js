@@ -32,7 +32,7 @@ const CustomerLoginForm = () => {
     }
 
     // Validate password
-    if (password !== "1234") {
+    if (code !== "1234") {
       setError("Incorrect password");
       return;
     }
