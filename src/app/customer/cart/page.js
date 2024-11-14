@@ -4,7 +4,10 @@ import Link from "next/link";
 import { FaShoppingCart } from "react-icons/fa";
 
 const CartPage = () => {
-    const [cart, setCart] = useState([]);
+    const [cart, setCart] = useState(() => { // retrive initially from sessionstorage
+    const storedCart = sessionStorage.getItem('cart');
+    return storedCart ? JSON.parse(storedCart) : [];
+    });
     const [prices, setPrices] = useState({});
     const [loading, setLoading] = useState(true);
     const [promoCode, setPromoCode] = useState("");
@@ -32,40 +35,25 @@ const CartPage = () => {
     useEffect(() => {
         if (cart.length === 0) return; // Do nothing if the cart is empty.
 
-        // Process the cart items and assign prices based on mealItem names.
-        const foodNames = cart.map(item => {
-            if (item.mealItem) {
-            // For mealCartItem, assign fixed prices based on mealItem name
-            let price = 0;
-            switch (item.mealItem.name) {
-                case "Bowl":
-                price = 8.30;
-                break;
-                case "Plate":
-                price = 10.00;
-                break;
-                case "Bigger Plate":
-                price = 11.75;
-                break;
-                default:
-                price = 0; // Default price if mealItem is unrecognized
-                break;
-            }
-            // Update the item's price directly
-            item.price = price;
+        // Process the cart items and update their prices based on the existing price field.
+        const foodNames = cart.map((item) => {
+        if (item.mealItem) {
+            // Use the price field directly from the mealItem object
+            item.price = item.mealItem.price || 0; // Default to 0 if price is undefined
 
-            // You can also add the item to the foodNames list if needed
+            console.log(item.mealItem.price);
+
+            // Return the mealItem name for further processing (if needed)
             return item.mealItem.name;
-            }
+        }
 
-            // For other types (non-mealCartItems), return the name (continue fetching prices as before)
-            return item.name;
+        // For other types (non-mealCartItems), return the name (continue fetching prices as before)
+        return item.name;
     }).flat(); // Flatten the array in case there are nested names (for entrees/sides)
     
 
     // Now, fetch prices for the non-mealCartItem items from the server
     const nonMealItems = cart.filter(item => !item.mealItem).map(item => item.name);
-
         if (nonMealItems.length > 0) {
         fetch('/api/getPrice', {
             method: 'POST',
@@ -90,11 +78,19 @@ const CartPage = () => {
 
     const calculateSubtotal = () => {
         return cart.reduce((total, item) => {
-            
-            const itemPrice = prices[item.name]?.[item.size] || specialDealPrices[item.name] || 0;
+            let itemPrice;
+    
+            // If it's a mealItem, use the price from the mealItem itself
+            if (item.mealItem) {
+                itemPrice = item.price || item.mealItem.price || 0; // Fallback to mealItem.price if item.price is not set
+            } else {
+                // For regular items, use the fetched prices or special deal prices
+                itemPrice = prices[item.name]?.[item.size] || specialDealPrices[item.name] || 0;
+            }
+    
             return total + (itemPrice * item.quantity);
         }, 0);
-    };
+    };    
 
     const subtotal = calculateSubtotal();
 
@@ -234,7 +230,7 @@ const CartPage = () => {
 
             <button onClick={handleClearCart} className="btn btn-danger mt-3">Clear Order</button>
             <Link href="/customer/menuselection" className="btn btn-primary mt-3">Back to Menu</Link>
-            <Link href="/customer/confirm" className="btn btn-success mt-3">Confirm</Link>
+            <Link href="/customer/confirmation" className="btn btn-success mt-3">Confirm</Link>
         </div>
     );
 };

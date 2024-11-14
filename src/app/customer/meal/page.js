@@ -65,8 +65,7 @@ const CustomerMealSelect = () => {
 
   const [selectedSides, setSelectedSides] = useState([]);
   const [selectedEntrees, setSelectedEntrees] = useState([]);
-
-  const [cart, setCart] = useState(() => { // retrive initially from sessionstorage
+  const [cart, setCart] = useState(() => {
     const storedCart = sessionStorage.getItem('cart');
     return storedCart ? JSON.parse(storedCart) : [];
   });
@@ -147,10 +146,10 @@ const canAddEntree = () => {
       console.log("addedtocart");
   
       // Update the cart state and then sessionStorage
-      setCart((prevCart) => {
-        const updatedCart = [...prevCart, mealCartItem];
-        sessionStorage.setItem("cart", JSON.stringify(updatedCart));
-        return updatedCart;
+      setCart(prevCart => {
+        const updatedCart = [...prevCart, mealCartItem]; // Create a new cart array with the new item
+        sessionStorage.setItem("cart", JSON.stringify(updatedCart)); // Save the updated cart to sessionStorage
+        return updatedCart; // Return the updated cart as the new state
       });
   
       // Wait a moment to ensure cart is updated in sessionStorage
