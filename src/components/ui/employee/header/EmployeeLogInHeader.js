@@ -4,9 +4,14 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import './EmployeeHeader.css';
+import getWeather from '@/backend/weather';
 
 const EmployeeLogInHeader = () => {
   const [employee, setEmployee] = useState(null);
+  const [currentTemperature, setCurrentTemperature] = useState('');
+  const [currentWeatherCondition, setCurrentWeatherCondition] = useState('');
+  const [currentWeatherIcon, setCurrentWeatherIcon] = useState('');
+  const [currentTime, setCurrentTime] = useState('');
   const router = useRouter();
 
   useEffect(() => {
@@ -15,10 +20,32 @@ const EmployeeLogInHeader = () => {
     if (storedEmployee) {
       setEmployee(JSON.parse(storedEmployee));
     }
+
+    const updateTime = () => {
+      const now = new Date();
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      const formattedTime = `${hours % 12 || 12}:${minutes < 10 ? `0${minutes}` : minutes} ${ampm}`;
+      setCurrentTime(formattedTime);
+    };
+
+    const fetchWeather = async () => {
+      const response = await getWeather();
+      setCurrentTemperature(response.temperature);
+      setCurrentWeatherCondition(response.description);
+      setCurrentWeatherIcon(response.icon);
+    };
+
+    fetchWeather();
+    updateTime();
+    const intervalId = setInterval(updateTime, 60000); // Update time every minute
+
+    return () => clearInterval(intervalId); // Cleanup interval on component unmount
   }, []);
 
   const handleBackClick = () => {
-    router.push("/employee");
+    router.back();
   };
 
   return (
@@ -50,10 +77,10 @@ const EmployeeLogInHeader = () => {
 
       {/* Weather Info */}
       <div className="d-flex align-items-center">
-        <i className="bi bi-cloud-sun me-2" style={{ fontSize: '2rem' }}></i>
+        <i className={`bi bi-${currentWeatherIcon} me-2`} style={{ fontSize: '2rem' }}></i>
         <div className="ms-2" id="vertical_container">
-          <span>83° Partly Cloudy</span>
-          <span className="ms-2">6:10 PM</span>
+          <span>{currentWeatherCondition}</span>
+          <span className="ms-2">{currentTime}</span>
         </div>
       </div>
     </header>
