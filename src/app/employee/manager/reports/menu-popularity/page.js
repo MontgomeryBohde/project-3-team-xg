@@ -77,7 +77,7 @@ const MenuPopularity = () => {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="5">Loading...</td>
+                                <td colSpan="5">Loading...</td> {/* Currently always loading because food_name undefined (name for menu_items table) */}
                             </tr>
                         )}
                     </tbody>
