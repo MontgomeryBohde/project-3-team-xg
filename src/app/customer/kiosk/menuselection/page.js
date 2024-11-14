@@ -237,7 +237,7 @@ const MealSelectionPage = () => {
                     </div>
                 </nav>
                 <main className="col-md-10 ms-sm-auto col-lg-10 px-md-4">
-                    <div className="py-3" id="Meals">
+                    <div className="py-3" id="meals">
                         <h2>Meals</h2>
                         <h3>Choose Your Meal</h3>
                         <div className="row mb-4">
