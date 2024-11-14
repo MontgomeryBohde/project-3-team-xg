@@ -128,7 +128,6 @@ const canAddEntree = () => {
     router.push("/customer/menuselection"); // TODO: Navigate to the menu page
   };
 
-  // Handle confirm action
   const handleConfirm = () => {
     // Check if the number of selected items equals the expected number of entrees + 1 (for sides)
     if (selectedEntrees.length === numEntrees && selectedSides.length === numSides) {
@@ -140,17 +139,29 @@ const canAddEntree = () => {
         quantity: 1, // Adjust quantity if needed
         price: mealPrice,
       };
-      
-      setCart([...cart, mealCartItem]); // Add the complex meal object to the cart
-
-      localStorage.setItem("cart", JSON.stringify([...cart, mealCartItem])); // Save cart to localStorage
-
-      router.push("/customer/menuselection"); // Navigate to the menu page
+  
+      console.log(mealCartItem);
+      console.log("addedtocart");
+  
+      // Update the cart state and then localStorage
+      setCart(prevCart => {
+        const updatedCart = [...prevCart, mealCartItem]; // Create a new cart array with the new item
+        localStorage.setItem("cart", JSON.stringify(updatedCart)); // Save the updated cart to localStorage
+        return updatedCart; // Return the updated cart as the new state
+      });
+  
+      // Wait a moment to ensure cart is updated in localStorage
+      setTimeout(() => {
+        const updatedCart = JSON.parse(localStorage.getItem("cart"));
+        console.log(updatedCart[0]); // Log the first item from the updated cart
+        router.push("/customer/menuselection"); // Navigate after cart update
+      }, 500); // Adjust the timeout as needed
     } else {
       // Optional: show an error or alert if the user hasn't selected the correct number of items
       alert("Not enough items selected!");
     }
   };
+  
 
   return (
     <div>

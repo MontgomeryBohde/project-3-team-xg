@@ -24,27 +24,68 @@ const CartPage = () => {
 
     useEffect(() => {
         const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
-        setCart(savedCart);
+        setCart(savedCart); // This will trigger a re-render after the cart is updated.
+    }, []); // This only runs once when the component mounts.
+    
+      // This effect processes the cart items after the cart state has been updated.
+    useEffect(() => {
+        if (cart.length === 0) return; // Do nothing if the cart is empty.
 
-        const foodNames = savedCart.map(item => item.name);
+        // Process the cart items and assign prices based on mealItem names.
+        const foodNames = cart.map(item => {
+            if (item.mealItem) {
+            // For mealCartItem, assign fixed prices based on mealItem name
+            let price = 0;
+            switch (item.mealItem.name) {
+                case "Bowl":
+                price = 8.30;
+                break;
+                case "Plate":
+                price = 10.00;
+                break;
+                case "Bigger Plate":
+                price = 11.75;
+                break;
+                default:
+                price = 0; // Default price if mealItem is unrecognized
+                break;
+            }
+            // Update the item's price directly
+            item.price = price;
 
+            // You can also add the item to the foodNames list if needed
+            return item.mealItem.name;
+            }
+
+            // For other types (non-mealCartItems), return the name (continue fetching prices as before)
+            return item.name;
+    }).flat(); // Flatten the array in case there are nested names (for entrees/sides)
+    
+
+    // Now, fetch prices for the non-mealCartItem items from the server
+    const nonMealItems = cart.filter(item => !item.mealItem).map(item => item.name);
+
+        if (nonMealItems.length > 0) {
         fetch('/api/getPrice', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+            'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ foodNames }),
+            body: JSON.stringify({ foodNames: nonMealItems }),
         })
         .then(response => response.json())
         .then(data => {
-            setPrices(data);
-            setLoading(false);
+            setPrices(data); // Update prices based on server response
+            setLoading(false); // Done loading
         })
         .catch(error => {
             console.error('Error fetching prices:', error);
-            setLoading(false);
+            setLoading(false); // Done loading even in case of error
         });
-    }, []);
+        } else {
+        setLoading(false); // No need to fetch if no non-mealCartItems exist
+        }
+    }, [cart]); // This effect runs whenever the `cart` state changes.  
 
     const calculateSubtotal = () => {
         return cart.reduce((total, item) => {
@@ -109,28 +150,49 @@ const CartPage = () => {
                 <ul className="list-group">
                     {cart.map((item, index) => (
                         <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
+                        <div>
+                            {/* Check if this is a mealCartItem or a regular item */}
+                            {item.mealItem ? (
+                            // This is a mealCartItem
+                            <>
+                                <strong>{item.mealItem}</strong><br />
+                                <span>Entrees: {item.entrees.join(", ") || "N/A"}</span><br />
+                                <span>Sides: {item.sides.join(", ") || "N/A"}</span><br />
+                                <span>Quantity: {item.quantity}</span><br />
+                                {loading ? (
+                                <span>Price: Loading...</span>
+                                ) : (
+                                <span>Price: ${(item.price * item.quantity).toFixed(2)}</span>
+                                )}
+                            </>
+                            ) : (
+                            // This is a regular item
+                            <>
                                 <strong>{item.name}</strong><br />
                                 Quantity: {item.quantity}<br />
                                 {loading ? (
-                                    <span>Price: Loading...</span>
+                                <span>Price: Loading...</span>
                                 ) : (
-                                    <span>Price: ${specialDealPrices[item.name] 
-                                        ? (specialDealPrices[item.name] * item.quantity).toFixed(2) 
-                                        : (Number(prices[item.name]?.[item.size] || 0) * item.quantity).toFixed(2)}
-                                    </span>
+                                <span>Price: ${specialDealPrices[item.name]
+                                    ? (specialDealPrices[item.name] * item.quantity).toFixed(2)
+                                    : (Number(prices[item.name]?.[item.size] || 0) * item.quantity).toFixed(2)
+                                }</span>
                                 )}
                                 <br />
                                 <span>Size: {item.size || "N/A"}</span>
-                            </div>
-                            <div className="quantity-controls">
-                                <button onClick={() => updateQuantity(index, 1)} className="btn btn-sm btn-outline-primary">+</button>
-                                <button onClick={() => updateQuantity(index, -1)} className="btn btn-sm btn-outline-secondary">-</button>
-                                <button onClick={() => removeItemFromCart(index)} className="btn btn-sm btn-danger ml-2">Remove</button>
-                            </div>
+                            </>
+                            )}
+                        </div>
+
+                        <div className="quantity-controls">
+                            <button onClick={() => updateQuantity(index, 1)} className="btn btn-sm btn-outline-primary">+</button>
+                            <button onClick={() => updateQuantity(index, -1)} className="btn btn-sm btn-outline-secondary">-</button>
+                            <button onClick={() => removeItemFromCart(index)} className="btn btn-sm btn-danger ml-2">Remove</button>
+                        </div>
                         </li>
                     ))}
                 </ul>
+
             )}
 
             <div className="summary mt-4">
