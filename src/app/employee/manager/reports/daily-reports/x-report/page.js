@@ -50,11 +50,11 @@ const XReport = () => {
     const getAdjustedOpenHours = () => {
         const adjustedHours = [...openHours];
         const currentHour = new Date().getHours();
-        
+
         if (currentHour < 10) {
             adjustedHours[0] = 9; // If current hour is before 10 AM, show 9:00 AM to 10:00 AM
         }
-        
+
         if (currentHour >= 21) {
             adjustedHours[adjustedHours.length - 1] = 22; // Show 9:00 PM to 10:00 PM if after 9 PM
         }

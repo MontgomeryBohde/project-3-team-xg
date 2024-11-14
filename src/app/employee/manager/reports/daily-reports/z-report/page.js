@@ -1,38 +1,66 @@
-// src/app/employee/manager/reports/daily-reports/page.js
+// src/app/employee/manager/reports/daily-reports/Z-Report/page.js
 "use client";
-import { useRouter } from "next/navigation";
-import EmployeeHeader from "@/components/ui/employee/header/EmployeeHeader";
-import Head from "next/head";
 
-const Page = () => {
-    const router = useRouter();
+import { useEffect, useState } from 'react';
+import EmployeeHeader from '@/components/ui/employee/header/EmployeeHeader';
+import Head from 'next/head';
 
-    const navigateToXReport = () => {
-        router.push("/employee/manager/reports/daily-reports/X-Report");
-    };
-    const navigateToZReport = () => {
-        router.push("/employee/manager/reports/daily-reports/Z-Report");
+const ZReport = () => {
+    const [reportData, setReportData] = useState(null);
+
+    useEffect(() => {
+        async function fetchZReport() {
+            try {
+                const response = await fetch('/api/getZReport');
+                const data = await response.json();
+                setReportData(data);
+            } catch (error) {
+                console.error('Error fetching Z report data:', error);
+            }
+        }
+
+        fetchZReport();
+    }, []);
+
+    const formatCurrency = (value) => {
+        return value !== null && value !== undefined ? `$${value.toFixed(2)}` : '$0.00';
     };
 
     return (
         <>
             <Head>
-                <title>Daily Reports</title>
+                <title>Z Report</title>
             </Head>
             <EmployeeHeader />
-            <div className="text-center m-4">
-                <h2 className="m-5">Daily Reports</h2>
-                <div className="d-grid gap-2 col-6 mx-auto">
-                    <button className="btn btn-primary btn-lg m-3" onClick={navigateToXReport}>
-                        X-Report
-                    </button>
-                    <button className="btn btn-primary btn-lg m-3" onClick={navigateToZReport}>
-                        Z-Report
-                    </button>
-                </div>
+            <div className="container mt-4">
+                <h2 className="text-center">Z Report</h2>
+                <table className="table">
+                    <thead>
+                        <tr>
+                            <th>Total Sales</th>
+                            <th>Transactions</th>
+                            <th>Cash Total</th>
+                            <th>Credit Card Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {reportData ? (
+                            <tr>
+                                <td>{formatCurrency(reportData.total_sales)}</td>
+                                <td>{reportData.transaction_count}</td>
+                                <td>{formatCurrency(reportData.cash_total)}</td>
+                                <td>{formatCurrency(reportData.credit_card_total)}</td>
+                            </tr>
+                        ) : (
+                            <tr>
+                                <td colSpan="4">Loading...</td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
             </div>
         </>
     );
 };
 
-export default Page;
+export default ZReport;
