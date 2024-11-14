@@ -1,14 +1,14 @@
 "use client";
-import React, { useState, useEffect } from "react"; 
+import React, { useState, useEffect } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FaUtensils, FaShoppingCart, FaDrumstickBite, FaCarrot, FaConciergeBell, FaGlassCheers, FaGift, FaTruck } from "react-icons/fa";
 import Link from "next/link";
 import './menuselection.css';
 
 const MealSelectionPage = () => {
-    
+
     const entrees = [
-        { name: "Hot Ones Blazing Bourbon Chicken", image: " https://olo-images-live.imgix.net/50/503be498564c415eb59e4e37120117b0.png?auto=format%2Ccompress&q=60&cs=tinysrgb&w=810&h=540&fit=crop&fm=png32&s=91acd3adc699123bb269b094fb843769"},
+        { name: "Hot Ones Blazing Bourbon Chicken", image: " https://olo-images-live.imgix.net/50/503be498564c415eb59e4e37120117b0.png?auto=format%2Ccompress&q=60&cs=tinysrgb&w=810&h=540&fit=crop&fm=png32&s=91acd3adc699123bb269b094fb843769" },
         { name: "The Original Orange Chicken", image: " https://olo-images-live.imgix.net/78/783b6c093c4c44428516139005a621f1.png?auto=format%2Ccompress&q=60&cs=tinysrgb&w=810&h=540&fit=crop&fm=png32&s=e8191ba402e81280158b4793829b83e0" },
         { name: "Black Pepper Sirloin Steak", image: " https://olo-images-live.imgix.net/fd/fd7ab3840a8f476db096435bfef01322.png?auto=format%2Ccompress&q=60&cs=tinysrgb&w=810&h=540&fit=crop&fm=png32&s=db6bb16a3f93d09d28b09f7e3df02679" },
         { name: "Honey Walnut Shrimp", image: " https://olo-images-live.imgix.net/e0/e065708712fb4fa2b43d3b6a34e7993d.png?auto=format%2Ccompress&q=60&cs=tinysrgb&w=810&h=540&fit=crop&fm=png32&s=a195a7d0bfcdab2002821f262b3fb624" },
@@ -22,17 +22,17 @@ const MealSelectionPage = () => {
     ];
 
     const sides = [
-        { name: "White Steamed Rice", image: "https://olo-images-live.imgix.net/1e/1eecd6a480134a45b88198ec2a57a83e.png?auto=format%2Ccompress&q=60&cs=tinysrgb&w=810&h=540&fit=crop&fm=png32&s=05d420b31613cf44fd57d09c352ad2e6", sizeType: "side"  },
-        { name: "Fried Rice", image: "https://olo-images-live.imgix.net/ff/ff1cd394782b46298ddfc8086896444b.png?auto=format%2Ccompress&q=60&cs=tinysrgb&w=810&h=540&fit=crop&fm=png32&s=f4bd9545f88c7cd671ec849d0c75a4ed", sizeType: "side"   },
-        { name: "Chow Mein", image: "https://olo-images-live.imgix.net/77/77c49b6405af4f0cac296293e1d559ea.png?auto=format%2Ccompress&q=60&cs=tinysrgb&w=810&h=540&fit=crop&fm=png32&s=05ee72f3039f6e56d181aeb441f848ff", sizeType: "side"   },
-        { name: "Super Greens", image: "https://olo-images-live.imgix.net/4f/4f61599dba714395b526fad311f09ecf.png?auto=format%2Ccompress&q=60&cs=tinysrgb&w=810&h=540&fit=crop&fm=png32&s=929eccce4846f47c41170e7aefed0382" , sizeType: "side"  }
+        { name: "White Steamed Rice", image: "https://olo-images-live.imgix.net/1e/1eecd6a480134a45b88198ec2a57a83e.png?auto=format%2Ccompress&q=60&cs=tinysrgb&w=810&h=540&fit=crop&fm=png32&s=05d420b31613cf44fd57d09c352ad2e6", sizeType: "side" },
+        { name: "Fried Rice", image: "https://olo-images-live.imgix.net/ff/ff1cd394782b46298ddfc8086896444b.png?auto=format%2Ccompress&q=60&cs=tinysrgb&w=810&h=540&fit=crop&fm=png32&s=f4bd9545f88c7cd671ec849d0c75a4ed", sizeType: "side" },
+        { name: "Chow Mein", image: "https://olo-images-live.imgix.net/77/77c49b6405af4f0cac296293e1d559ea.png?auto=format%2Ccompress&q=60&cs=tinysrgb&w=810&h=540&fit=crop&fm=png32&s=05ee72f3039f6e56d181aeb441f848ff", sizeType: "side" },
+        { name: "Super Greens", image: "https://olo-images-live.imgix.net/4f/4f61599dba714395b526fad311f09ecf.png?auto=format%2Ccompress&q=60&cs=tinysrgb&w=810&h=540&fit=crop&fm=png32&s=929eccce4846f47c41170e7aefed0382", sizeType: "side" }
     ];
 
     const appetizers = [
-        { name: "Chicken Egg Roll", image: "https://olo-images-live.imgix.net/52/524bbb9023e2409b8d3fceae944a808f.png?auto=format%2Ccompress&q=60&cs=tinysrgb&w=810&h=540&fit=crop&fm=png32&s=4f4cc30df356786bbe3968181f8c5160" , sizeType: "app"  },
-        { name: "Apple Pie Roll", image: "https://olo-images-live.imgix.net/ab/ab4e688dea2b4b56b79fa2ff42a31f24.png?auto=format%2Ccompress&q=60&cs=tinysrgb&w=810&h=540&fit=crop&fm=png32&s=4b9d93576ba69591523a4c60034d54d3"  },
-        { name: "Veggie Spring Roll", image: "https://olo-images-live.imgix.net/18/183834b8a35a4737a73a28421f68b4f0.png?auto=format%2Ccompress&q=60&cs=tinysrgb&w=810&h=540&fit=crop&fm=png32&s=0d4be7c417ec1998251da41d5bfe13fb", sizeType: "app"   },
-        { name: "Cream Cheese Rangoon", image: "https://olo-images-live.imgix.net/fe/fef7db209d7d41e6ae065af16afa1577.png?auto=format%2Ccompress&q=60&cs=tinysrgb&w=810&h=540&fit=crop&fm=png32&s=f14d518edf4e7ee0fd22b4d3cddc59b8", sizeType: "app"   }
+        { name: "Chicken Egg Roll", image: "https://olo-images-live.imgix.net/52/524bbb9023e2409b8d3fceae944a808f.png?auto=format%2Ccompress&q=60&cs=tinysrgb&w=810&h=540&fit=crop&fm=png32&s=4f4cc30df356786bbe3968181f8c5160", sizeType: "app" },
+        { name: "Apple Pie Roll", image: "https://olo-images-live.imgix.net/ab/ab4e688dea2b4b56b79fa2ff42a31f24.png?auto=format%2Ccompress&q=60&cs=tinysrgb&w=810&h=540&fit=crop&fm=png32&s=4b9d93576ba69591523a4c60034d54d3" },
+        { name: "Veggie Spring Roll", image: "https://olo-images-live.imgix.net/18/183834b8a35a4737a73a28421f68b4f0.png?auto=format%2Ccompress&q=60&cs=tinysrgb&w=810&h=540&fit=crop&fm=png32&s=0d4be7c417ec1998251da41d5bfe13fb", sizeType: "app" },
+        { name: "Cream Cheese Rangoon", image: "https://olo-images-live.imgix.net/fe/fef7db209d7d41e6ae065af16afa1577.png?auto=format%2Ccompress&q=60&cs=tinysrgb&w=810&h=540&fit=crop&fm=png32&s=f14d518edf4e7ee0fd22b4d3cddc59b8", sizeType: "app" }
     ];
 
     const drinks = [
@@ -78,97 +78,97 @@ const MealSelectionPage = () => {
     };
 
     const handleAddToCart = (mealName, items) => {
-   
-    const item = items.find((item) => item.name === mealName);
-    const defaultSize = item?.sizeType === "special" ? null : item?.sizeType === "mediumOnly"
-        ? "Medium"
-        : item?.sizeType === "side"
-        ? "Medium"
-        : "Small"; //for regular items the default is small
 
-    
-    const size = selectedSize[mealName] || defaultSize;
-    const existingItem = cart.find(item => item.name === mealName && item.size === size);
+        const item = items.find((item) => item.name === mealName);
+        const defaultSize = item?.sizeType === "special" ? null : item?.sizeType === "mediumOnly"
+            ? "Medium"
+            : item?.sizeType === "side"
+                ? "Medium"
+                : "Small"; //for regular items the default is small
 
-    let updatedCart;
-    if (existingItem) {
-        //if item already exists in the cart, increase the quantity
-        updatedCart = cart.map(item => 
-            item.name === mealName && item.size === size
-                ? { ...item, quantity: item.quantity + 1 }
-                : item
-        );
-    } else {
-        //else just add new item
-        updatedCart = [...cart, { name: mealName, size: size, quantity: 1 }];
-    }
 
-    //update cart and save to sessionStorage
-    setCart(updatedCart);
-    sessionStorage.setItem("cart", JSON.stringify(updatedCart));
-};
+        const size = selectedSize[mealName] || defaultSize;
+        const existingItem = cart.find(item => item.name === mealName && item.size === size);
 
-const setMealType = (mealType) => {
-    // Store the selected meal type in localStorage
-    localStorage.setItem('selectedMeal', mealType);
-  };
+        let updatedCart;
+        if (existingItem) {
+            //if item already exists in the cart, increase the quantity
+            updatedCart = cart.map(item =>
+                item.name === mealName && item.size === size
+                    ? { ...item, quantity: item.quantity + 1 }
+                    : item
+            );
+        } else {
+            //else just add new item
+            updatedCart = [...cart, { name: mealName, size: size, quantity: 1 }];
+        }
+
+        //update cart and save to sessionStorage
+        setCart(updatedCart);
+        sessionStorage.setItem("cart", JSON.stringify(updatedCart));
+    };
+
+    const setMealType = (mealType) => {
+        // Store the selected meal type in localStorage
+        localStorage.setItem('selectedMeal', mealType);
+    };
 
     const renderItems = (items) => (
         items.map((item, index) => (
             <div key={index} className="col-4 col-md-3 col-lg-2 mb-3">
                 <div className="card">
-                    <img 
-                        src={item.image} 
-                        className="card-img-top img-fluid" 
-                        alt={item.name} 
-                        style={{ objectFit: 'cover', maxHeight: '200px' }} 
+                    <img
+                        src={item.image}
+                        className="card-img-top img-fluid"
+                        alt={item.name}
+                        style={{ objectFit: 'cover', maxHeight: '200px' }}
                     />
                     <div className="card-body text-center">
                         <p className="card-text">{item.name}</p>
 
-                    {item.sizeType !== "special" && (
-                        <select 
-                            className="form-select mb-2"
-                            onChange={(e) => handleSizeChange(item.name, e.target.value)}
-                        >
-                            {item.sizeType === "mediumOnly" ? (
-    
-                                <option value="Medium">Medium</option>
-                            ) : item.sizeType === "side" ? (
-                               
-                                <>
-                                    <option value="Medium">Medium</option>
-                                    <option value="Large">Large</option>
-                                </>
-                            ) 
-                            : item.sizeType === "app" ? (     
-                                <>
-                                    <option value="Small">Small</option>
-                                    <option value="Large">Large</option>
-                                </>
-                                ): (
-                                <>
-                                    <option value="Small">Small</option>
-                                    <option value="Medium">Medium</option>
-                                    <option value="Large">Large</option>
-                                </>
-                            )}
-                        </select>
-                    )}
+                        {item.sizeType !== "special" && (
+                            <select
+                                className="form-select mb-2"
+                                onChange={(e) => handleSizeChange(item.name, e.target.value)}
+                            >
+                                {item.sizeType === "mediumOnly" ? (
 
-                    <button 
-                        className="btn btn-danger"
-                        onClick={() => handleAddToCart(item.name, items)}
-                    > 
-                        Add to Cart
-                    </button>
+                                    <option value="Medium">Medium</option>
+                                ) : item.sizeType === "side" ? (
+
+                                    <>
+                                        <option value="Medium">Medium</option>
+                                        <option value="Large">Large</option>
+                                    </>
+                                )
+                                    : item.sizeType === "app" ? (
+                                        <>
+                                            <option value="Small">Small</option>
+                                            <option value="Large">Large</option>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <option value="Small">Small</option>
+                                            <option value="Medium">Medium</option>
+                                            <option value="Large">Large</option>
+                                        </>
+                                    )}
+                            </select>
+                        )}
+
+                        <button
+                            className="btn btn-danger"
+                            onClick={() => handleAddToCart(item.name, items)}
+                        >
+                            Add to Cart
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
-    ))
-);
+        ))
+    );
 
-    
+
 
     const handleScrollToSection = (sectionId) => {
         const element = document.getElementById(sectionId);
@@ -226,50 +226,50 @@ const setMealType = (mealType) => {
                                 </a>
                             </li>
                             <li className="nav-item">
-                            <Link href="/customer/kiosk/cart">
-                            <span style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
-                                <FaShoppingCart className="me-2" style={{ fontSize: '2rem', color: 'red' }} />
-                                <span style={{ color: 'red' }}>View Cart</span>
-                            </span>
-                            </Link>
+                                <Link href="/customer/kiosk/cart">
+                                    <span style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
+                                        <FaShoppingCart className="me-2" style={{ fontSize: '2rem', color: 'red' }} />
+                                        <span style={{ color: 'red' }}>View Cart {cart.length > 0 && `(${cart.length})`}</span>
+                                    </span>
+                                </Link>
                             </li>
                         </ul>
                     </div>
                 </nav>
                 <main className="col-md-10 ms-sm-auto col-lg-10 px-md-4">
-                <div className="py-3" id="Meals">
-                    <h2>Meals</h2>
-                    <h3>Choose Your Meal</h3>
-                    <div className="row mb-4">
-                        <div className="col-4">
-                            <Link href="meal">
-                                <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}
-                                onClick={() => setMealType('Bowl')}
-                                >
-                                    Bowl
-                                </button>
-                            </Link>
-                        </div>
-                        <div className="col-4">
-                            <Link href="meal">
-                                <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}
-                                onClick={() => setMealType('Plate')}
-                                >
-                                    Plate
-                                </button>
-                            </Link>
-                        </div>
-                        <div className="col-4">
-                            <Link href="meal">
-                                <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}
-                                onClick={() => setMealType('Bigger Plate')}
-                                >
-                                    Bigger Plate
-                                </button>
-                            </Link>
+                    <div className="py-3" id="Meals">
+                        <h2>Meals</h2>
+                        <h3>Choose Your Meal</h3>
+                        <div className="row mb-4">
+                            <div className="col-4">
+                                <Link href="meal">
+                                    <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}
+                                        onClick={() => setMealType('Bowl')}
+                                    >
+                                        Bowl
+                                    </button>
+                                </Link>
+                            </div>
+                            <div className="col-4">
+                                <Link href="meal">
+                                    <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}
+                                        onClick={() => setMealType('Plate')}
+                                    >
+                                        Plate
+                                    </button>
+                                </Link>
+                            </div>
+                            <div className="col-4">
+                                <Link href="meal">
+                                    <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}
+                                        onClick={() => setMealType('Bigger Plate')}
+                                    >
+                                        Bigger Plate
+                                    </button>
+                                </Link>
+                            </div>
                         </div>
                     </div>
-                </div>
 
                     <div className="py-3" id="A La Carte">
                         <h2>A La Carte</h2>
