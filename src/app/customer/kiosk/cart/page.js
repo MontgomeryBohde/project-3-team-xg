@@ -3,6 +3,10 @@ import { useState, useEffect } from 'react';
 import Link from "next/link";
 import { FaShoppingCart } from "react-icons/fa";
 
+import dynamic from "next/dynamic";
+ 
+const Content = dynamic(() => import("./content.tsx"), { ssr: false });
+
 const CartPage = () => {
     const [cart, setCart] = useState(() => { // retrive initially from sessionstorage
     const storedCart = sessionStorage.getItem('cart');
