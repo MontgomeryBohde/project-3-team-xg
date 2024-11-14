@@ -37,10 +37,10 @@ const CustomerMealSelect = () => {
   ];
   const [meal, setMeal] = useState("Bowl");
   useEffect(() => {
-    // Retrieve 'selectedMeal' from localStorage when the component mounts
-    const storedMeal = localStorage.getItem('selectedMeal');
+    // Retrieve 'selectedMeal' from sessionStorage when the component mounts
+    const storedMeal = sessionStorage.getItem('selectedMeal');
 
-    // If a value is found in localStorage, update the state
+    // If a value is found in sessionStorage, update the state
     if (storedMeal) {
       setMeal(storedMeal);
     }
@@ -143,16 +143,16 @@ const canAddEntree = () => {
       console.log(mealCartItem);
       console.log("addedtocart");
   
-      // Update the cart state and then localStorage
+      // Update the cart state and then sessionStorage
       setCart(prevCart => {
         const updatedCart = [...prevCart, mealCartItem]; // Create a new cart array with the new item
-        localStorage.setItem("cart", JSON.stringify(updatedCart)); // Save the updated cart to localStorage
+        sessionStorage.setItem("cart", JSON.stringify(updatedCart)); // Save the updated cart to sessionStorage
         return updatedCart; // Return the updated cart as the new state
       });
   
-      // Wait a moment to ensure cart is updated in localStorage
+      // Wait a moment to ensure cart is updated in sessionStorage
       setTimeout(() => {
-        const updatedCart = JSON.parse(localStorage.getItem("cart"));
+        const updatedCart = JSON.parse(sessionStorage.getItem("cart"));
         console.log(updatedCart[0]); // Log the first item from the updated cart
         router.push("/customer/menuselection"); // Navigate after cart update
       }, 500); // Adjust the timeout as needed

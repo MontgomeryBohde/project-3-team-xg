@@ -20,10 +20,11 @@ const CartPage = () => {
     };
 
    //50% off deal
-    const isFiftyPercentOff = cart.some(item => item.name.toLowerCase().includes("50 percent off"));
+   const isFiftyPercentOff = cart.some(item => item.name && item.name.toLowerCase().includes("50 percent off"));
+
 
     useEffect(() => {
-        const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
+        const savedCart = JSON.parse(sessionStorage.getItem("cart")) || [];
         setCart(savedCart); // This will trigger a re-render after the cart is updated.
     }, []); // This only runs once when the component mounts.
     
@@ -124,20 +125,20 @@ const CartPage = () => {
             return item;
         });
         setCart(updatedCart);
-        localStorage.setItem("cart", JSON.stringify(updatedCart));
+        sessionStorage.setItem("cart", JSON.stringify(updatedCart));
     };
 
     //remove item from cart button
     const removeItemFromCart = (index) => {
         const updatedCart = cart.filter((_, i) => i !== index); // Remove item by index
         setCart(updatedCart);
-        localStorage.setItem("cart", JSON.stringify(updatedCart));
+        sessionStorage.setItem("cart", JSON.stringify(updatedCart));
     };
 
     //clear cart button
     const handleClearCart = () => {
         setCart([]);
-        localStorage.removeItem("cart");
+        sessionStorage.removeItem("cart");
     };
 
     return (
