@@ -72,14 +72,6 @@ const CustomerMealSelect = () => {
 
 	const router = useRouter();
 
-	// Check if running on client-side to use sessionStorage
-	useEffect(() => {
-		if (typeof window !== "undefined") {
-			const storedCart = sessionStorage.getItem('cart');
-			setCart(storedCart ? JSON.parse(storedCart) : []);
-		}
-	}, []);
-
 	// Handle item button press
 	const handlePressed = (item, type) => {
 		if (type === "Side") {
