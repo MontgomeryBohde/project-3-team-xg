@@ -125,7 +125,7 @@ const MenuSelectionPage = () => {
                         src={item.image} 
                         className="card-img-top" 
                         alt={item.name} 
-                        style={{ width: '365px', height: '200px', objectFit: 'cover' }} 
+                        style={{ width: '290px', height: '200px', objectFit: 'cover' }} 
                     />
                     <div className="card-body text-center">
                         <p className="card-text">{item.name}</p>
@@ -158,7 +158,7 @@ const MenuSelectionPage = () => {
                             </select>
                         )}
 
-                        {/* Quantity Selector */}
+                        {/* Quantity Selection */}
                         <input 
                             type="number" 
                             min="1" 
@@ -194,7 +194,7 @@ const MenuSelectionPage = () => {
    
 
     useEffect(() => {
-        // Optional: Persist cart in local storage
+        
         localStorage.setItem('cart', JSON.stringify(cart));
     }, [cart]);
 
@@ -247,45 +247,38 @@ const MenuSelectionPage = () => {
                                 </a>
                             </li>
                             <li className="nav-item">
-                            <Link href="/customer/cart">
-                            <span style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
-                                <FaShoppingCart className="me-2" style={{ fontSize: '2rem', color: 'red' }} />
-                                <span style={{ color: 'red' }}>View Cart</span>
-                            </span>
-                            </Link>
+                                <Link href="/customer/cart">
+                                    <span style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
+                                        <FaShoppingCart className="me-2" style={{ fontSize: '2rem', color: 'red' }} />
+                                        <span style={{ color: 'red' }}>View Cart</span>
+                                    </span>
+                                </Link>
                             </li>
                         </ul>
                     </div>
                 </nav>
                 <main className="col-md-10 ms-sm-auto col-lg-10 px-md-4">
-                <div className="py-3" id="Meals">
-                    <h2>Meals</h2>
-                    <h3>Choose Your Meal</h3>
-                    <div className="row mb-4">
-                        <div className="col-4">
-                            <Link href="PLACEHOLD">
-                                <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}>
-                                    Bowl
-                                </button>
-                            </Link>
-                        </div>
-                        <div className="col-4">
-                            <Link href="PLACEHOLD">
-                                <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}>
-                                    Plate
-                                </button>
-                            </Link>
-                        </div>
-                        <div className="col-4">
-                            <Link href="PLACEHOLD">
-                                <button className="btn btn-outline-dark  w-100" style={{ height: '100px', borderRadius: '5px' }}>
-                                    Bigger Plate
-                                </button>
-                            </Link>
+                    <div className="py-3" id="meals">
+                        <h2>Meals</h2>
+                        <h3>Choose Your Meal</h3>
+                        <div className="row mb-4">
+                            <div className="col-4">
+                                <Link href="PLACEHOLD">
+                                    <button className="btn btn-outline-dark w-100" style={{ height: '100px', borderRadius: '5px' }}>Bowl</button>
+                                </Link>
+                            </div>
+                            <div className="col-4">
+                                <Link href="PLACEHOLD">
+                                    <button className="btn btn-outline-dark w-100" style={{ height: '100px', borderRadius: '5px' }}>Plate</button>
+                                </Link>
+                            </div>
+                            <div className="col-4">
+                                <Link href="PLACEHOLD">
+                                    <button className="btn btn-outline-dark w-100" style={{ height: '100px', borderRadius: '5px' }}>Bigger Plate</button>
+                                </Link>
+                            </div>
                         </div>
                     </div>
-                </div>
-
                     <div className="py-3" id="A La Carte">
                         <h2>A La Carte</h2>
                         <div className="row">
@@ -295,13 +288,13 @@ const MenuSelectionPage = () => {
                     <div className="py-3" id="sides">
                         <h2>Sides</h2>
                         <div className="row">
-                            {renderItems(sides, "side")} {/*Send true that this is a side so it only shows med and large */}
+                            {renderItems(sides, "side")}
                         </div>
                     </div>
                     <div className="py-3" id="appetizers">
                         <h2>Appetizers</h2>
                         <div className="row">
-                            {renderItems(appetizers, "side")} {/*Send true that this is an app so it only shows small and large */}
+                            {renderItems(appetizers, "side")}
                         </div>
                     </div>
                     <div className="py-3" id="drinks">
@@ -326,6 +319,7 @@ const MenuSelectionPage = () => {
             </div>
         </div>
     );
+    
 };
 
 export default MenuSelectionPage;
