@@ -31,7 +31,7 @@ const ZReport = () => {
             <Head>
                 <title>Z Report</title>
             </Head>
-            <EmployeeHeader />
+            <EmployeeLogInHeader />
             <div className="container mt-4">
                 <h2 className="text-center">Z Report</h2>
                 <table className="table">
