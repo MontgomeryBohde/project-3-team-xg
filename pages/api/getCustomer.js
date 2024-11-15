@@ -1,3 +1,4 @@
+// pages/api/getCustomer.js
 "use server";
 
 import { Client } from 'pg';

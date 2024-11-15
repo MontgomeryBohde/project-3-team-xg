@@ -39,7 +39,7 @@ const OrderPage = () => {
     useEffect(() => {
         const fetchMenuItems = async () => {
             try {
-                const response = await fetch('/api/menu_items');
+                const response = await fetch('/api/getMenuItems');
                 if (!response.ok) throw new Error('Failed to fetch menu items');
                 const data = await response.json();
                 setMenuItems({
@@ -133,7 +133,7 @@ const OrderPage = () => {
 
     const handleSelectItemForSize = async (item) => {
         try {
-            const response = await fetch(`/api/item_sizes?item_id=${item.id}`);
+            const response = await fetch(`/api/getItemSizes?item_id=${item.id}`);
             if (!response.ok) throw new Error('Failed to fetch item sizes');
 
             const data = await response.json();
