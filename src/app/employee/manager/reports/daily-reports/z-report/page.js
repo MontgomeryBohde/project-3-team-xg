@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import EmployeeHeader from '@/components/ui/employee/header/EmployeeHeader';
+import EmployeeLogInHeader from '@/components/ui/employee/header/EmployeeLogInHeader';
 import Head from 'next/head';
 
 const ZReport = () => {
