@@ -8,10 +8,10 @@ const Page = () => {
     const router = useRouter();
 
     const navigateToXReport = () => {
-        router.push("/employee/manager/reports/daily-reports/x-Report");
+        router.push("/employee/manager/reports/daily-reports/x-report");
     };
     const navigateToZReport = () => {
-        router.push("/employee/manager/reports/daily-reports/z-Report");
+        router.push("/employee/manager/reports/daily-reports/z-report");
     };
 
     return (
