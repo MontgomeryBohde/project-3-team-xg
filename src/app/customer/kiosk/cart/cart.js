@@ -198,8 +198,8 @@ const CartPage = () => {
                     <p>Subtotal:</p>
                     <p>${subtotal.toFixed(2)}</p>
                 </div>
-                <div className="d-flex justify-content-between align-items-center">
-                    <p>Promo Code:</p>
+                <div className="d-flex align-items-center">
+                    <p className="mb-0">Promo Code:</p>
                     <input 
                         type="text" 
                         value={promoCode} 
@@ -209,7 +209,7 @@ const CartPage = () => {
                     />
                     <button onClick={handleApplyPromoCode} className="btn btn-secondary ml-2">Apply</button>
                 </div>
-                <div className="d-flex justify-content-between">
+                <div className="mt-3 d-flex justify-content-between">
                     <p>Discount:</p>
                     <p>-${discount.toFixed(2)}</p>
                 </div>
@@ -228,10 +228,12 @@ const CartPage = () => {
                     <h4>${total.toFixed(2)}</h4>
                 </div>
             </div>
-
-            <button onClick={handleClearCart} className="btn btn-danger mt-3">Clear Order</button>
-            <Link href="/customer/kiosk/menuselection" className="btn btn-primary mt-3">Back to Menu</Link>
-            <Link href="/customer/kiosk/confirmation" className="btn btn-success mt-3">Confirm</Link>
+            
+            <div className="d-flex justify-content-between">
+                <Link href="/customer/kiosk/menuselection" className="btn btn-primary m-3">Back to Menu</Link>
+                <button onClick={handleClearCart} className="btn btn-danger m-3">Clear Order</button>
+                <Link href="/customer/kiosk/confirmation" className="btn btn-success m-3">Check Out</Link>
+            </div>
         </div>
     );
 };

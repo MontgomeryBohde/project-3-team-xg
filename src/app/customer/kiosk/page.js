@@ -31,13 +31,13 @@ const KioskPage = () => {
                 
                 {/* Start Meal Selection Button */}                
                 <button className="btn btn-outline-light btn-lg px-5 py-3 customer-button mb-4" onClick={navigateToMeal}>
-                    Start Meal Selection
+                    Start making your order
                 </button>
 
                 {/* Back Button */}
                 <div className="mt-5">
                     <button className="btn btn-secondary btn-sm mb-2" onClick={navigateToMainPage}>
-                        Back to Customer Page
+                        Back
                     </button>
                 </div>
             </div>
