@@ -53,3 +53,151 @@ Monte
 -Decide tasks and due dates
 -Next.js
 
+10/30 Wed
+12:15-12:30 pm
+12:29-12:33 pm
+Risha
+Did: finished figma with feedback
+Today: next task
+Roadblocks: don’t know how to set up Vercel
+Tee
+Did: added button to login, login takes to cashier page
+Roadblocks: CSS
+Rebecca
+Did: created menu board, review PRs
+Today: set up environment
+Monte
+Did: added menu board on site, made login page, made header for manager pages
+Alisa
+Did: finished menu board
+12:33-1:04 pm
+Set up vercel
+Dev branch
+File structure
+
+11/1 Fri
+11:30-11:45 am
+11:35-11:39 am
+Alisa
+Did: frontend employees and orders
+Today: finish orders
+Risha
+Did: change menu
+Today: testing of menu, inventory
+Monte
+Today: finish db and manager homepage
+Roadblocks: busy
+Rebecca
+Today: finish contact
+Roadblock: exams, node and npm issues
+Tee
+Did: cashier page
+Today: finishing
+Roadblocks: trying to break up into smaller functions but having issues implementing
+
+11/4 Mon
+12:15-12:30 pm
+12:19-12:25 pm
+Alisa
+Finished: orders page
+Today: create pr for it
+Risha
+Finished: menu, inventory page
+Today: finish, fix menu branching
+Roadblock: branched from main
+Monte
+Finished: how to connect to db example (need to add to .env)
+Today: finishing manager home page
+Roadblock: db stuff works locally but not on the server
+Tee
+Finished: cashier order page
+Today: continue working on improvements
+Roadblock: connect to db
+Rebecca
+Finished: contact, sales page
+Today: connect sales to db
+Roadblock: connect to db for sales, npm and next issues
+
+
+_________Sprint 2________
+11/6 Wed
+12:18-12:50 pm
+Alisa
+Roadblocks: 411 exam
+Risha
+Today: employee header
+Monte
+db fixed on Vercel
+Working on manager home page, customer
+Tee
+Roadblock: 411 exam
+Rebecca
+Finished: written materials
+-Organization good, assignment using project was good and clear
+-Backlog was somewhat unclear - use descriptions
+-PR going well but Vercel deployment was annoying
+-Deadlines not tight so didn’t finish
+-Everyone has been very busy
+-Customer interface done halfway through sprint 2 finish by this week
+-Tee - frontend integrations
+-Continue 3x a week
+
+11/8 Fri
+11:40-11:56
+Alisa
+Started customer meal interface
+Today: finish that + cart interface
+Risha
+Did: employee header
+Today: working on it and fix
+Roadblocks: couldn’t connect to db
+Monte
+Did: login page
+Today: working on rest of customer pages
+Rebecca
+Did: some organization of scrum board
+Today: finish scrum board, start assigning stuff on scrum board, connect db to sales
+Roadblocks: interview yesterday
+11/11 Mon
+3:06-3:24
+Alisa
+Did menu selection and cart, Did orders page connect to db and extra info on orders
+Today: working on order popup
+Hard to show prices of items with db changes
+Risha
+Finished employee header, worked on customer side pages, fixed some nav bars on manager menu and inventory
+Today: finish up fixing menu db + images to customer menu
+R: none
+Monte
+Finished login pages for customer, made customer header + weather API, customer name customized
+Today: working on customer login backend, work on card payment
+Roadblock: works locally but not vercel (styling)
+Tee
+Tried to integrate db to cashier page + restructured to new size table + added img & description
+Today: work on finishing other pages if can finish cashier menu
+Need to do inventory ids later
+Issues with duplicate entries so can’t filter when changing sizes, formatting isn’t right for reading entries
+Rebecca
+Moved + assigned stuff on scrum board, get orders from db using Alisa’s query
+Today: finishing the chart for sales
+Roadblocks: none?
+-Move to using discord chat
+-Questions + assign new tasks
+
+11/13 Wed
+3:03-3:16
+Alisa
+Did: added quantity selection updated prices on menu selection, worked on orders page to reflect
+Risha
+Did: created meal selection page to be in line with cart, fixed menu database
+Waiting for cart page to be merged
+Monte
+Was trying to figure out vercel
+Will be doing entering code for login
+Still stuck on it
+Tee
+Finished cashier order fixes, some changes
+Integrating when everyone is done
+Rebecca
+Doing rest of sales reports
+-Checked on track for sprint 2
