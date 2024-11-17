@@ -20,10 +20,67 @@ const Menu = () => {
     const [itemName, setItemName] = useState('');
     const [itemSize, setItemSize] = useState('Medium');
     const [itemCategory, setItemCategory] = useState('Entree');
-    const [inventoryIds, setInventoryIds] = useState([]); 
-
+    
     const [itemPrice, setItemPrice] = useState(3.00);
-
+    const inventoryItems = [
+        { id: 45, name: 'Chopsticks' },
+        { id: 46, name: 'Bowl Lids' },
+        { id: 47, name: 'Drink Lids' },
+        { id: 48, name: 'Cups' },
+        { id: 49, name: 'Plates' },
+        { id: 50, name: 'Napkins' },
+        { id: 51, name: 'Bowls' },
+        { id: 52, name: 'Spoons' },
+        { id: 53, name: 'Forks' },
+        { id: 54, name: 'Straws' },
+        { id: 2, name: 'Veggie Spring Roll' },
+        { id: 3, name: 'Cream Cheese Rangoon' },
+        { id: 4, name: 'Apple Pie Roll' },
+        { id: 6, name: 'Chicken' },
+        { id: 7, name: 'Beyond Meat Chicken' },
+        { id: 8, name: 'Beef' },
+        { id: 9, name: 'Shrimp' },
+        { id: 10, name: 'Broccoli' },
+        { id: 11, name: 'Cucumber' },
+        { id: 12, name: 'Peas' },
+        { id: 13, name: 'Tomato' },
+        { id: 14, name: 'Onion' },
+        { id: 15, name: 'Chili Pepper' },
+        { id: 16, name: 'Red Peppers' },
+        { id: 17, name: 'Green Peppers' },
+        { id: 18, name: 'Mushrooms' },
+        { id: 19, name: 'String Beans' },
+        { id: 20, name: 'Scallion' },
+        { id: 21, name: 'Kale' },
+        { id: 22, name: 'Celery' },
+        { id: 23, name: 'Pineapple' },
+        { id: 24, name: 'Oil' },
+        { id: 25, name: 'Noodles' },
+        { id: 26, name: 'Rice' },
+        { id: 27, name: 'Egg' },
+        { id: 28, name: 'Honey' },
+        { id: 29, name: 'Walnuts' },
+        { id: 30, name: 'Sesame Seeds' },
+        { id: 31, name: 'Tofu' },
+        { id: 32, name: 'Seasoning Sauce' },
+        { id: 33, name: 'Black Pepper' },
+        { id: 34, name: 'Peanuts' },
+        { id: 35, name: 'Diet Pepsi' },
+        { id: 36, name: 'Mountain Dew' },
+        { id: 37, name: 'Lipton Brisk Raspberry Iced' },
+        { id: 38, name: 'Sierra Mist' },
+        { id: 39, name: 'Tropicana Lemonade' },
+        { id: 40, name: 'Aquafina' },
+        { id: 41, name: 'Gatorade Lemon Lime' },
+        { id: 42, name: 'Dr Pepper' },
+        { id: 43, name: 'Sweet Tea' },
+        { id: 44, name: 'Pepsi' },
+        { id: 5, name: 'Breaded Chicken' },
+        { id: 1, name: 'Chicken Egg Roll' }
+      ];
+      
+      
+      const [inventoryIds, setInventoryIds] = useState([]); // Now stores item names
     const handlePopup = (name, category) => {
         setItemName(name);
         setItemCategory(category);
@@ -37,34 +94,63 @@ const Menu = () => {
         }
     };
 
-    const handleInventoryChange = (e) => {
-        const selectedOptions = Array.from(e.target.selectedOptions, option => parseInt(option.value));
-        setInventoryIds(selectedOptions); // Update inventoryIds as an array
-    };
+    const handleInventoryChange = (event) => {
+        const selectedOptions = Array.from(event.target.selectedOptions, option => option.value);
+        setInventoryIds(selectedOptions); // Set selected item names in inventoryIds
+      };
+      
     console.log('Selected inventory IDs:', inventoryIds); // Logs the selected inventory IDs
 
     const addItem = () => {
-        switch (itemCategory) {
-            case 'Entree':
-                setEntrees((prev) => [...prev, itemName]);
-                break;
-            case 'Side':
-                setSides((prev) => [...prev, itemName]);
-                break;
-            case 'Appetizer':
-                setAppetizers((prev) => [...prev, itemName]);
-                break;
-            case 'Drink':
-                setDrinks((prev) => [...prev, itemName]);
-                break;
-            case 'Seasonal':
-                setSeasonal((prev) => [...prev, itemName]);
-                break;
-            default:
-                break;
+        // Check if an item is selected for editing
+        if (selectedItem) {
+            const { name, category, index } = selectedItem;
+            switch (category) {
+                case 'Entree':
+                    setEntrees((prev) => prev.map((item, i) => i === index ? itemName : item));
+                    break;
+                case 'Side':
+                    setSides((prev) => prev.map((item, i) => i === index ? itemName : item));
+                    break;
+                case 'Appetizer':
+                    setAppetizers((prev) => prev.map((item, i) => i === index ? itemName : item));
+                    break;
+                case 'Drink':
+                    setDrinks((prev) => prev.map((item, i) => i === index ? itemName : item));
+                    break;
+                case 'Seasonal':
+                    setSeasonal((prev) => prev.map((item, i) => i === index ? itemName : item));
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            // If no item is selected, add a new item
+            switch (itemCategory) {
+                case 'Entree':
+                    setEntrees((prev) => [...prev, itemName]);
+                    break;
+                case 'Side':
+                    setSides((prev) => [...prev, itemName]);
+                    break;
+                case 'Appetizer':
+                    setAppetizers((prev) => [...prev, itemName]);
+                    break;
+                case 'Drink':
+                    setDrinks((prev) => [...prev, itemName]);
+                    break;
+                case 'Seasonal':
+                    setSeasonal((prev) => [...prev, itemName]);
+                    break;
+                default:
+                    break;
+            }
         }
-        //resetFields();
+        resetFields();
     };
+    
+   
+    
 
     const removeItem = () => {
         switch (itemCategory) {
@@ -94,7 +180,7 @@ const Menu = () => {
         setItemName('');
         setItemSize('Medium');
         setItemCategory('Entree');
-        setInventoryIds('[]');
+        setInventoryIds([]);
         setItemPrice(3.00);
     };
 
@@ -233,18 +319,20 @@ const Menu = () => {
                                     </select>
                                 </div>
                                 <div className="mb-3">
-                                    <label className="form-label">Inventory Item IDs:</label>
+                                    <label className="form-label">Inventory Item IDs (select multiple if needed):</label>
+                                    
                                     <select
-      className="form-select"
-      value={inventoryIds} // Ensure value is an array
-      onChange={handleInventoryChange}
-      multiple // Enable multiple selection
-    >
-      {Array.from({ length: 20 }, (_, i) => (
-        <option key={i + 1} value={i + 1}>{i + 1}</option>
-      ))}
-    </select>
-
+                                        className="form-select"
+                                        value={inventoryIds} // Ensure value is an array
+                                        onChange={handleInventoryChange}
+                                        multiple // Enable multiple selection
+                                    >
+                                        {inventoryItems.map(item => (
+                                        <option key={item.id} value={item.name}>
+                                            {item.name}
+                                        </option>
+                                        ))}
+                                    </select>
 
                                 </div>
                                 <div className="mb-3">
