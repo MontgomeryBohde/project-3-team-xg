@@ -20,8 +20,9 @@ const Menu = () => {
     const [itemName, setItemName] = useState('');
     const [itemSize, setItemSize] = useState('Medium');
     const [itemCategory, setItemCategory] = useState('Entree');
-    
+    const [inventoryIds, setInventoryIds] = useState([]);
     const [itemPrice, setItemPrice] = useState(3.00);
+
     const inventoryItems = [
         { id: 45, name: 'Chopsticks' },
         { id: 46, name: 'Bowl Lids' },
@@ -78,13 +79,16 @@ const Menu = () => {
         { id: 5, name: 'Breaded Chicken' },
         { id: 1, name: 'Chicken Egg Roll' }
       ];
+
+      const handleInventoryChange = (event) => {
+        const selectedOptions = Array.from(event.target.selectedOptions, option => option.value);
+        setInventoryIds(selectedOptions); // Set selected item names in inventoryIds
+      };
       
-      
-      const [inventoryIds, setInventoryIds] = useState([]); // Now stores item names
-    const handlePopup = (name, category) => {
+    const handlePopup = (name, category, index = null) => {
         setItemName(name);
         setItemCategory(category);
-        setSelectedItem(category);
+        setSelectedItem({ name, category, index });
     };
 
     const handleNavigation = (sectionId) => {
@@ -94,32 +98,34 @@ const Menu = () => {
         }
     };
 
-    const handleInventoryChange = (event) => {
-        const selectedOptions = Array.from(event.target.selectedOptions, option => option.value);
-        setInventoryIds(selectedOptions); // Set selected item names in inventoryIds
-      };
-      
-    console.log('Selected inventory IDs:', inventoryIds); // Logs the selected inventory IDs
-
     const addItem = () => {
+        // Log selectedItem and itemCategory for debugging
+        console.log("selectedItem:", selectedItem);
+        console.log("itemCategory:", itemCategory);
+    
         // Check if an item is selected for editing
-        if (selectedItem) {
+        if (selectedItem && selectedItem.index !== null) {
+            // If selectedItem exists and has a valid index
             const { name, category, index } = selectedItem;
             switch (category) {
                 case 'Entree':
-                    setEntrees((prev) => prev.map((item, i) => i === index ? itemName : item));
+                    setEntrees((prev) => {
+                        const updated = prev.map((item, i) => (i === index ? itemName : item));
+                        console.log("Updated Entrees after editing:", updated);  // Log the updated state
+                        return updated;
+                    });
                     break;
                 case 'Side':
-                    setSides((prev) => prev.map((item, i) => i === index ? itemName : item));
+                    setSides((prev) => prev.map((item, i) => (i === index ? itemName : item)));
                     break;
                 case 'Appetizer':
-                    setAppetizers((prev) => prev.map((item, i) => i === index ? itemName : item));
+                    setAppetizers((prev) => prev.map((item, i) => (i === index ? itemName : item)));
                     break;
                 case 'Drink':
-                    setDrinks((prev) => prev.map((item, i) => i === index ? itemName : item));
+                    setDrinks((prev) => prev.map((item, i) => (i === index ? itemName : item)));
                     break;
                 case 'Seasonal':
-                    setSeasonal((prev) => prev.map((item, i) => i === index ? itemName : item));
+                    setSeasonal((prev) => prev.map((item, i) => (i === index ? itemName : item)));
                     break;
                 default:
                     break;
@@ -128,7 +134,11 @@ const Menu = () => {
             // If no item is selected, add a new item
             switch (itemCategory) {
                 case 'Entree':
-                    setEntrees((prev) => [...prev, itemName]);
+                    setEntrees((prev) => {
+                        const updated = [...prev, itemName];
+                        console.log("Updated Entrees after adding new item:", updated);  // Log the updated state
+                        return updated;
+                    });
                     break;
                 case 'Side':
                     setSides((prev) => [...prev, itemName]);
@@ -145,11 +155,13 @@ const Menu = () => {
                 default:
                     break;
             }
+            // Reset selectedItem to ensure it's ready for the next addition
+            resetFields(); // Reset fields to clear form inputs and selectedItem state
         }
-        resetFields();
     };
     
-   
+    
+    
     
 
     const removeItem = () => {
@@ -216,11 +228,17 @@ const Menu = () => {
                         <section id="entrees" className="mb-5">
                             <h2 className="text-center">Entrees</h2>
                             <div className="row">
-                                {entrees.map((item, index) => (
-                                    <div key={index} className="col-md-3 mb-3">
-                                        <button className="btn btn-outline-primary w-100 btn-lg" onClick={() => handlePopup(item, "Entree")}>{item}</button>
-                                    </div>
-                                ))}
+                            {entrees.map((item, index) => (
+                                <div key={index} className="col-md-3 mb-3">
+                                    <button
+                                        className="btn btn-outline-primary w-100 btn-lg"
+                                        onClick={() => handlePopup(item, "Entree", index)}
+                                    >
+                                        {item}
+                                    </button>
+                                </div>
+                            ))}
+
                                 <div className="col-md-3 mb-3">
                                     <button className="btn btn-outline-success w-100 btn-lg" onClick={() => handlePopup("", "Entree")}>Add New Item</button>
                                 </div>
@@ -297,20 +315,32 @@ const Menu = () => {
                             <div className="modal-body">
                                 <div className="mb-3">
                                     <label className="form-label">Name:</label>
-                                    <input type="text" className="form-control" value={itemName} onChange={(e) => setItemName(e.target.value)} />
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        value={itemName}
+                                        onChange={(e) => setItemName(e.target.value)}
+                                    />
                                 </div>
                                 <div className="mb-3">
                                     <label className="form-label">Size:</label>
-                                    <select className="form-select" value={itemSize} onChange={(e) => setItemSize(e.target.value)}>
+                                    <select
+                                        className="form-select"
+                                        value={itemSize}
+                                        onChange={(e) => setItemSize(e.target.value)}
+                                    >
                                         <option value="Small">Small</option>
                                         <option value="Medium">Medium</option>
                                         <option value="Large">Large</option>
                                     </select>
-
                                 </div>
                                 <div className="mb-3">
                                     <label className="form-label">Category:</label>
-                                    <select className="form-select" value={itemCategory} onChange={(e) => setItemCategory(e.target.value)}>
+                                    <select
+                                        className="form-select"
+                                        value={itemCategory}
+                                        onChange={(e) => setItemCategory(e.target.value)}
+                                    >
                                         <option value="Entree">Entree</option>
                                         <option value="Side">Side</option>
                                         <option value="Appetizer">Appetizer</option>
@@ -319,8 +349,7 @@ const Menu = () => {
                                     </select>
                                 </div>
                                 <div className="mb-3">
-                                    <label className="form-label">Inventory Item IDs (select multiple if needed):</label>
-                                    
+                                    <label className="form-label">Inventory Item IDs:</label>
                                     <select
                                         className="form-select"
                                         value={inventoryIds} // Ensure value is an array
@@ -333,17 +362,27 @@ const Menu = () => {
                                         </option>
                                         ))}
                                     </select>
-
                                 </div>
                                 <div className="mb-3">
                                     <label className="form-label">Price:</label>
-                                    <input type="number" className="form-control" value={itemPrice} onChange={(e) => setItemPrice(e.target.value)} />
+                                    <input
+                                        type="number"
+                                        className="form-control"
+                                        value={itemPrice}
+                                        onChange={(e) => setItemPrice(e.target.value)}
+                                    />
                                 </div>
                             </div>
                             <div className="modal-footer">
-                                <button type="button" className="btn btn-success btn-lg" onClick={addItem}>Add</button>
-                                <button type="button" className="btn btn-danger btn-lg" onClick={removeItem}>Remove</button>
-                                <button type="button" className="btn btn-secondary btn-lg" onClick={() => setSelectedItem(null)}>Cancel</button>
+                                <button type="button" className="btn btn-success btn-lg" onClick={addItem}>
+                                    Add
+                                </button>
+                                <button type="button" className="btn btn-danger btn-lg" onClick={removeItem}>
+                                    Remove
+                                </button>
+                                <button type="button" className="btn btn-secondary btn-lg" onClick={() => setSelectedItem(null)}>
+                                    Cancel
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -351,6 +390,7 @@ const Menu = () => {
             )}
         </div>
     );
-}
+};
+
 
 export default Menu;
