@@ -23,10 +23,12 @@ const Menu = () => {
     const [inventoryIds, setInventoryIds] = useState('{}');
     const [itemPrice, setItemPrice] = useState(3.00);
 
-    const handlePopup = (name, category) => {
+    
+
+    const handlePopup = (name, category, index = null) => {
         setItemName(name);
         setItemCategory(category);
-        setSelectedItem(category);
+        setSelectedItem({ name, category, index });
     };
 
     const handleNavigation = (sectionId) => {
@@ -37,27 +39,53 @@ const Menu = () => {
     };
 
     const addItem = () => {
-        switch (itemCategory) {
-            case 'Entree':
-                setEntrees((prev) => [...prev, itemName]);
-                break;
-            case 'Side':
-                setSides((prev) => [...prev, itemName]);
-                break;
-            case 'Appetizer':
-                setAppetizers((prev) => [...prev, itemName]);
-                break;
-            case 'Drink':
-                setDrinks((prev) => [...prev, itemName]);
-                break;
-            case 'Seasonal':
-                setSeasonal((prev) => [...prev, itemName]);
-                break;
-            default:
-                break;
+        // Check if an item is selected for editing
+        if (selectedItem) {
+            const { name, category, index } = selectedItem;
+            switch (category) {
+                case 'Entree':
+                    setEntrees((prev) => prev.map((item, i) => i === index ? itemName : item));
+                    break;
+                case 'Side':
+                    setSides((prev) => prev.map((item, i) => i === index ? itemName : item));
+                    break;
+                case 'Appetizer':
+                    setAppetizers((prev) => prev.map((item, i) => i === index ? itemName : item));
+                    break;
+                case 'Drink':
+                    setDrinks((prev) => prev.map((item, i) => i === index ? itemName : item));
+                    break;
+                case 'Seasonal':
+                    setSeasonal((prev) => prev.map((item, i) => i === index ? itemName : item));
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            // If no item is selected, add a new item
+            switch (itemCategory) {
+                case 'Entree':
+                    setEntrees((prev) => [...prev, itemName]);
+                    break;
+                case 'Side':
+                    setSides((prev) => [...prev, itemName]);
+                    break;
+                case 'Appetizer':
+                    setAppetizers((prev) => [...prev, itemName]);
+                    break;
+                case 'Drink':
+                    setDrinks((prev) => [...prev, itemName]);
+                    break;
+                case 'Seasonal':
+                    setSeasonal((prev) => [...prev, itemName]);
+                    break;
+                default:
+                    break;
+            }
         }
         resetFields();
     };
+    
 
     const removeItem = () => {
         switch (itemCategory) {
@@ -123,11 +151,17 @@ const Menu = () => {
                         <section id="entrees" className="mb-5">
                             <h2 className="text-center">Entrees</h2>
                             <div className="row">
-                                {entrees.map((item, index) => (
-                                    <div key={index} className="col-md-3 mb-3">
-                                        <button className="btn btn-outline-primary w-100 btn-lg" onClick={() => handlePopup(item, "Entree")}>{item}</button>
-                                    </div>
-                                ))}
+                            {entrees.map((item, index) => (
+                                <div key={index} className="col-md-3 mb-3">
+                                    <button
+                                        className="btn btn-outline-primary w-100 btn-lg"
+                                        onClick={() => handlePopup(item, "Entree", index)}
+                                    >
+                                        {item}
+                                    </button>
+                                </div>
+                            ))}
+
                                 <div className="col-md-3 mb-3">
                                     <button className="btn btn-outline-success w-100 btn-lg" onClick={() => handlePopup("", "Entree")}>Add New Item</button>
                                 </div>
@@ -204,15 +238,32 @@ const Menu = () => {
                             <div className="modal-body">
                                 <div className="mb-3">
                                     <label className="form-label">Name:</label>
-                                    <input type="text" className="form-control" value={itemName} onChange={(e) => setItemName(e.target.value)} />
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        value={itemName}
+                                        onChange={(e) => setItemName(e.target.value)}
+                                    />
                                 </div>
                                 <div className="mb-3">
                                     <label className="form-label">Size:</label>
-                                    <input type="text" className="form-control" value={itemSize} onChange={(e) => setItemSize(e.target.value)} />
+                                    <select
+                                        className="form-select"
+                                        value={itemSize}
+                                        onChange={(e) => setItemSize(e.target.value)}
+                                    >
+                                        <option value="Small">Small</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="Large">Large</option>
+                                    </select>
                                 </div>
                                 <div className="mb-3">
                                     <label className="form-label">Category:</label>
-                                    <select className="form-select" value={itemCategory} onChange={(e) => setItemCategory(e.target.value)}>
+                                    <select
+                                        className="form-select"
+                                        value={itemCategory}
+                                        onChange={(e) => setItemCategory(e.target.value)}
+                                    >
                                         <option value="Entree">Entree</option>
                                         <option value="Side">Side</option>
                                         <option value="Appetizer">Appetizer</option>
@@ -222,17 +273,36 @@ const Menu = () => {
                                 </div>
                                 <div className="mb-3">
                                     <label className="form-label">Inventory Item IDs:</label>
-                                    <input type="text" className="form-control" value={inventoryIds} onChange={(e) => setInventoryIds(e.target.value)} />
+                                    <select
+                                        className="form-select"
+                                        value={inventoryIds}
+                                        onChange={(e) => setInventoryIds(parseInt(e.target.value))}
+                                    >
+                                        {Array.from({ length: 20 }, (_, i) => (
+                                            <option key={i + 1} value={i + 1}>{i + 1}</option>
+                                        ))}
+                                    </select>
                                 </div>
                                 <div className="mb-3">
                                     <label className="form-label">Price:</label>
-                                    <input type="number" className="form-control" value={itemPrice} onChange={(e) => setItemPrice(e.target.value)} />
+                                    <input
+                                        type="number"
+                                        className="form-control"
+                                        value={itemPrice}
+                                        onChange={(e) => setItemPrice(e.target.value)}
+                                    />
                                 </div>
                             </div>
                             <div className="modal-footer">
-                                <button type="button" className="btn btn-success btn-lg" onClick={addItem}>Add</button>
-                                <button type="button" className="btn btn-danger btn-lg" onClick={removeItem}>Remove</button>
-                                <button type="button" className="btn btn-secondary btn-lg" onClick={() => setSelectedItem(null)}>Cancel</button>
+                                <button type="button" className="btn btn-success btn-lg" onClick={addItem}>
+                                    Add
+                                </button>
+                                <button type="button" className="btn btn-danger btn-lg" onClick={removeItem}>
+                                    Remove
+                                </button>
+                                <button type="button" className="btn btn-secondary btn-lg" onClick={() => setSelectedItem(null)}>
+                                    Cancel
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -240,6 +310,7 @@ const Menu = () => {
             )}
         </div>
     );
-}
+};
+
 
 export default Menu;
