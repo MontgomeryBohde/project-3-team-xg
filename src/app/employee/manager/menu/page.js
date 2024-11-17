@@ -349,7 +349,7 @@ const Menu = () => {
                                     </select>
                                 </div>
                                 <div className="mb-3">
-                                    <label className="form-label">Inventory Item IDs:</label>
+                                    <label className="form-label">Choose Inventory Items:</label>
                                     <select
                                         className="form-select"
                                         value={inventoryIds} // Ensure value is an array
