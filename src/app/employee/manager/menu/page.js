@@ -20,7 +20,8 @@ const Menu = () => {
     const [itemName, setItemName] = useState('');
     const [itemSize, setItemSize] = useState('Medium');
     const [itemCategory, setItemCategory] = useState('Entree');
-    const [inventoryIds, setInventoryIds] = useState('{}');
+    const [inventoryIds, setInventoryIds] = useState([]); 
+
     const [itemPrice, setItemPrice] = useState(3.00);
 
     const handlePopup = (name, category) => {
@@ -35,6 +36,12 @@ const Menu = () => {
             section.scrollIntoView({ behavior: 'smooth' });
         }
     };
+
+    const handleInventoryChange = (e) => {
+        const selectedOptions = Array.from(e.target.selectedOptions, option => parseInt(option.value));
+        setInventoryIds(selectedOptions); // Update inventoryIds as an array
+    };
+    console.log('Selected inventory IDs:', inventoryIds); // Logs the selected inventory IDs
 
     const addItem = () => {
         switch (itemCategory) {
@@ -56,7 +63,7 @@ const Menu = () => {
             default:
                 break;
         }
-        resetFields();
+        //resetFields();
     };
 
     const removeItem = () => {
@@ -87,7 +94,7 @@ const Menu = () => {
         setItemName('');
         setItemSize('Medium');
         setItemCategory('Entree');
-        setInventoryIds('{}');
+        setInventoryIds('[]');
         setItemPrice(3.00);
     };
 
@@ -227,11 +234,17 @@ const Menu = () => {
                                 </div>
                                 <div className="mb-3">
                                     <label className="form-label">Inventory Item IDs:</label>
-                                    <select className="form-select" value={inventoryIds} onChange={(e) => setInventoryIds(parseInt(e.target.value))}>
-                                        {Array.from({ length: 20 }, (_, i) => (
-                                            <option key={i + 1} value={i + 1}>{i + 1}</option>
-                                        ))}
-                                    </select>
+                                    <select
+      className="form-select"
+      value={inventoryIds} // Ensure value is an array
+      onChange={handleInventoryChange}
+      multiple // Enable multiple selection
+    >
+      {Array.from({ length: 20 }, (_, i) => (
+        <option key={i + 1} value={i + 1}>{i + 1}</option>
+      ))}
+    </select>
+
 
                                 </div>
                                 <div className="mb-3">
