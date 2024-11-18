@@ -52,18 +52,29 @@ const OrderInfo = () => {
                     <OrderCard key={order.id} order={order} />
                 ))}
             </div>
-            <div className="page-buttons">
-                <button onClick={prevPage} disabled={currentPage === 1}> 
+            <div className="page-buttons d-flex justify-content-between">
+                <button 
+                    onClick={prevPage} 
+                    disabled={currentPage === 1} 
+                    className="btn btn-info"
+                >
                     Previous Page
                 </button>
-                <button onClick={nextPage} disabled={currentPage === Math.ceil(orders.length / numPerPage)}>
+                <button 
+                    onClick={nextPage} 
+                    disabled={currentPage === Math.ceil(orders.length/numPerPage)} 
+                    className="btn btn-info"
+                >
                     Next Page
-                    
                 </button>
             </div>
-            <div className="page-info">
-                <p>Page {currentPage} of {Math.ceil(orders.length / numPerPage)}</p>
+            <div className="page-info mt-3 text-center">
+                <p className="mb-0 fs-5 fw-bold">
+                    Page {currentPage} of {Math.ceil(orders.length / numPerPage)}
+                </p>
             </div>
+
+
         </div>
     );
 };
