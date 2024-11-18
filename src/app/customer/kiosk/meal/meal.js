@@ -138,7 +138,7 @@ const CustomerMealSelect = () => {
 
 	// Handle cancel action
 	const handleCancel = () => {
-		router.push("/customer/menuselection"); // TODO: Navigate to the menu page
+		router.push("/customer/kiosk/menuselection"); // TODO: Navigate to the menu page
 	};
 
 	const handleConfirm = () => {
