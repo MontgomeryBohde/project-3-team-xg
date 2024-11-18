@@ -16,7 +16,7 @@ const LoginForm = () => {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await fetch('/api/employees');
+        const response = await fetch('/api/getEmployees');
         if (!response.ok) {
             throw new Error('Failed to fetch employees');
         }

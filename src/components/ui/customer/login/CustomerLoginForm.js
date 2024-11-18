@@ -1,10 +1,8 @@
 // src/components/ui/customer/login/CustomerLoginForm.js
 "use client";
 
-import { getCustomerByPhoneNumber } from '@/backend/customer';
 import React, { useState } from 'react';
 import { useRouter } from "next/navigation";
-import 'bootstrap/dist/css/bootstrap.css';
 
 const CustomerLoginForm = () => {
 	const [phoneNumber, setPhoneNumber] = useState('');
@@ -19,24 +17,31 @@ const CustomerLoginForm = () => {
 		// Reset error state
 		setError(null);
 
-		const customer = await getCustomerByPhoneNumber(phoneNumber);
+		try {
+			// Fetch the customer by phone number from the API
+			const response = await fetch(`/api/getCustomer?phoneNumber=${encodeURIComponent(phoneNumber)}`);
+			const customer = await response.json();
 
-		if (!customer) {
-			setError("Customer not Found");
-			return;
-		} else {
-			// store this employee in local storage
-			console.log(customer);
-			localStorage.setItem('loggedInCustomer', customer);
-			localStorage.setItem('loggedInCustomerName', customer.name);
-		}
+			if (!response.ok || !customer) {
+				setError("Customer not found");
+				return;
+			} else {
+				// Store customer data in local storage
+				console.log(customer);
+				localStorage.setItem('loggedInCustomer', JSON.stringify(customer));
+				localStorage.setItem('loggedInCustomerName', customer.name);
+			}
 
-		// Validate password
-		if (code !== "1234") {
-			setError("No login found for code. Please enter a valid code.");
-			return;
+			// Validate password
+			if (code !== "1234") {
+				setError("No login found for code. Please enter a valid code.");
+				return;
+			}
+			router.push("/customer/kiosk/mealselect/");
+		} catch (error) {
+			console.error("Error fetching customer:", error);
+			setError("An error occurred. Please try again later.");
 		}
-		router.push("/customer/kiosk/mealselect/");
 	};
 
 	const navigateToKioskPage = () => {

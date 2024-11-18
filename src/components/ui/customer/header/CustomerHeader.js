@@ -1,27 +1,38 @@
-import 'bootstrap/dist/css/bootstrap.css';
+// src/components/ui/customer/header/CustomerHeader.js
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import './CustomerHeader.css';
-import getWeather from '@/backend/weather';
 
 const CustomerHeader = () => {
   const [customer, setCustomer] = useState('');
-  const [currentTemperature, setCurrentTemperature] = useState('');
-  const [currentWeatherCondition, setCurrentWeatherCondition] = useState('');
-  const [currentWeatherIcon, setCurrentWeatherIcon] = useState('');
+  const [weather, setWeather] = useState({ temperature: '', description: '', icon: '' });
   const [currentTime, setCurrentTime] = useState('');
   const router = useRouter();
 
+  // Define weather icon mapping
+  const weatherMap = {
+    '01d': 'brightness-high',
+    '02d': 'cloud-sun',
+    '03d': 'clouds',
+    '04d': 'clouds',
+    '09d': 'cloud-drizzle',
+    '10d': 'cloud-rain',
+    '11d': 'cloud-lightning',
+    '13d': 'cloud-snow',
+    '50d': 'cloud-haze',
+  };
+
   useEffect(() => {
     // Retrieve customer data from local storage
-    const storedCustomer = window.localStorage.getItem('loggedInCustomerName');
+    const storedCustomer = localStorage.getItem('loggedInCustomerName');
     if (storedCustomer) {
       setCustomer(storedCustomer);
     }
 
+    // Update time every minute
     const updateTime = () => {
       const now = new Date();
       const hours = now.getHours();
@@ -31,13 +42,21 @@ const CustomerHeader = () => {
       setCurrentTime(formattedTime);
     };
 
+    // Fetch weather data from API
     const fetchWeather = async () => {
-      const response = getWeather();
-      const data = await response;
-
-      setCurrentTemperature(data.temperature);
-      setCurrentWeatherCondition(data.description);
-      setCurrentWeatherIcon(data.icon);
+      try {
+        const response = await fetch('/api/getWeather');
+        if (!response.ok) throw new Error('Failed to fetch weather data');
+        
+        const data = await response.json();
+        setWeather({
+          temperature: data.temperature,
+          description: data.description,
+          icon: weatherMap[data.icon] || 'cloud' // Fallback to 'cloud' if icon is not found
+        });
+      } catch (error) {
+        console.error('Error fetching weather:', error);
+      }
     };
 
     fetchWeather();
@@ -45,7 +64,7 @@ const CustomerHeader = () => {
     const intervalId = setInterval(updateTime, 60000); // Update time every minute
 
     return () => clearInterval(intervalId); // Cleanup interval on component unmount
-  }, [customer]);
+  }, []);
 
   const handleHomePush = () => {
     router.push("/customer");
@@ -58,9 +77,9 @@ const CustomerHeader = () => {
         <h4 className="mb-0">{customer ? `Welcome, ${customer}` : 'Welcome'}</h4>
       </div>
       <div className="d-flex align-items-center">
-        <i className={`bi bi-${currentWeatherIcon} me-2`} style={{ fontSize: '2rem' }}></i>
+        <i className={`bi bi-${weather.icon} me-2`} style={{ fontSize: '2rem' }}></i>
         <div className="ms-2" id="vertical_container">
-          <span>{currentWeatherCondition}</span>
+          <span>{weather.description}</span>
           <span className="ms-2">{currentTime}</span>
         </div>
       </div>
