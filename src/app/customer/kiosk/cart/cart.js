@@ -40,7 +40,9 @@ const CartPage = () => {
         const foodNames = cart.map((item) => {
         if (item.mealItem) {
             // Use the price field directly from the mealItem object
-            item.price = item.mealItem.price || 0; // Default to 0 if price is undefined
+            if (!item.price) {
+                item.price = item.mealItem.price || 0; // Default to 0 if price is undefined
+            }
 
             console.log(item.mealItem.price);
 
@@ -65,7 +67,7 @@ const CartPage = () => {
         })
         .then(response => response.json())
         .then(data => {
-            setPrices(data); // Update prices based on server response
+            setPrices(prevPrices => ({ ...prevPrices, ...data })); // Update prices based on server response
             setLoading(false); // Done loading
         })
         .catch(error => {
