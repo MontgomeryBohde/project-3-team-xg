@@ -22,7 +22,7 @@ const MenuPopularity = () => {
                 console.error('Error fetching popular items:', error);
             }
         }
-    
+
         fetchPopularItems();
     }, [n]); // Fetch popular items whenever `n` changes    
 
@@ -80,7 +80,7 @@ const MenuPopularity = () => {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="5">Loading...</td> {/* Currently always loading because food_name undefined (name for menu_items table) */}
+                                <td colSpan="5">Loading...</td>
                             </tr>
                         )}
                     </tbody>

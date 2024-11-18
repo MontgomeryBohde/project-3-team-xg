@@ -49,53 +49,60 @@ export default async function handler(req, res) {
         }
 
         case 'allSales': {
-          let dateFilter = '';
-          if (period === '7') dateFilter = "WHERE order_time >= NOW() - INTERVAL '7 days'";
-          else if (period === '30') dateFilter = "WHERE order_time >= NOW() - INTERVAL '30 days'";
-          else if (period === '180') dateFilter = "WHERE order_time >= NOW() - INTERVAL '6 months'";
-          else if (period === '365') dateFilter = "WHERE order_time >= NOW() - INTERVAL '1 year'";
-
-          result = await query(
-            `
-            SELECT DATE(order_time) AS order_date, SUM(order_total) AS daily_total
-            FROM orders
-            ${dateFilter}
-            GROUP BY DATE(order_time)
-            ORDER BY order_date;
-            `
-          );
+          const dateFilter = period
+              ? `WHERE order_time >= NOW() - INTERVAL '${parseInt(period)} days'`
+              : '';
+          const salesData = await query(`
+              SELECT DATE(order_time) AS order_date, SUM(order_total) AS daily_total
+              FROM orders
+              ${dateFilter}
+              GROUP BY DATE(order_time)
+              ORDER BY order_date;
+          `);
+          res.status(200).json(salesData);
           break;
-        }
+      }
 
-        case 'popularity': {
-          if (!n) {
-            return res.status(400).json({ error: 'Missing "n" parameter' });
-          }
-
-          result = await query(
-            `
-            WITH combined_items AS (
-              SELECT menu_item_id AS item_id, 'menu_item' AS item_type
-              FROM orders o CROSS JOIN unnest(o.menu_item_ids) AS menu_item_id
-              UNION ALL
-              SELECT unnest(mi.entree_ids) AS item_id, 'entree_item' AS item_type
-              FROM orders o JOIN meal_items mi ON mi.id = ANY(o.meal_item_ids)
-              UNION ALL
-              SELECT mi.side_id AS item_id, 'side_item' AS item_type
-              FROM orders o JOIN meal_items mi ON mi.id = ANY(o.meal_item_ids)
-            )
-            SELECT COALESCE(m.food_name, mi.meal_type) AS item_name, COUNT(*) AS times_ordered
-            FROM combined_items ci
-            LEFT JOIN menu_items m ON m.id = ci.item_id
-            LEFT JOIN meal_items mi ON mi.id = ci.item_id
-            GROUP BY item_name
-            ORDER BY times_ordered DESC
-            LIMIT $1;
-            `,
-            [parseInt(n)]
-          );
-          break;
+      case 'popularity': {
+        if (!n || isNaN(parseInt(n, 10))) {
+            return res.status(400).json({ error: 'Invalid or missing "n" parameter' });
         }
+    
+        try {
+            const result = await query(
+                `
+                WITH combined_items AS (
+                    SELECT menu_item_id AS item_id, 'menu_item' AS item_type
+                    FROM orders o CROSS JOIN UNNEST(o.menu_item_ids) AS menu_item_id
+                    UNION ALL
+                    SELECT UNNEST(mi.entree_ids) AS item_id, 'entree_item' AS item_type
+                    FROM orders o
+                    JOIN meal_items mi ON mi.id = ANY(o.meal_item_ids)
+                    UNION ALL
+                    SELECT mi.side_id AS item_id, 'side_item' AS item_type
+                    FROM orders o
+                    JOIN meal_items mi ON mi.id = ANY(o.meal_item_ids)
+                )
+                SELECT 
+                    COALESCE(m.name, mi.meal_type) AS item_name,
+                    COUNT(*) AS times_ordered
+                FROM combined_items ci
+                LEFT JOIN menu_items m ON m.id = ci.item_id
+                LEFT JOIN meal_items mi ON mi.id = ci.item_id
+                GROUP BY item_name
+                ORDER BY times_ordered DESC
+                LIMIT $1;
+                `,
+                [parseInt(n, 10)]
+            );
+    
+            res.status(200).json(result);
+        } catch (error) {
+            console.error('Error fetching popularity data:', error);
+            res.status(500).json({ error: 'Failed to fetch popularity data' });
+        }
+        break;
+    }    
 
         default:
           return res.status(400).json({ error: 'Invalid report type' });

@@ -39,17 +39,18 @@ const OrderPage = () => {
     useEffect(() => {
         const fetchMenuItems = async () => {
             try {
-                const response = await fetch('/api/getMenuItems');
+                const response = await fetch('/api/getProducts?action=menu');
                 if (!response.ok) throw new Error('Failed to fetch menu items');
-                
-                const data = await response.json();
-                console.log('API Response:', data); // Log raw data from API
     
+                const data = await response.json();
+                console.log('API Response:', data); // Debugging log
+    
+                // Validate API response
                 if (!Array.isArray(data)) {
                     throw new Error('Invalid data format from API');
                 }
     
-                // Filter items and log results
+                // Filter items into categories
                 const appetizers = data.filter(item => item.category.toLowerCase() === 'appetizer');
                 const entrees = data.filter(item => item.category.toLowerCase() === 'entree');
                 const sides = data.filter(item => item.category.toLowerCase() === 'side');

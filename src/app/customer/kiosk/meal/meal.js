@@ -1,3 +1,4 @@
+// src/app/customer/kiosk/meal/meal.js
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -11,35 +12,30 @@ const CustomerMealSelect = () => {
 
 	// Fetch entrees and sides from the database using the API endpoint
 	useEffect(() => {
-		const fetchMenuItems = async () => {
-			try {
-				const response = await fetch('/api/getMenuItems');
-				if (!response.ok) throw new Error('Failed to fetch menu items');
-	
-				const data = await response.json();
-				console.log('API Response:', data); // Debugging line to inspect the API response
-	
-				// Ensure the response contains a valid `menuItems` array
-				if (!Array.isArray(data)) {
-					throw new Error('Invalid data format from API');
-				}
-	
-				// Filter and set entrees and sides
-				setEntrees(
-					data
-						.filter(item => item.category.toLowerCase() === 'entree')
-						.map(item => item.name)
-				);
-				setSides(
-					data
-						.filter(item => item.category.toLowerCase() === 'side')
-						.map(item => item.name)
-				);
-			} catch (error) {
-				console.error('Error fetching menu items:', error);
-				alert('Error fetching menu items. Please try again later.');
-			}
-		};
+        const fetchMenuItems = async () => {
+            try {
+                const response = await fetch("/api/getProducts?action=menu");
+                if (!response.ok) throw new Error("Failed to fetch menu items");
+
+                const data = await response.json();
+                console.log("API Response:", data);
+
+                if (!Array.isArray(data)) {
+                    throw new Error("Invalid data format from API");
+                }
+
+                // Filter and set entrees and sides
+                setEntrees(
+                    data.filter((item) => item.category.toLowerCase() === "entree").map((item) => item.name)
+                );
+                setSides(
+                    data.filter((item) => item.category.toLowerCase() === "side").map((item) => item.name)
+                );
+            } catch (err) {
+                console.error("Error fetching menu items:", err);
+                setError("Failed to fetch menu items. Please try again later.");
+            }
+        };
 	
 		fetchMenuItems();
 	}, []);	
