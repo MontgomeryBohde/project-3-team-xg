@@ -1,13 +1,13 @@
 import { query } from '@lib/db';
 
 export default async function handler(req, res) {
-    const { action } = req.query;
+    const { type } = req.query;
 
     if (req.method === 'GET' || req.method === 'POST') {
         try {
             let result;
 
-            switch (action) {
+            switch (type) {
                 case 'price': {
                     const { foodNames } = req.body || {};
                     if (!foodNames || !Array.isArray(foodNames)) {
@@ -54,6 +54,25 @@ export default async function handler(req, res) {
 
                 case 'menu': {
                     result = await query('SELECT * FROM menu_items;');
+                    break;
+                }
+
+                case 'addMenuItem': {
+                    const { name, category, price, description } = req.body || {};
+                    
+                    // Input validation
+                    if (!name || !category || isNaN(price) || !description) {
+                        return res.status(400).json({ error: 'Invalid input for adding menu item' });
+                    }
+
+                    result = await query(
+                        `
+                        INSERT INTO menu_items (name, category, price, description)
+                        VALUES ($1, $2, $3, $4)
+                        RETURNING *;
+                        `,
+                        [name, category, price, description]
+                    );
                     break;
                 }
 

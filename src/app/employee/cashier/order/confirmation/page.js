@@ -64,7 +64,7 @@ const ConfirmationPage = () => {
         <ul className="list-group list-group-flush mt-2">
             {subItems.map((subItem, subIndex) => (
                 <li key={subIndex} className="list-group-item ps-4">
-                    <small className="text-muted">{subItem.name}</small>
+                    <small className="text-muted">{subItem.item_name}</small>
                 </li>
             ))}
         </ul>
@@ -73,7 +73,7 @@ const ConfirmationPage = () => {
     const renderCartItem = (item, index) => (
         <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
             <div className="d-flex flex-column">
-                <strong>{item.name}</strong>
+                <strong>{item.item_name}</strong>
                 {item.size && (
                     <span className="text-muted">Size: {item.size}</span>
                 )}
