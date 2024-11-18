@@ -41,20 +41,29 @@ const OrderPage = () => {
             try {
                 const response = await fetch('/api/getMenuItems');
                 if (!response.ok) throw new Error('Failed to fetch menu items');
+                
                 const data = await response.json();
-                setMenuItems({
-                    appetizers: data.menuItems.filter(item => item.category.toLowerCase() === 'appetizer'),
-                    entrees: data.menuItems.filter(item => item.category.toLowerCase() === 'entree'),
-                    sides: data.menuItems.filter(item => item.category.toLowerCase() === 'side'),
-                    drinks: data.menuItems.filter(item => item.category.toLowerCase() === 'drink')
-                });
+                console.log('API Response:', data); // Log raw data from API
+    
+                if (!Array.isArray(data)) {
+                    throw new Error('Invalid data format from API');
+                }
+    
+                // Filter items and log results
+                const appetizers = data.filter(item => item.category.toLowerCase() === 'appetizer');
+                const entrees = data.filter(item => item.category.toLowerCase() === 'entree');
+                const sides = data.filter(item => item.category.toLowerCase() === 'side');
+                const drinks = data.filter(item => item.category.toLowerCase() === 'drink');
+    
+                setMenuItems({ appetizers, entrees, sides, drinks });
             } catch (error) {
                 console.error('Error fetching menu items:', error);
                 setWarningMessage('Error fetching menu items. Please try again later.');
             }
         };
+    
         fetchMenuItems();
-    }, []);
+    }, []);    
 
     useEffect(() => {
         const handlePopState = () => {

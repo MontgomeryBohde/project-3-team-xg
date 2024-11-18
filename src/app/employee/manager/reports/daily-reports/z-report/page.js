@@ -11,16 +11,19 @@ const ZReport = () => {
     useEffect(() => {
         async function fetchZReport() {
             try {
-                const response = await fetch('/api/getZReport');
+                const response = await fetch('/api/getReports?type=zReport');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch Z Report');
+                }
                 const data = await response.json();
                 setReportData(data);
             } catch (error) {
                 console.error('Error fetching Z report data:', error);
             }
         }
-
+    
         fetchZReport();
-    }, []);
+    }, []);    
 
     const formatCurrency = (value) => {
         return value !== null && value !== undefined ? `$${value.toFixed(2)}` : '$0.00';

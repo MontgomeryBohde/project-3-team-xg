@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import EmployeeHeader from "@/components/ui/employee/header/EmployeeHeader";
-import "bootstrap/dist/css/bootstrap.css"; // Bootstrap is already included
 import "./meal-select.css";
 
 const CustomerMealSelect = () => {
@@ -14,21 +13,37 @@ const CustomerMealSelect = () => {
 	useEffect(() => {
 		const fetchMenuItems = async () => {
 			try {
-				const response = await fetch('/api/menu_items');
+				const response = await fetch('/api/getMenuItems');
 				if (!response.ok) throw new Error('Failed to fetch menu items');
+	
 				const data = await response.json();
-
+				console.log('API Response:', data); // Debugging line to inspect the API response
+	
+				// Ensure the response contains a valid `menuItems` array
+				if (!Array.isArray(data)) {
+					throw new Error('Invalid data format from API');
+				}
+	
 				// Filter and set entrees and sides
-				setEntrees(data.menuItems.filter(item => item.category.toLowerCase() === 'entree').map(item => item.name));
-				setSides(data.menuItems.filter(item => item.category.toLowerCase() === 'side').map(item => item.name));
+				setEntrees(
+					data
+						.filter(item => item.category.toLowerCase() === 'entree')
+						.map(item => item.name)
+				);
+				setSides(
+					data
+						.filter(item => item.category.toLowerCase() === 'side')
+						.map(item => item.name)
+				);
 			} catch (error) {
 				console.error('Error fetching menu items:', error);
 				alert('Error fetching menu items. Please try again later.');
 			}
 		};
-
+	
 		fetchMenuItems();
-	}, []);
+	}, []);	
+	
 
 	const mealTypes = [
 		{ name: "Bowl", sides: 1, entrees: 1, price: 8.30 },

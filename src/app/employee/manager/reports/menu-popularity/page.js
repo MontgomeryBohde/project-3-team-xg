@@ -12,16 +12,19 @@ const MenuPopularity = () => {
     useEffect(() => {
         async function fetchPopularItems() {
             try {
-                const response = await fetch(`/api/getPopularity?n=${n}`);
+                const response = await fetch(`/api/getReports?type=popularity&n=${n}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch popular items');
+                }
                 const data = await response.json();
                 setPopularItems(data);
             } catch (error) {
                 console.error('Error fetching popular items:', error);
             }
         }
-
+    
         fetchPopularItems();
-    }, [n]); // Fetch popular items whenever `n` changes
+    }, [n]); // Fetch popular items whenever `n` changes    
 
     const handleNChange = (event) => {
         const newN = parseInt(event.target.value, 10);

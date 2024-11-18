@@ -1,9 +1,11 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",  // Ensure the root directory is explicitly set
     "paths": {
-      "@/*": ["./src/*"],
-      "@/components": ["./src/components"],
-      "@/assets": ["./src/assets"],
+      "@lib/*": ["lib/*"],            // Maps @lib/ to the lib/ folder in the project root
+      "@/*": ["src/*"],              // Maps @/ to the src/ folder
+      "@/components/*": ["src/components/*"],  // Explicitly map components
+      "@/assets/*": ["src/assets/*"]          // Explicitly map assets
     }
   }
 }

@@ -12,19 +12,25 @@ const ProductUsageChart = () => {
     const [productData, setProductData] = useState([]);
 
     useEffect(() => {
-        // Fetch product usage data from the API
         const fetchProductUsageData = async () => {
-            const response = await fetch('/api/getProductUsage');
-            const data = await response.json();
-
-            // Process the data into the format Chart.js requires
-            if (data && data.length > 0) {
-                setProductData(data);
+            try {
+                const response = await fetch('/api/getProducts?type=usage');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch product usage data');
+                }
+                const data = await response.json();
+    
+                // Process the data into the format Chart.js requires
+                if (data && data.length > 0) {
+                    setProductData(data);
+                }
+            } catch (error) {
+                console.error('Error fetching product usage data:', error);
             }
         };
-
+    
         fetchProductUsageData();
-    }, []);
+    }, []);    
 
     // Prepare chart data
     const chartData = {
