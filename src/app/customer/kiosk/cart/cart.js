@@ -56,7 +56,7 @@ const CartPage = () => {
     // Now, fetch prices for the non-mealCartItem items from the server
     const nonMealItems = cart.filter(item => !item.mealItem).map(item => item.name);
         if (nonMealItems.length > 0) {
-        fetch('/api/getPrice', {
+        fetch('/api/getProducts?type=price', {
             method: 'POST',
             headers: {
             'Content-Type': 'application/json',

@@ -1,29 +1,21 @@
 // pages/api/getItemSizes.js
-import { Client } from 'pg';
+import { query } from '@lib/db';
 
 export default async function handler(req, res) {
   if (req.method === 'GET') {
-    const connectionString = process.env.POSTGRES_URL;
-    const client = new Client({ connectionString });
-    const itemId = req.query.item_id;
+    const { item_id } = req.query;
 
-    if (!itemId) {
-      res.status(400).json({ error: 'item_id is required' });
-      return;
+    if (!item_id) {
+      return res.status(400).json({ error: 'item_id is required' });
     }
 
     try {
-      await client.connect();
-      const itemSizesResult = await client.query(
+      const itemSizes = await query(
         'SELECT * FROM item_sizes WHERE item_id = $1;',
-        [itemId]
+        [item_id]
       );
-      const itemSizes = itemSizesResult.rows;
-      await client.end();
-
       res.status(200).json(itemSizes);
     } catch (error) {
-      console.error('Database query error:', error);
       res.status(500).json({ error: 'Failed to fetch item sizes' });
     }
   } else {
