@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import Link from "next/link";
 import { FaShoppingCart } from "react-icons/fa";
+import CustomerHeader from '@/components/ui/customer/header/CustomerHeader';
 
 
 const CartPage = () => {
@@ -141,101 +142,105 @@ const CartPage = () => {
     };
 
     return (
-        <div className="container">
-            <h1 className="text-center my-4">Your Cart</h1>
+        <div>
+            <CustomerHeader></CustomerHeader>
+            <div className="container">
+                <h1 className="text-center my-4">Your Cart</h1>
 
-            {cart.length === 0 ? (
-                <p>Your cart is empty.</p>
-            ) : (
-                <ul className="list-group">
-                    {cart.map((item, index) => (
-                        <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                            {/* Check if this is a mealCartItem or a regular item */}
-                            {item.mealItem ? (
-                            // This is a mealCartItem
-                            <>
-                                <strong>{item.mealItem}</strong><br />
-                                <span>Entrees: {item.entrees.join(", ") || "N/A"}</span><br />
-                                <span>Sides: {item.sides.join(", ") || "N/A"}</span><br />
-                                <span>Quantity: {item.quantity}</span><br />
-                                {loading ? (
-                                <span>Price: Loading...</span>
+                {cart.length === 0 ? (
+                    <p>Your cart is empty.</p>
+                ) : (
+                    <ul className="list-group">
+                        {cart.map((item, index) => (
+                            <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                {/* Check if this is a mealCartItem or a regular item */}
+                                {item.mealItem ? (
+                                // This is a mealCartItem
+                                <>
+                                    <strong>{item.mealItem}</strong><br />
+                                    <span>Entrees: {item.entrees.join(", ") || "N/A"}</span><br />
+                                    <span>Sides: {item.sides.join(", ") || "N/A"}</span><br />
+                                    <span>Quantity: {item.quantity}</span><br />
+                                    {loading ? (
+                                    <span>Price: Loading...</span>
+                                    ) : (
+                                    <span>Price: ${(item.price * item.quantity).toFixed(2)}</span>
+                                    )}
+                                </>
                                 ) : (
-                                <span>Price: ${(item.price * item.quantity).toFixed(2)}</span>
+                                // This is a regular item
+                                <>
+                                    <strong>{item.name}</strong><br />
+                                    Quantity: {item.quantity}<br />
+                                    {loading ? (
+                                    <span>Price: Loading...</span>
+                                    ) : (
+                                    <span>Price: ${specialDealPrices[item.name]
+                                        ? (specialDealPrices[item.name] * item.quantity).toFixed(2)
+                                        : (Number(prices[item.name]?.[item.size] || 0) * item.quantity).toFixed(2)
+                                    }</span>
+                                    )}
+                                    <br />
+                                    <span>Size: {item.size || "N/A"}</span>
+                                </>
                                 )}
-                            </>
-                            ) : (
-                            // This is a regular item
-                            <>
-                                <strong>{item.name}</strong><br />
-                                Quantity: {item.quantity}<br />
-                                {loading ? (
-                                <span>Price: Loading...</span>
-                                ) : (
-                                <span>Price: ${specialDealPrices[item.name]
-                                    ? (specialDealPrices[item.name] * item.quantity).toFixed(2)
-                                    : (Number(prices[item.name]?.[item.size] || 0) * item.quantity).toFixed(2)
-                                }</span>
-                                )}
-                                <br />
-                                <span>Size: {item.size || "N/A"}</span>
-                            </>
-                            )}
-                        </div>
+                            </div>
 
-                        <div className="quantity-controls">
-                            <button onClick={() => updateQuantity(index, 1)} className="btn btn-sm btn-outline-primary">+</button>
-                            <button onClick={() => updateQuantity(index, -1)} className="btn btn-sm btn-outline-secondary">-</button>
-                            <button onClick={() => removeItemFromCart(index)} className="btn btn-sm btn-danger ml-2">Remove</button>
-                        </div>
-                        </li>
-                    ))}
-                </ul>
+                            <div className="quantity-controls">
+                                <button onClick={() => updateQuantity(index, 1)} className="btn btn-sm btn-outline-primary">+</button>
+                                <button onClick={() => updateQuantity(index, -1)} className="btn btn-sm btn-outline-secondary">-</button>
+                                <button onClick={() => removeItemFromCart(index)} className="btn btn-sm btn-danger ml-2">Remove</button>
+                            </div>
+                            </li>
+                        ))}
+                    </ul>
 
-            )}
-
-            <div className="summary mt-4">
-                <div className="d-flex justify-content-between">
-                    <p>Subtotal:</p>
-                    <p>${subtotal.toFixed(2)}</p>
-                </div>
-                <div className="d-flex align-items-center">
-                    <p className="mb-0">Promo Code:</p>
-                    <input 
-                        type="text" 
-                        value={promoCode} 
-                        onChange={(e) => setPromoCode(e.target.value)} 
-                        placeholder="Enter code" 
-                        className="promo-input"
-                    />
-                    <button onClick={handleApplyPromoCode} className="btn btn-secondary ml-2">Apply</button>
-                </div>
-                <div className="mt-3 d-flex justify-content-between">
-                    <p>Discount:</p>
-                    <p>-${discount.toFixed(2)}</p>
-                </div>
-                {isFiftyPercentOff && (
-                    <div className="d-flex justify-content-between">
-                        <p>Automatic 50% Off:</p>
-                        <p>-${automaticDiscount.toFixed(2)}</p>
-                    </div>
                 )}
-                <div className="d-flex justify-content-between">
-                    <p>Tax:</p>
-                    <p>${tax.toFixed(2)}</p>
+
+                <div className="summary mt-4">
+                    <div className="d-flex justify-content-between">
+                        <p>Subtotal:</p>
+                        <p>${subtotal.toFixed(2)}</p>
+                    </div>
+                    <div className="d-flex align-items-center">
+                        <p className="mb-0">Promo Code:</p>
+                        <input 
+                            type="text" 
+                            value={promoCode} 
+                            onChange={(e) => setPromoCode(e.target.value)} 
+                            placeholder="Enter code" 
+                            className="promo-input"
+                        />
+                        <button onClick={handleApplyPromoCode} className="btn btn-secondary ml-2">Apply</button>
+                    </div>
+                    <div className="mt-3 d-flex justify-content-between">
+                        <p>Discount:</p>
+                        <p>-${discount.toFixed(2)}</p>
+                    </div>
+                    {isFiftyPercentOff && (
+                        <div className="d-flex justify-content-between">
+                            <p>Automatic 50% Off:</p>
+                            <p>-${automaticDiscount.toFixed(2)}</p>
+                        </div>
+                    )}
+                    <div className="d-flex justify-content-between">
+                        <p>Tax:</p>
+                        <p>${tax.toFixed(2)}</p>
+                    </div>
+                    <div className="d-flex justify-content-between">
+                        <h4>Total:</h4>
+                        <h4>${total.toFixed(2)}</h4>
+                    </div>
                 </div>
+                
                 <div className="d-flex justify-content-between">
-                    <h4>Total:</h4>
-                    <h4>${total.toFixed(2)}</h4>
+                    <Link href="/customer/kiosk/menuselection" className="btn btn-primary m-3">Back to Menu</Link>
+                    <button onClick={handleClearCart} className="btn btn-danger m-3">Clear Order</button>
+                    <Link href="/customer/kiosk/confirmation" className="btn btn-success m-3">Check Out</Link>
                 </div>
             </div>
             
-            <div className="d-flex justify-content-between">
-                <Link href="/customer/kiosk/menuselection" className="btn btn-primary m-3">Back to Menu</Link>
-                <button onClick={handleClearCart} className="btn btn-danger m-3">Clear Order</button>
-                <Link href="/customer/kiosk/confirmation" className="btn btn-success m-3">Check Out</Link>
-            </div>
         </div>
     );
 };
