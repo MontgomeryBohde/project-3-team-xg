@@ -55,6 +55,8 @@ const CartPage = () => {
 
     // Now, fetch prices for the non-mealCartItem items from the server
     const nonMealItems = cart.filter(item => !item.mealItem).map(item => item.name);
+    console.log('Food names to send:', foodNames);
+
         if (nonMealItems.length > 0) {
         fetch('/api/getProducts?type=price', {
             method: 'POST',
@@ -65,9 +67,22 @@ const CartPage = () => {
         })
         .then(response => response.json())
         .then(data => {
-            setPrices(data); // Update prices based on server response
+            console.log("Server response:", data); // Log the full response from the backend
+        
+            // Map the data into a more convenient structure for easy lookup
+            const priceMap = data.reduce((acc, item) => {
+                if (!acc[item.item_name]) {
+                    acc[item.item_name] = {};  // Initialize the item if it's not already in the map
+                }
+                acc[item.item_name][item.item_size] = parseFloat(item.price); // Parse the price to ensure it's a number
+                return acc;
+            }, {});
+        
+            setPrices(priceMap); // Update prices based on server response
             setLoading(false); // Done loading
         })
+        
+
         .catch(error => {
             console.error('Error fetching prices:', error);
             setLoading(false); // Done loading even in case of error
@@ -78,20 +93,21 @@ const CartPage = () => {
     }, [cart]); // This effect runs whenever the `cart` state changes.  
 
     const calculateSubtotal = () => {
-        return cart.reduce((total, item) => {
-            let itemPrice;
-    
-            // If it's a mealItem, use the price from the mealItem itself
-            if (item.mealItem) {
-                itemPrice = item.price || item.mealItem.price || 0; // Fallback to mealItem.price if item.price is not set
-            } else {
-                // For regular items, use the fetched prices or special deal prices
-                itemPrice = prices[item.name]?.[item.size] || specialDealPrices[item.name] || 0;
-            }
-    
-            return total + (itemPrice * item.quantity);
-        }, 0);
-    };    
+    return cart.reduce((total, item) => {
+        let itemPrice;
+
+        // If it's a mealItem, use the price from the mealItem itself
+        if (item.mealItem) {
+            itemPrice = item.price || item.mealItem.price || 0; // Fallback to mealItem.price if item.price is not set
+        } else {
+            // For regular items, use the fetched prices or special deal prices
+            itemPrice = prices[item.name]?.[item.size] || specialDealPrices[item.name] || 0;
+        }
+
+        return total + (itemPrice * item.quantity);
+    }, 0);
+};
+
 
     const subtotal = calculateSubtotal();
 
