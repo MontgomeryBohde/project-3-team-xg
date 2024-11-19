@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import EmployeeLogInHeader from '@/components/ui/employee/header/EmployeeLogInHeader';
-import InventoryPopup from '@/components/ui/employee/manager/inventory/InventoryPopUp';
+import InventoryPopUp from '@/components/ui/employee/manager/inventory/InventoryPopUp';
 
 const Inventory = () => {
     const [inventoryItems, setInventoryItems] = useState({
@@ -16,7 +16,7 @@ const Inventory = () => {
     });
 
     const [selectedCategory, setSelectedCategory] = useState("Appetizer");
-    const [selectedItem, setSelectedItem] = useState(null);
+    const [selectedItem, setSelectedItem] = useState(false);
     const [itemId, setItemId] = useState(null);
     const [itemName, setItemName] = useState('');
     const [itemCategory, setItemCategory] = useState("Appetizer");
@@ -26,35 +26,37 @@ const Inventory = () => {
     const [isAllergen, setIsAllergen] = useState(false);
     const [isVegan, setIsVegan] = useState(false);
 
-    // Fetch inventory items on load
+    // Fetch inventory items function
+    const fetchInventoryItems = async () => {
+        try {
+            const response = await fetch('/api/getInventory?type=inventory');
+            if (!response.ok) throw new Error('Failed to fetch inventory items');
+    
+            const data = await response.json();
+            const categorizedItems = data.reduce((acc, item) => {
+                if (!acc[item.category]) acc[item.category] = [];
+                acc[item.category].push(item);
+                return acc;
+            }, {});
+    
+            // Ensure all categories exist in the state
+            setInventoryItems((prev) => ({
+                ...prev,
+                ...categorizedItems,
+            }));
+        } catch (error) {
+            console.error('Error fetching inventory items:', error);
+        }
+    };
+
     useEffect(() => {
-        const fetchInventoryItems = async () => {
-            try {
-                const response = await fetch('/api/getInventory?type=inventory');
-                if (!response.ok) throw new Error('Failed to fetch inventory items');
-
-                const data = await response.json();
-                const categorizedItems = data.reduce((acc, item) => {
-                    if (!acc[item.category]) acc[item.category] = [];
-                    acc[item.category].push(item);
-                    return acc;
-                }, {});
-
-                // Ensure all categories exist in the state
-                setInventoryItems((prev) => ({
-                    ...prev,
-                    ...categorizedItems,
-                }));
-            } catch (error) {
-                console.error('Error fetching inventory items:', error);
-            }
-        };
-
         fetchInventoryItems();
     }, []);
 
     const handlePopup = (item) => {
         if (item) {
+            // Set fields for editing
+            setItemId(item.id || null);
             setItemName(item.item_name || '');
             setItemCategory(item.category || 'Appetizer');
             setItemPrice(item.unit_price || 0.50);
@@ -62,11 +64,12 @@ const Inventory = () => {
             setRestockDate(item.restock_date ? item.restock_date.split('T')[0] : '');
             setIsAllergen(item.is_allergen || false);
             setIsVegan(item.is_vegan || false);
-            setSelectedItem(item); // Ensure the full item object, including `id`, is stored
+            setSelectedItem(item); // Set the actual item for editing
         } else {
+            // Reset fields for adding a new item
             resetFields();
+            setSelectedItem(true); // Set to true to show the "Add New Item" form
         }
-        setSelectedItem(true);
     };    
 
     const addItem = async () => {
@@ -74,7 +77,7 @@ const Inventory = () => {
             alert('All fields are required and must have valid values!');
             return;
         }
-
+    
         try {
             const response = await fetch('/api/getInventory?type=addInventoryItem', {
                 method: 'POST',
@@ -89,56 +92,17 @@ const Inventory = () => {
                     is_vegan: isVegan,
                 }),
             });
-
+    
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Failed to add inventory item');
             }
-
-            const newItem = await response.json();
-            console.log('Added item:', newItem);
-
-            setInventoryItems((prev) => ({
-                ...prev,
-                [itemCategory]: [...(prev[itemCategory] || []), newItem],
-            }));
+            await fetchInventoryItems();
         } catch (error) {
             console.error('Error adding item:', error);
             alert(`Error adding item: ${error.message}`);
         } finally {
-            resetFields();
-        }
-    };
-
-    const removeItem = async () => {
-        if (!selectedItem?.id) {
-            alert('Item ID is required!');
-            return;
-        }
-    
-        try {
-            console.log('Attempting to remove item with ID:', selectedItem.id); // Debugging log
-    
-            const response = await fetch('/api/getInventory?type=removeInventoryItem', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: selectedItem.id }),
-            });
-    
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to remove inventory item');
-            }
-    
-            setInventoryItems((prev) => ({
-                ...prev,
-                [itemCategory]: prev[itemCategory].filter((item) => item.id !== selectedItem.id),
-            }));
-        } catch (error) {
-            console.error('Error removing item:', error);
-            alert(`Error removing item: ${error.message}`);
-        } finally {
-            resetFields();
+            resetFields(); // Reset fields after adding the item
         }
     };    
 
@@ -147,8 +111,10 @@ const Inventory = () => {
             alert('All fields are required and must have valid values!');
             return;
         }
-
+    
         try {
+            console.log('Editing item with ID:', itemId);
+    
             const response = await fetch('/api/getInventory?type=editInventoryItem', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -163,28 +129,61 @@ const Inventory = () => {
                     is_vegan: isVegan,
                 }),
             });
-
+    
+            if (response.status === 404) {
+                console.warn(`Item with ID ${itemId} not found for editing.`);
+                alert(`Item not found. Please refresh and try again.`);
+                return;
+            }
+    
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Failed to edit inventory item');
             }
-
-            const updatedItem = await response.json();
-            console.log('Edited item:', updatedItem);
-
-            setInventoryItems((prev) => ({
-                ...prev,
-                [itemCategory]: (prev[itemCategory] || []).map((item) =>
-                    item.id === itemId ? updatedItem : item
-                ),
-            }));
+    
+            console.log('Edited item successfully.');
+    
+            // Add a small delay before fetching updated inventory to ensure the backend has fully processed the request
+            await new Promise((resolve) => setTimeout(resolve, 500));
+    
+            // Refetch the updated inventory items from the server
+            await fetchInventoryItems();
         } catch (error) {
             console.error('Error editing item:', error);
             alert(`Error editing item: ${error.message}`);
         } finally {
-            resetFields();
+            resetFields(); // Reset fields after editing the item
         }
-    };
+    };    
+    
+    const removeItem = async () => {
+        if (!selectedItem?.id) {
+            alert('Item ID is required!');
+            return;
+        }
+    
+        try {
+            const response = await fetch('/api/getInventory?type=removeInventoryItem', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: selectedItem.id }),
+            });
+    
+            // Check if the response was successful
+            if (response.status === 404) {
+                console.warn(`Item with ID ${selectedItem.id} was not found, which means it has likely already been deleted.`);
+            } else if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to remove inventory item');
+            }
+            await fetchInventoryItems();
+        } catch (error) {
+            console.error('Error removing item:', error);
+            alert(`Error removing item: ${error.message}`);
+        } finally {
+            resetFields(); // Reset fields after deleting an item
+        }
+    };    
 
     const resetFields = () => {
         setItemId(null);
@@ -196,7 +195,7 @@ const Inventory = () => {
         setIsAllergen(false);
         setIsVegan(false);
         setSelectedItem(false);
-    };
+    };    
 
     const renderItems = () => inventoryItems[selectedCategory] || [];
 
@@ -243,7 +242,8 @@ const Inventory = () => {
             </div>
 
             {selectedItem && (
-                <InventoryPopup
+                <InventoryPopUp
+                    itemId={itemId}
                     itemName={itemName}
                     itemCategory={itemCategory}
                     itemPrice={itemPrice}

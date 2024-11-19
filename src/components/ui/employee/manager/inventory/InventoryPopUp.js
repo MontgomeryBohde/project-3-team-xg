@@ -71,7 +71,7 @@ const InventoryPopup = ({
             setErrorMessage('');
             editItem(); // Call edit function
         }
-    };
+    };    
 
     const handleRemoveItem = () => {
         if (itemId) {
@@ -86,10 +86,10 @@ const InventoryPopup = ({
         <div className="modal show d-block" tabIndex="-1">
             <div className="modal-dialog">
                 <div className="modal-content">
-                    <div className="modal-header">
-                        <h5 className="modal-title">{itemId ? 'Edit Item' : 'Add New Item'}</h5>
-                        <button type="button" className="btn-close" onClick={resetFields}></button>
-                    </div>
+                <div className="modal-header">
+                    <h5 className="modal-title">{itemId ? 'Edit Item' : 'Add New Item'}</h5>
+                    <button type="button" className="btn-close" onClick={resetFields}></button>
+                </div>
                     <div className="modal-body">
                         {errorMessage && (
                             <div className="alert alert-danger" role="alert">
@@ -169,17 +169,17 @@ const InventoryPopup = ({
                     </div>
                     <div className="modal-footer">
                         {itemId ? (
-                            <button className="btn btn-primary" onClick={handleEditItem}>
-                                Save Changes
-                            </button>
+                            <>
+                                <button className="btn btn-primary" onClick={handleEditItem}>
+                                    Save Changes
+                                </button>
+                                <button className="btn btn-danger" onClick={handleRemoveItem}>
+                                    Remove
+                                </button>
+                            </>
                         ) : (
                             <button className="btn btn-primary" onClick={handleAddItem}>
                                 Add Item
-                            </button>
-                        )}
-                        {itemId && (
-                            <button className="btn btn-danger" onClick={handleRemoveItem}>
-                                Remove
                             </button>
                         )}
                         <button className="btn btn-secondary" onClick={resetFields}>
