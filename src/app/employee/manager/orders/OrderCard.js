@@ -35,25 +35,25 @@ const OrderCard = ({ order }) => {
                             </div>
                         )}
 
-                            <div className="mt-3">
-                                <div className="fs-4 fw-bold mt-2">Entree(s):</div>
-                                {Array.isArray(order.entree_names) && order.entree_names.length > 0 ? (
-                                    order.entree_names.map((entree, index) => (
-                                        <div key={index} className="fs-5">{entree}</div>
-                                    ))
-                                ) : (
-                                    <div className="fs-5">N/A</div>
-                                )}
-                                <div className="fs-4 fw-bold mt-2">A La Carte, Appetizers, or Drinks:</div>
-                                {Array.isArray(order.food_names) && order.food_names.length > 0 ? (
-                                    order.food_names.map((food, index) => (
-                                        <div key={index} className="fs-5">{food}</div>
-                                    ))
+                        <div className="mt-3">
+                            <div className="fs-4 fw-bold mt-2">Entrees, Appetizers, and Drinks:</div>
+                            {Array.isArray(order.entree_names) && order.entree_names.length > 0 ? (
+                                order.entree_names.map((entree, index) => (
+                                    <div key={index} className="fs-5">{entree}</div>
+                                ))
+                            ) : (
+                                <div className="fs-5">N/A</div>
+                            )}
 
-                                ) :  (
-                                    <div className="fs-5">None</div>
-                                )}
-                            </div>
+                        
+                            {Array.isArray(order.food_names) && order.food_names.length > 0 ? (
+                                order.food_names.map((food, index) => (
+                                    <div key={index} className="fs-5">{food}</div>
+                                ))
+                            ) : (
+                                <div className="fs-5">None</div>
+                            )}
+                        </div>
                         </div>
 
                         {/* RIGHT */}
