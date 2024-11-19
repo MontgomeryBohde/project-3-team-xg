@@ -184,12 +184,16 @@ const CartPage = () => {
         // here
         for(const item of cart)
         {
+            console.log("item handling:");
+
             let entreeIds = [];
             let sideId = null;
 
             // if mealItem
             if(item.mealItem)
             {
+                console.log("meal item");
+
                 // process entrees
                 for(const entree of item.entrees)
                 {
@@ -256,22 +260,41 @@ const CartPage = () => {
                     }
                 }
             }
-            else 
-            {
-                // check in the item_sizes db to see the ids associated with their names
-                /*
-                    id | item_id | item_size | price | calories 
-                    ----+---------+-----------+-------+----------
-                    1 |       1 | Small     |  5.20 |      400
-                    2 |       1 | Medium    |  8.50 |      450
-                    etc
-                */
-                // add the id to mealItems array
+            else {
+                console.log("Not a meal item");
+            
                 try {
-                    const itemSizeResponse = await fetch(`/api/item_sizes?id=${item.item_size}`);
-                    const itemSizeData = await itemSizeResponse.json();
-                    if (itemSizeData && itemSizeData.id) {
-                        itemSizeIds.push(itemSizeData.id);
+                    console.log("Item size:", item.size);
+                    console.log("Item name:", item.name);
+            
+                    // Step 1: Fetch the menu item ID using the item name
+                    const menuItemResponse = await fetch(`/api/getMenuItemId?name=${encodeURIComponent(item.name)}`);
+                    const menuItemData = await menuItemResponse.json();
+
+                    console.log(menuItemData);
+                    console.log(menuItemData.id);
+            
+                    if (menuItemData && menuItemData.id) {
+                        const menuItemId = menuItemData.id;
+                        console.log("Menu item ID:", menuItemId);
+            
+                        // Step 2: Fetch the item size ID using the menu item ID and size
+                        const itemSizeResponse = await fetch(`/api/item_sizes?item_id=${menuItemId}&size=${encodeURIComponent(item.size)}`);
+                        const itemSizeData = await itemSizeResponse.json();
+
+                        console.log(itemSizeData);
+
+                        for(const sizeItems of itemSizeData)
+                        {
+                            console.log(sizeItems);
+                            if(sizeItems.item_size == item.size)
+                            {
+                                console.log(sizeItems.item_size);
+                                console.log(sizeItems.id);
+                                itemSizeIds.push(sizeItems.id);
+                                break;
+                            }
+                        }
                     }
                 } catch (error) {
                     console.error("Error fetching item size ID:", error);
