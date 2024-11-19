@@ -67,19 +67,19 @@ const CartPage = () => {
         })
         .then(response => response.json())
         .then(data => {
-            console.log("Server response:", data); // Log the full response from the backend
+           // console.log("Server response:", data); 
         
-            // Map the data into a more convenient structure for easy lookup
+        
             const priceMap = data.reduce((acc, item) => {
                 if (!acc[item.item_name]) {
-                    acc[item.item_name] = {};  // Initialize the item if it's not already in the map
+                    acc[item.item_name] = {};  
                 }
-                acc[item.item_name][item.item_size] = parseFloat(item.price); // Parse the price to ensure it's a number
+                acc[item.item_name][item.item_size] = parseFloat(item.price); 
                 return acc;
             }, {});
         
-            setPrices(priceMap); // Update prices based on server response
-            setLoading(false); // Done loading
+            setPrices(priceMap);
+            setLoading(false); 
         })
         
 
@@ -96,9 +96,9 @@ const CartPage = () => {
     return cart.reduce((total, item) => {
         let itemPrice;
 
-        // If it's a mealItem, use the price from the mealItem itself
+      
         if (item.mealItem) {
-            itemPrice = item.price || item.mealItem.price || 0; // Fallback to mealItem.price if item.price is not set
+            itemPrice = item.price || item.mealItem.price || 0; 
         } else {
             // For regular items, use the fetched prices or special deal prices
             itemPrice = prices[item.name]?.[item.size] || specialDealPrices[item.name] || 0;
