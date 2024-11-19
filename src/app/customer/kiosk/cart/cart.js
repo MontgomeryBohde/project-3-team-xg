@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from "next/link";
 import { FaShoppingCart } from "react-icons/fa";
 import CustomerHeader from '@/components/ui/customer/header/CustomerHeader';
@@ -15,6 +16,18 @@ const CartPage = () => {
     const [promoCode, setPromoCode] = useState("");
     const [discount, setDiscount] = useState(0);
     const [taxRate] = useState(0.08); 
+
+    const [currentTime, setCurrentTime] = useState('');
+    useEffect(() => {
+        const updateTime = () => {
+          const now = new Date();
+          const hours = now.getHours();
+          const minutes = now.getMinutes();
+          const ampm = hours >= 12 ? 'PM' : 'AM';
+          const formattedTime = `${hours % 12 || 12}:${minutes < 10 ? `0${minutes}` : minutes} ${ampm}`;
+          setCurrentTime(formattedTime);
+        };
+    }, []);
 
     //Catering prices (hardcoded)
     const specialDealPrices = {
@@ -37,47 +50,47 @@ const CartPage = () => {
     useEffect(() => {
         if (cart.length === 0) return; // Do nothing if the cart is empty.
 
-        // Process the cart items and update their prices based on the existing price field.
+            // Process the cart items and update their prices based on the existing price field.
         const foodNames = cart.map((item) => {
-        if (item.mealItem) {
-            // Use the price field directly from the mealItem object
-            if (!item.price) {
-                item.price = item.mealItem.price || 0; // Default to 0 if price is undefined
+            if (item.mealItem) {
+                // Use the price field directly from the mealItem object
+                if (!item.price) {
+                    item.price = item.mealItem.price || 0; // Default to 0 if price is undefined
+                }
+
+                console.log(item.mealItem.price);
+
+                // Return the mealItem name for further processing (if needed)
+                return item.mealItem.name;
             }
 
-            console.log(item.mealItem.price);
+            // For other types (non-mealCartItems), return the name (continue fetching prices as before)
+            return item.name;
+        }).flat(); // Flatten the array in case there are nested names (for entrees/sides)
+        
 
-            // Return the mealItem name for further processing (if needed)
-            return item.mealItem.name;
-        }
-
-        // For other types (non-mealCartItems), return the name (continue fetching prices as before)
-        return item.name;
-    }).flat(); // Flatten the array in case there are nested names (for entrees/sides)
-    
-
-    // Now, fetch prices for the non-mealCartItem items from the server
-    const nonMealItems = cart.filter(item => !item.mealItem).map(item => item.name);
-        if (nonMealItems.length > 0) {
-        fetch('/api/getPrice', {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ foodNames: nonMealItems }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            setPrices(prevPrices => ({ ...prevPrices, ...data })); // Update prices based on server response
-            setLoading(false); // Done loading
-        })
-        .catch(error => {
-            console.error('Error fetching prices:', error);
-            setLoading(false); // Done loading even in case of error
-        });
-        } else {
-        setLoading(false); // No need to fetch if no non-mealCartItems exist
-        }
+        // Now, fetch prices for the non-mealCartItem items from the server
+        const nonMealItems = cart.filter(item => !item.mealItem).map(item => item.name);
+            if (nonMealItems.length > 0) {
+            fetch('/api/getPrice', {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ foodNames: nonMealItems }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                setPrices(prevPrices => ({ ...prevPrices, ...data })); // Update prices based on server response
+                setLoading(false); // Done loading
+            })
+            .catch(error => {
+                console.error('Error fetching prices:', error);
+                setLoading(false); // Done loading even in case of error
+            });
+            } else {
+            setLoading(false); // No need to fetch if no non-mealCartItems exist
+            }
     }, [cart]); // This effect runs whenever the `cart` state changes.  
 
     const calculateSubtotal = () => {
@@ -140,6 +153,165 @@ const CartPage = () => {
         setCart([]);
         sessionStorage.removeItem("cart");
     };
+
+    // check out button
+    const router = useRouter();
+    /*
+    const handleCheckout = () => {
+        // pseudocode
+            // create a int[] list for menu_items
+            // go through non-meal items in cart
+                // check in the db to see the ids associated with their names
+                // add to mealItems array
+            // go through meal items
+                // ids are stored by serial number, so get id from meal_items db
+                // make an int array with its entrees and another with its sides
+                // create meal item member with id, meal_type, side_id, entree_ids, price & push to db
+            
+            // create order member with  id (get from db), customer_id (randomly select 1-1000), cashier_id (stored in local storage), order_total, menu_item_ids, meal_item_ids, payment_method, order_time (current time) & push to db
+
+        // Then navigate to the confirmation page
+        router.push("/customer/kiosk/confirmation");
+    };*/
+    const handleCheckout = async () => {
+        const cashierId = 0; // kiosk order --> 0
+        const paymentMethod = "Credit Card"; // TODO: replace later according to pop-up
+        const orderTotal = total; // using the already calculated total
+
+        const itemSizeIds = [];
+        const mealItemIds = [];
+
+        // here
+        for(const item of cart)
+        {
+            let entreeIds = [];
+            let sideId = null;
+
+            // if mealItem
+            if(item.mealItem)
+            {
+                // process entrees
+                for(const entree of item.entrees)
+                {
+                   try {
+                    // Get entree ID from menu_items
+                    const entreeResponse = await fetch(`/api/menu_items?id=${entree.item_name}`);
+                    const entreeData = await entreeResponse.json();
+                    if (entreeData && entreeData.id) {
+                        entreeIds.push(entreeData.id);
+                    }
+                    } catch (error) {
+                        console.error("Error fetching entree ID:", error);
+                    }
+                }
+                // get side ID
+                if (item.sides && item.sides.length > 0) {
+                    const side = item.sides[0]; // Assuming first side is chosen
+                    try {
+                        // Get side ID from item_sizes
+                        const sideResponse = await fetch(`/api/item_sizes?id=${side.name}`);
+                        const sideData = await sideResponse.json();
+                        if (sideData && sideData.id) {
+                            sideId = sideData.id;
+                        }
+                    } catch (error) {
+                        console.error("Error fetching side ID:", error);
+                    }
+
+                    // HERE: push this meal item into the db
+                    /*
+                        id   |  meal_type   | side_id | entree_ids | price 
+                        -------+--------------+---------+------------+-------
+                            1 | Bowl         |       7 | {36}       |  8.30
+                            2 | Plate        |       7 | {39,9}     |  9.80
+                            3 | Bigger Plate |       7 | {24,9,39}  | 11.30
+                            etc
+                    */
+                    // id is serialised
+
+                    // after pushing into db, add that order to mealItemIds array
+                    try {
+                        const mealItemResponse = await fetch('/api/meal_items', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                meal_type: item.mealType,  // Assuming mealType is part of the item object
+                                side_id: sideId,
+                                entree_ids: entreeIds,
+                                price: item.price,  // Assuming item has a price
+                            }),
+                        });
+        
+                        const mealItemData = await mealItemResponse.json();
+        
+                        if (mealItemData && mealItemData.id) {
+                            mealItemIds.push(mealItemData.id);
+                        } else {
+                            console.error("Failed to add meal item to the database");
+                        }
+                    } catch (error) {
+                        console.error("Error creating meal item:", error);
+                    }
+                }
+            }
+            else 
+            {
+                // check in the item_sizes db to see the ids associated with their names
+                /*
+                    id | item_id | item_size | price | calories 
+                    ----+---------+-----------+-------+----------
+                    1 |       1 | Small     |  5.20 |      400
+                    2 |       1 | Medium    |  8.50 |      450
+                    etc
+                */
+                // add the id to mealItems array
+                try {
+                    const itemSizeResponse = await fetch(`/api/item_sizes?id=${item.item_size}`);
+                    const itemSizeData = await itemSizeResponse.json();
+                    if (itemSizeData && itemSizeData.id) {
+                        itemSizeIds.push(itemSizeData.id);
+                    }
+                } catch (error) {
+                    console.error("Error fetching item size ID:", error);
+                }
+            }
+        }
+    
+        // Prepare the data to send to the backend
+        const requestBody = {
+            itemSizeIds,
+            mealItemIds,
+            cashierId,
+            paymentMethod,
+            price: orderTotal,
+        };
+    
+        try {
+            const response = await fetch('/api/orders', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody),
+            });
+    
+            const data = await response.json();
+    
+            if (response.ok) {
+                // Navigate to the confirmation page with the order ID
+                router.push(`/customer/kiosk/confirmation?orderId=${data.orderId}`);
+            } else {
+                alert(`Failed to create order: ${data.error}`);
+            }
+        } catch (error) {
+            console.error("Error during checkout:", error);
+            alert("An error occurred while processing your order. Please try again.");
+        }
+    };
+    
+    
 
     return (
         <div>
@@ -237,7 +409,7 @@ const CartPage = () => {
                 <div className="d-flex justify-content-between">
                     <Link href="/customer/kiosk/menuselection" className="btn btn-primary m-3">Back to Menu</Link>
                     <button onClick={handleClearCart} className="btn btn-danger m-3">Clear Order</button>
-                    <Link href="/customer/kiosk/confirmation" className="btn btn-success m-3">Check Out</Link>
+                    <button onClick={handleCheckout} className="btn btn-success m-3">Check Out</button>
                 </div>
             </div>
             
