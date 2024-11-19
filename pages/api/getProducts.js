@@ -56,6 +56,16 @@ export default async function handler(req, res) {
                     break;
                 }
 
+                case 'menu': {
+                    console.log("Fetching menu items");
+                    const queryText = `
+                        SELECT menu_items.item_name AS name, menu_items.category
+                        FROM menu_items;
+                    `;
+                    result = await pool.query(queryText);
+                    break;
+                }
+
                 default:
                     return res.status(400).json({ error: 'Invalid action' });
             }
