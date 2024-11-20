@@ -1,9 +1,11 @@
 // CreditCardPopUp.js
 // src/components/ui/employee/cashier/order/confirmation/CreditCardPopUp.js
 import React, { useState } from 'react';
+import { useRouter } from "next/navigation";
 import 'bootstrap/dist/css/bootstrap.css';
 
 const CreditCardPopUp = ({ onClose }) => {
+    const router = useRouter();
     const [cardNumber, setCardNumber] = useState('');
     const [cvv, setCvv] = useState('');
     const [expiryDate, setExpiryDate] = useState('');
@@ -11,7 +13,8 @@ const CreditCardPopUp = ({ onClose }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log({ cardNumber, cvv, expiryDate });
-        onClose();
+        sessionStorage.removeItem('cart');
+        router.push("/employee/cashier/order");
     };
 
     return (

@@ -17,9 +17,10 @@ const CustomerHeader = () => {
 
   useEffect(() => {
     // Retrieve customer data from local storage
-    const storedCustomer = window.localStorage.getItem('loggedInCustomerName');
-    if (storedCustomer) {
-      setCustomer(storedCustomer);
+    const storedCustomerJSON = window.sessionStorage.getItem('loggedInCustomer');
+    if (storedCustomerJSON) {
+      const customerObject = JSON.parse(storedCustomerJSON);
+      setCustomer(customerObject);
     }
 
     const updateTime = () => {
@@ -45,7 +46,7 @@ const CustomerHeader = () => {
     const intervalId = setInterval(updateTime, 60000); // Update time every minute
 
     return () => clearInterval(intervalId); // Cleanup interval on component unmount
-  }, [customer]);
+  }, []);
 
   const handleHomePush = () => {
     router.push("/customer");
@@ -55,7 +56,7 @@ const CustomerHeader = () => {
     <header className="bg-danger text-white p-2 d-flex align-items-center justify-content-between">
       <div className="d-flex align-items-center">
         <Image src="/panda-icon.png" alt="Panda Icon" width={50} height={50} onClick={handleHomePush} style={{ cursor: 'pointer' }}/>
-        <h4 className="mb-0">{customer ? `Welcome, ${customer}` : 'Welcome'}</h4>
+        <h4 className="mb-0">{customer ? `Welcome, ${customer.first_name}` : 'Welcome'}</h4>
       </div>
       <div className="d-flex align-items-center">
         <i className={`bi bi-${currentWeatherIcon} me-2`} style={{ fontSize: '2rem' }}></i>

@@ -26,9 +26,7 @@ const CustomerLoginForm = () => {
 			return;
 		} else {
 			// store this employee in local storage
-			console.log(customer);
-			localStorage.setItem('loggedInCustomer', customer);
-			localStorage.setItem('loggedInCustomerName', customer.name);
+			window.sessionStorage.setItem('loggedInCustomer', JSON.stringify(customer));
 		}
 
 		// Validate password
@@ -36,7 +34,7 @@ const CustomerLoginForm = () => {
 			setError("No login found for code. Please enter a valid code.");
 			return;
 		}
-		router.push("/customer/kiosk/mealselect/");
+		router.push("/customer/kiosk/menuselection/");
 	};
 
 	const navigateToKioskPage = () => {
