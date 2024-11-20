@@ -1,32 +1,75 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useEffect, useState } from "react";
 import EmployeeLogInHeader from '@/components/ui/employee/header/EmployeeLogInHeader';
 
 const Menu = () => {
-    // Hardcoded for now
-    const [entrees, setEntrees] = useState([
-        "Orange Chicken", "Black Pepper Sirloin Steak", "Honey Walnut Shrimp",
-        "Grilled Teriyaki Chicken", "Kung Pao Chicken", "Honey Sesame Chicken Breast",
-        "Beijing Beef", "Mushroom Chicken", "SweetFire Chicken Breast",
-        "String Bean Chicken Breast", "Broccoli Beef", "Black Pepper Chicken", "Super Greens"
-    ]);
-    const [sides, setSides] = useState(["White Steamed Rice", "Fried Rice", "Chow Mein", "Super Greens"]);
-    const [appetizers, setAppetizers] = useState(["Chicken Egg Roll", "Apple Pie Roll", "Veggie Spring Roll", "Cream Cheese Rangoon"]);
-    const [drinks, setDrinks] = useState(["Fountain", "Sweet Tea", "Gatorade", "Lemonade", "Bottled Water"]);
-    const [seasonal, setSeasonal] = useState([]); // empty for now
+    const [entrees, setEntrees] = useState([]);
+	const [sides, setSides] = useState([]);
+    const [appetizers, setAppetizers] = useState([]);
+    const [drinks, setDrinks] = useState([]);
+    const [seasonal, setSeasonal] = useState([]);
+
+	// Fetch menu items from the database using the API endpoint
+	useEffect(() => {
+        const fetchMenuItems = async () => {
+            try {
+                const response = await fetch("/api/getProducts?type=menu-with-sizes");
+                if (!response.ok) throw new Error("Failed to fetch menu items");
+
+                const data = await response.json();
+                console.log("API Response:", data);
+
+                if (!Array.isArray(data)) {
+                    throw new Error("Invalid data format from API");
+                }
+
+                // filter entrees
+                setEntrees(data.filter(item => {
+                    return item.category && item.category.trim().toLowerCase() === "entree";
+                }));
+
+                // filter sides
+                setSides(data.filter(item => {
+                    return item.category && item.category.trim().toLowerCase() === "side";
+                }));
+
+                // filter appetizers
+                setAppetizers(data.filter(item => {
+                    return item.category && item.category.trim().toLowerCase() === "appetizer";
+                }));
+
+                // filter drinks
+                setDrinks(data.filter(item => {
+                    return item.category && item.category.trim().toLowerCase() === "drink";
+                }));
+
+                // filter seasonal
+                setSeasonal(data.filter((item) => item.is_seasonal === "t")); // Adjust as necessary if seasonal is included
+                
+            } catch (err) {
+                console.error("Error fetching menu items:", err);
+            }
+        };
+	
+		fetchMenuItems();
+	}, []);	
 
     const [selectedItem, setSelectedItem] = useState(null);
     const [itemName, setItemName] = useState('');
     const [itemSize, setItemSize] = useState('Medium');
     const [itemCategory, setItemCategory] = useState('Entree');
-    const [inventoryIds, setInventoryIds] = useState('{}');
-    const [itemPrice, setItemPrice] = useState(3.00);
+    const [inventoryIds, setInventoryIds] = useState("{}");
+    const [itemPrice, setItemPrice] = useState(0.00);
 
-    const handlePopup = (name, category) => {
-        setItemName(name);
+    const handlePopup = (item, category) => {
+        console.log("Selected Item's inventory ids:", item.inventory_ids); // Debug the selected item
+        setItemName(item.name);
+        setItemSize(item.size);
         setItemCategory(category);
         setSelectedItem(category);
+        setInventoryIds(item.inventory_ids ? item.inventory_ids.join(', ') : '{}'); // Convert array to string
+        setItemPrice(item.price);
     };
 
     const handleNavigation = (sectionId) => {
@@ -36,6 +79,16 @@ const Menu = () => {
         }
     };
 
+    const resetFields = () => {
+        setSelectedItem(null);
+        setItemName('');
+        setItemSize('Medium');
+        setItemCategory('Entree');
+        setInventoryIds('{}');
+        setItemPrice(0.00);
+    };
+
+    // FIXME - update db
     const addItem = () => {
         switch (itemCategory) {
             case 'Entree':
@@ -59,6 +112,7 @@ const Menu = () => {
         resetFields();
     };
 
+    // FIXME - update db
     const removeItem = () => {
         switch (itemCategory) {
             case 'Entree':
@@ -82,14 +136,23 @@ const Menu = () => {
         resetFields();
     };
 
-    const resetFields = () => {
-        setSelectedItem(null);
-        setItemName('');
-        setItemSize('Medium');
-        setItemCategory('Entree');
-        setInventoryIds('{}');
-        setItemPrice(3.00);
-    };
+    const renderMenuItems = (items, category) => (
+        items.length > 0 ? (
+            items.map((item, index) => (
+                <div key={index} className="col-md-3 mb-3">
+                    <button
+                        className="btn btn-outline-primary w-100 btn-lg"
+                        onClick={() => handlePopup(item, category)}
+                    >
+                        {item.name} ({item.size})
+                    </button>
+                </div>
+            ))
+        ) : (
+            <div className="text-center text-muted">No items available in this category</div>
+        )
+    );
+    
 
     return (
         <div className="container-fluid p-0">
@@ -123,70 +186,35 @@ const Menu = () => {
                         <section id="entrees" className="mb-5">
                             <h2 className="text-center">Entrees</h2>
                             <div className="row">
-                                {entrees.map((item, index) => (
-                                    <div key={index} className="col-md-3 mb-3">
-                                        <button className="btn btn-outline-primary w-100 btn-lg" onClick={() => handlePopup(item, "Entree")}>{item}</button>
-                                    </div>
-                                ))}
-                                <div className="col-md-3 mb-3">
-                                    <button className="btn btn-outline-success w-100 btn-lg" onClick={() => handlePopup("", "Entree")}>Add New Item</button>
-                                </div>
+                                {renderMenuItems(entrees, "Entree")}
                             </div>
                         </section>
 
                         <section id="sides" className="mb-5">
                             <h2 className="text-center">Sides</h2>
                             <div className="row">
-                                {sides.map((item, index) => (
-                                    <div key={index} className="col-md-3 mb-3">
-                                        <button className="btn btn-outline-primary w-100 btn-lg" onClick={() => handlePopup(item, "Side")}>{item}</button>
-                                    </div>
-                                ))}
-                                <div className="col-md-3 mb-3">
-                                    <button className="btn btn-outline-success w-100 btn-lg" onClick={() => handlePopup("", "Side")}>Add New Item</button>
-                                </div>
+                                {renderMenuItems(sides, "Side")}
                             </div>
                         </section>
 
                         <section id="appetizers" className="mb-5">
                             <h2 className="text-center">Appetizers</h2>
                             <div className="row">
-                                {appetizers.map((item, index) => (
-                                    <div key={index} className="col-md-3 mb-3">
-                                        <button className="btn btn-outline-primary w-100 btn-lg" onClick={() => handlePopup(item, "Appetizer")}>{item}</button>
-                                    </div>
-                                ))}
-                                <div className="col-md-3 mb-3">
-                                    <button className="btn btn-outline-success w-100 btn-lg" onClick={() => handlePopup("", "Appetizer")}>Add New Item</button>
-                                </div>
+                                {renderMenuItems(appetizers, "Appetizer")}
                             </div>
                         </section>
 
                         <section id="drinks" className="mb-5">
                             <h2 className="text-center">Drinks</h2>
                             <div className="row">
-                                {drinks.map((item, index) => (
-                                    <div key={index} className="col-md-3 mb-3">
-                                        <button className="btn btn-outline-primary w-100 btn-lg" onClick={() => handlePopup(item, "Drink")}>{item}</button>
-                                    </div>
-                                ))}
-                                <div className="col-md-3 mb-3">
-                                    <button className="btn btn-outline-success w-100 btn-lg" onClick={() => handlePopup("", "Drink")}>Add New Item</button>
-                                </div>
+                                {renderMenuItems(drinks, "Drink")}
                             </div>
                         </section>
 
                         <section id="seasonal" className="mb-5">
                             <h2 className="text-center">Seasonal</h2>
                             <div className="row">
-                                {seasonal.map((item, index) => (
-                                    <div key={index} className="col-md-3 mb-3">
-                                        <button className="btn btn-outline-primary w-100 btn-lg" onClick={() => handlePopup(item, "Seasonal")}>{item}</button>
-                                    </div>
-                                ))}
-                                <div className="col-md-3 mb-3">
-                                    <button className="btn btn-outline-success w-100 btn-lg" onClick={() => handlePopup("", "Seasonal")}>Add New Item</button>
-                                </div>
+                                {renderMenuItems(seasonal, "Seasonal")}
                             </div>
                         </section>
                     </div>
@@ -222,6 +250,7 @@ const Menu = () => {
                                 </div>
                                 <div className="mb-3">
                                     <label className="form-label">Inventory Item IDs:</label>
+                                    
                                     <input type="text" className="form-control" value={inventoryIds} onChange={(e) => setInventoryIds(e.target.value)} />
                                 </div>
                                 <div className="mb-3">

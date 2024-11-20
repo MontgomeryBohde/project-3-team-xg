@@ -66,6 +66,23 @@ export default async function handler(req, res) {
                     break;
                 }
 
+                case 'menu-with-sizes': {
+                    console.log("Fetching menu items");
+                    const queryText = `
+                            SELECT 
+                            menu_items.item_name AS name, 
+                            item_sizes.item_size AS size, 
+                            menu_items.category, 
+                            menu_items.inventory_item_ids AS inventory_ids, 
+                            item_sizes.price,
+                            menu_items.is_seasonal
+                        FROM menu_items
+                        JOIN item_sizes ON menu_items.id = item_sizes.item_id;
+                    `;
+                    result = await pool.query(queryText);
+                    break;
+                }
+
                 default:
                     return res.status(400).json({ error: 'Invalid action' });
             }
