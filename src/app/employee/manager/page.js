@@ -2,9 +2,9 @@
 "use client";
 import { useRouter } from 'next/navigation';
 import React from 'react';
-import Head from 'next/head';
 import EmployeeLogInHeader from '@/components/ui/employee/header/EmployeeLogInHeader';
-import './manager.css';
+import { FaUtensils, FaClipboardList, FaChartLine, FaBoxes, FaUserTie, FaPhone } from 'react-icons/fa';
+import './manager.css'; // Import the external CSS
 
 const ManagerHomePage = () => {
     const router = useRouter();
@@ -13,44 +13,34 @@ const ManagerHomePage = () => {
         router.push(path);
     };
 
+    const buttonConfig = [
+        { label: 'Menu', path: '/employee/manager/menu', icon: <FaUtensils size={40} className="mb-2" /> },
+        { label: 'Orders', path: '/employee/manager/orders', icon: <FaClipboardList size={40} className="mb-2" /> },
+        { label: 'Reports', path: '/employee/manager/reports', icon: <FaChartLine size={40} className="mb-2" /> },
+        { label: 'Inventory', path: '/employee/manager/inventory', icon: <FaBoxes size={40} className="mb-2" /> },
+        { label: 'Employee Info', path: '/employee/manager/employeeinfo', icon: <FaUserTie size={40} className="mb-2" /> },
+        { label: 'Contact', path: '/employee/manager/contact', icon: <FaPhone size={40} className="mb-2" /> },
+    ];
+
     return (
         <div>
-            <Head>
-                <title>Manager Home</title>
-            </Head>
             <EmployeeLogInHeader />
-            <div className="container-fluid mt-3">
-                <div className="row">
-                    <div className="col-4 mb-2">
-                        <button className="btn btn-danger btn-square" onClick={() => navigateTo('/employee/manager/menu')}>
-                            Menu
-                        </button>
-                    </div>
-                    <div className="col-4 mb-2">
-                        <button className="btn btn-danger btn-square" onClick={() => navigateTo('/employee/manager/orders')}>
-                            Orders
-                        </button>
-                    </div>
-                    <div className="col-4 mb-2">
-                        <button className="btn btn-danger btn-square" onClick={() => navigateTo('/employee/manager/reports')}>
-                            Reports
-                        </button>
-                    </div>
-                    <div className="col-4 mb-2">
-                        <button className="btn btn-danger btn-square" onClick={() => navigateTo('/employee/manager/inventory')}>
-                            Inventory
-                        </button>
-                    </div>
-                    <div className="col-4 mb-2">
-                        <button className="btn btn-danger btn-square" onClick={() => navigateTo('/employee/manager/employeeinfo')}>
-                            Employee Info
-                        </button>
-                    </div>
-                    <div className="col-4 mb-2">
-                        <button className="btn btn-danger btn-square" onClick={() => navigateTo('/employee/manager/contact')}>
-                            Contact
-                        </button>
-                    </div>
+            <div className="container mt-3">
+                <h1 className="text-center text-primary fw-bold mb-4 manager-dashboard-title">
+                    Manager Dashboard
+                </h1>
+                <div className="row row-cols-1 row-cols-md-2 g-4 justify-content-center">
+                    {buttonConfig.map(({ label, path, icon }) => (
+                        <div key={label} className="col d-flex justify-content-center">
+                            <button
+                                onClick={() => navigateTo(path)}
+                                className="manager-dashboard-button"
+                            >
+                                {icon}
+                                <span>{label}</span>
+                            </button>
+                        </div>
+                    ))}
                 </div>
             </div>
         </div>
