@@ -63,7 +63,7 @@ export default async function handler(req, res) {
                 }
 
                 case 'menu-with-sizes': {
-                    console.log("Fetching menu items with sizes and IDs");
+                    console.log("Fetching menu items with sizes, IDs, and calories");
                     const queryText = `
                         SELECT 
                             menu_items.id AS item_id,
@@ -72,13 +72,15 @@ export default async function handler(req, res) {
                             menu_items.category, 
                             menu_items.inventory_item_ids AS inventory_ids, 
                             item_sizes.price,
-                            menu_items.is_seasonal
+                            item_sizes.calories  -- Add the calories column from item_sizes
                         FROM menu_items
                         JOIN item_sizes ON menu_items.id = item_sizes.item_id;
                     `;
+                    
+                    // Run the query and get the result
                     result = await pool.query(queryText);
                     break;
-                }                
+                }                              
 
                 default:
                     return res.status(400).json({ error: 'Invalid action' });

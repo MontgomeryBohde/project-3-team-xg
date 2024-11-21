@@ -10,30 +10,52 @@ const Menu = () => {
     const [drinks, setDrinks] = useState([]);
     const [seasonal, setSeasonal] = useState([]);
 
-    // Fetch menu items from the database using the API endpoint
     const fetchMenuItems = async () => {
         try {
             const response = await fetch("/api/getProducts?type=menu-with-sizes");
             if (!response.ok) throw new Error("Failed to fetch menu items");
-
+    
             const data = await response.json();
-            // console.log("API Response:", data);
-
+    
             if (!Array.isArray(data)) {
                 throw new Error("Invalid data format from API");
             }
+    
+            // Group items by item_id to handle sizes
+            const groupedItems = data.reduce((acc, item) => {
+                if (!acc[item.item_id]) {
+                    acc[item.item_id] = {
+                        ...item,
+                        sizes: []
+                    };
+                }
+                // Push the size for each item
+                acc[item.item_id].sizes.push({
+                    size: item.size,
+                    price: item.price,
+                    calories: item.calories,
+                });
+                return acc;
+            }, {});
 
-            // filter items by category
-            setEntrees(data.filter(item => item.category?.toLowerCase() === "entree"));
-            setSides(data.filter(item => item.category?.toLowerCase() === "side"));
-            setAppetizers(data.filter(item => item.category?.toLowerCase() === "appetizer"));
-            setDrinks(data.filter(item => item.category?.toLowerCase() === "drink"));
-            setSeasonal(data.filter(item => item.is_seasonal === "t"));  // Adjust as necessary if seasonal is included
-            
+            console.log(groupedItems);
+    
+            // Now group them into categories
+            setEntrees(Object.values(groupedItems).filter(item => item.category?.toLowerCase() === "entree"));
+            setSides(Object.values(groupedItems).filter(item => item.category?.toLowerCase() === "side"));
+            setAppetizers(Object.values(groupedItems).filter(item => item.category?.toLowerCase() === "appetizer"));
+            setDrinks(Object.values(groupedItems).filter(item => item.category?.toLowerCase() === "drink"));
+            setSeasonal(Object.values(groupedItems).filter(item => item.category?.toLowerCase() === "seasonal"));
+
+
+            console.log("huh");
+            console.log(entrees);
+    
         } catch (err) {
             console.error("Error fetching menu items:", err);
         }
     };
+    
 
     // to only run one time
     useEffect(() => {
@@ -46,24 +68,49 @@ const Menu = () => {
     const [itemCategory, setItemCategory] = useState('Entree');
     const [inventoryIds, setInventoryIds] = useState("");
     const [itemPrice, setItemPrice] = useState(0.00);
+    const [itemCalories, setItemCalories] = useState(0);  // default to current calories if selected item exists
 
     const handlePopup = (item, category) => {
+        console.log("in popup");
         if (!item) {
+            console.log("in");
             setItemName('');
             setItemSize('Medium');
-            setItemCategory(category); // Set the category of the item to be added
+            setItemCategory(category);
             setInventoryIds('');
             setItemPrice(0.00);
-            setSelectedItem(category); // Set selectedItem to the category to trigger the modal
+            setItemCalories(0);
+
+            setSelectedItem('Item Name'); // Set to default if no item is selected
+
+
+
+            console.log(selectedItem);
         } else {
             setItemName(item.name);
-            setItemSize(item.size);
             setItemCategory(category);
-            setSelectedItem(item);
+            setSelectedItem(item); // This will trigger re-render
             setInventoryIds(item.inventory_ids ? item.inventory_ids.join(', ') : '');
-            setItemPrice(item.price);
+        
+            // Set the size and price of the first size by default
+            setItemSize(item.sizes[0].size);
+            setItemPrice(item.sizes[0].price);
+            setItemCalories(item.sizes[0].calories);
+        
+            console.log("selectedItem sizes: ", item.sizes);  // Check the sizes array here
         }
-    };
+    };    
+
+    const handleSizeChange = (selectedSize) => {
+        console.log("chanfing");
+        setItemSize(selectedSize); // Update the selected size
+        const selectedSizeDetails = selectedItem.sizes.find(size => size.item_size === selectedSize);
+    
+        if (selectedSizeDetails) {
+            setItemPrice(selectedSizeDetails.price); // Update price based on selected size
+            setItemCalories(selectedSizeDetails.calories); // Update calories based on selected size
+        }
+    };  
     
 
     const handleNavigation = (sectionId) => {
@@ -80,35 +127,41 @@ const Menu = () => {
         setItemCategory('Entree');
         setInventoryIds('');
         setItemPrice(0.00);
+        setItemCalories(0);
     };
 
-    // FIXME - update db
     const addItem = async () => {
+        // Ensure inventory IDs are processed correctly, and item size is passed as an array
         const itemData = {
             item_name: itemName,
             category: itemCategory,
-            inventory_item_ids: inventoryIds.split(',').map(id => parseInt(id.trim())),
-            descr: "",  // You can set a description if needed
+            inventory_item_ids: inventoryIds.split(',').map(id => parseInt(id.trim())), // parse inventory IDs
+            descr: "",
             available: true,
-            is_seasonal: false,  // Set this based on your logic
-            image_url: "",  // Provide image URL if needed
-            sizes: [{ item_size: itemSize, price: itemPrice, calories: 0 }]  // You can add more sizes if needed
+            is_seasonal: itemCategory === "Seasonal",  // Set is_seasonal to true if category is "Seasonal", else false
+            image_url: "",  // default for now
+            sizes: [
+                { 
+                    item_size: itemSize, 
+                    price: parseFloat(itemPrice), // ensure price is in float format
+                    calories: 0  // default for now
+                }
+            ]
         };
-
+    
         try {
             const response = await fetch("/api/manageMenuItems", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(itemData),
+                body: JSON.stringify(itemData),  // Send the formatted data
             });
-
+    
             if (response.ok) {
-                // ("Item added successfully");
-                // Refresh the menu items after adding
-                fetchMenuItems();
-                resetFields();
+                console.log("Item added successfully");
+                fetchMenuItems();  // Refresh the menu items after adding
+                resetFields();  // Clear form fields
             } else {
                 console.error("Failed to add item");
             }
@@ -116,25 +169,29 @@ const Menu = () => {
             console.error("Error adding menu item:", error);
         }
     };
+    
   
     const removeItem = async () => {
-        console.log(selectedItem);
-        const itemData = { id: selectedItem.item_id }; // Ensure you're sending the correct ID of the selected item
-        console.log("Sending remove request with data:", itemData);
+        if (!selectedItem || !selectedItem.item_id) {
+            console.error("No item selected for removal.");
+            return; // Ensure you don't try to remove an item if none is selected.
+        }
     
+        const itemData = { id: selectedItem.item_id };  // Make sure you are sending the item_id for removal
+        
         try {
             const response = await fetch("/api/manageMenuItems", {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(itemData),
+                body: JSON.stringify(itemData),  // Send the item ID to the backend
             });
     
             if (response.ok) {
                 console.log("Item removed successfully");
-                fetchMenuItems();  // Refresh the menu
-                resetFields();
+                fetchMenuItems();  // Refresh the menu after removal
+                resetFields();  // Reset form fields
             } else {
                 console.error("Failed to remove item:", response.status, response.statusText);
             }
@@ -142,6 +199,7 @@ const Menu = () => {
             console.error("Error removing menu item:", error);
         }
     };
+    
     
 
     const renderMenuItems = (items, category) => (
@@ -152,7 +210,7 @@ const Menu = () => {
                         className="btn btn-outline-primary w-100 btn-lg"
                         onClick={() => handlePopup(item, category)}
                     >
-                        {item.name} ({item.size})
+                        {item.name}
                     </button>
                 </div>
             ))
@@ -160,6 +218,136 @@ const Menu = () => {
             <div className="text-center text-muted">No items available in this category</div>
         )
     );
+    
+
+    const renderPopup = () => {
+        if (!selectedItem) return null;
+        
+        // item exists
+        return (
+            <div className="modal fade show d-block" tabIndex="-1" role="dialog" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                <div className="modal-dialog modal-dialog-centered" role="document">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title">Edit Item</h5>
+                            <button type="button" className="btn-close" onClick={() => setSelectedItem(null)}></button>
+                        </div>
+                        <div className="modal-body">
+                            {/* Name Input */}
+                            <div className="mb-3">
+                                <label className="form-label">Name:</label>
+                                <input 
+                                    type="text" 
+                                    className="form-control" 
+                                    value={itemName} 
+                                    onChange={(e) => setItemName(e.target.value)} 
+                                />
+                            </div>
+    
+                            {/* Conditional Size Input */}
+                            <div className="mb-3">
+                                <label className="form-label">Size:</label>
+                                {selectedItem === 'Item Name' ? (
+                                    // Render input field when itemName is "Item Name"
+                                    <input 
+                                        type="text" 
+                                        className="form-control" 
+                                        value={itemSize} 
+                                        onChange={(e) => setItemSize(e.target.value)} 
+                                    />
+                                ) : (
+                                    // Render select dropdown when itemName is not "Item Name"
+                                    <select 
+                                        className="form-select" 
+                                        value={itemSize} 
+                                        onChange={(e) => handleSizeChange(e.target.value)} // Call handleSizeChange
+                                    >
+                                        {selectedItem.sizes.map((size, idx) => (
+                                            <option key={idx} value={size.size}>
+                                                {size.size}
+                                            </option>
+                                        ))}
+                                    </select>
+                                )}
+                            </div>
+    
+                            {/* Category Dropdown */}
+                            <div className="mb-3">
+                                <label className="form-label">Category:</label>
+                                <select 
+                                    className="form-select" 
+                                    value={itemCategory} 
+                                    onChange={(e) => setItemCategory(e.target.value)}
+                                >
+                                    <option value="Entree">Entree</option>
+                                    <option value="Side">Side</option>
+                                    <option value="Appetizer">Appetizer</option>
+                                    <option value="Drink">Drink</option>
+                                    <option value="Seasonal">Seasonal</option>
+                                </select>
+                            </div>
+    
+                            {/* Inventory Item IDs Input */}
+                            <div className="mb-3">
+                                <label className="form-label">Inventory Item IDs:</label>
+                                <input 
+                                    type="text" 
+                                    className="form-control" 
+                                    value={inventoryIds} 
+                                    onChange={(e) => setInventoryIds(e.target.value)} 
+                                />
+                            </div>
+    
+                            {/* Price Input */}
+                            <div className="mb-3">
+                                <label className="form-label">Price:</label>
+                                <input 
+                                    type="number" 
+                                    className="form-control" 
+                                    value={itemPrice} 
+                                    onChange={(e) => setItemPrice(parseFloat(e.target.value))} 
+                                />
+                            </div>
+    
+                            {/* Calories Input */}
+                            <div className="mb-3">
+                                <label className="form-label">Calories:</label>
+                                <input 
+                                    type="number" 
+                                    className="form-control" 
+                                    value={itemCalories} 
+                                    onChange={(e) => setItemCalories(parseInt(e.target.value))} 
+                                />
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button 
+                                type="button" 
+                                className="btn btn-success btn-lg" 
+                                onClick={addItem}
+                            >
+                                Save
+                            </button>
+                            <button 
+                                type="button" 
+                                className="btn btn-danger btn-lg" 
+                                onClick={removeItem}
+                            >
+                                Remove
+                            </button>
+                            <button 
+                                type="button" 
+                                className="btn btn-secondary btn-lg" 
+                                onClick={() => setSelectedItem(null)}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }    
     
 
     return (
@@ -209,6 +397,12 @@ const Menu = () => {
                             <div className="row">
                                 {renderMenuItems(sides, "Side")}
                             </div>
+                            <button
+                                className="btn btn-outline-success btn-lg w-100 mt-3"
+                                onClick={() => handlePopup(null, "Side")} // Opens the popup with category
+                            >
+                                Add New Item
+                            </button>
                         </section>
 
                         <section id="appetizers" className="mb-5">
@@ -216,6 +410,12 @@ const Menu = () => {
                             <div className="row">
                                 {renderMenuItems(appetizers, "Appetizer")}
                             </div>
+                            <button
+                                className="btn btn-outline-success btn-lg w-100 mt-3"
+                                onClick={() => handlePopup(null, "Appetizer")} // Opens the popup with category
+                            >
+                                Add New Item
+                            </button>
                         </section>
 
                         <section id="drinks" className="mb-5">
@@ -223,6 +423,12 @@ const Menu = () => {
                             <div className="row">
                                 {renderMenuItems(drinks, "Drink")}
                             </div>
+                            <button
+                                className="btn btn-outline-success btn-lg w-100 mt-3"
+                                onClick={() => handlePopup(null, "Drink")} // Opens the popup with category
+                            >
+                                Add New Item
+                            </button>
                         </section>
 
                         <section id="seasonal" className="mb-5">
@@ -230,57 +436,19 @@ const Menu = () => {
                             <div className="row">
                                 {renderMenuItems(seasonal, "Seasonal")}
                             </div>
+                            <button
+                                className="btn btn-outline-success btn-lg w-100 mt-3"
+                                onClick={() => handlePopup(null, "Seasonal")} // Opens the popup with category
+                            >
+                                Add New Item
+                            </button>
                         </section>
                     </div>
                 </div>
             </div>
 
-            {selectedItem && (
-                <div className="modal fade show d-block" tabIndex="-1" role="dialog" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-                    <div className="modal-dialog modal-dialog-centered" role="document">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title">Add New Item</h5>
-                                <button type="button" className="btn-close" onClick={() => setSelectedItem(null)}></button>
-                            </div>
-                            <div className="modal-body">
-                                <div className="mb-3">
-                                    <label className="form-label">Name:</label>
-                                    <input type="text" className="form-control" value={itemName} onChange={(e) => setItemName(e.target.value)} />
-                                </div>
-                                <div className="mb-3">
-                                    <label className="form-label">Size:</label>
-                                    <input type="text" className="form-control" value={itemSize} onChange={(e) => setItemSize(e.target.value)} />
-                                </div>
-                                <div className="mb-3">
-                                    <label className="form-label">Category:</label>
-                                    <select className="form-select" value={itemCategory} onChange={(e) => setItemCategory(e.target.value)}>
-                                        <option value="Entree">Entree</option>
-                                        <option value="Side">Side</option>
-                                        <option value="Appetizer">Appetizer</option>
-                                        <option value="Drink">Drink</option>
-                                        <option value="Seasonal">Seasonal</option>
-                                    </select>
-                                </div>
-                                <div className="mb-3">
-                                    <label className="form-label">Inventory Item IDs:</label>
-                                    
-                                    <input type="text" className="form-control" value={inventoryIds} onChange={(e) => setInventoryIds(e.target.value)} />
-                                </div>
-                                <div className="mb-3">
-                                    <label className="form-label">Price:</label>
-                                    <input type="number" className="form-control" value={itemPrice} onChange={(e) => setItemPrice(e.target.value)} />
-                                </div>
-                            </div>
-                            <div className="modal-footer">
-                                <button type="button" className="btn btn-success btn-lg" onClick={addItem}>Add</button>
-                                <button type="button" className="btn btn-danger btn-lg" onClick={removeItem}>Remove</button>
-                                <button type="button" className="btn btn-secondary btn-lg" onClick={() => setSelectedItem(null)}>Cancel</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* Render the popup modal dynamically */}
+            {renderPopup()}
         </div>
     );
 }
