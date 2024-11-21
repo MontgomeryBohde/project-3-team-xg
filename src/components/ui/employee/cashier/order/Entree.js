@@ -1,4 +1,3 @@
-// Entree.js
 import React from 'react';
 
 const Entree = ({ menuItems, handleAddToCurrentMeal, handleAddToCart, currentMenu }) => (
@@ -17,7 +16,7 @@ const Entree = ({ menuItems, handleAddToCurrentMeal, handleAddToCart, currentMen
                                 }
                             }}
                         >
-                            {entree.name}
+                            {entree.item_name}
                         </button>
                     </div>
                 ))}

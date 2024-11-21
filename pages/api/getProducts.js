@@ -10,18 +10,12 @@ const pool = new Pool({
 
 
 export default async function handler(req, res) {
-    console.log("API route reached: /api/getProducts");
     const { type } = req.query;
-
-    
 
     if (req.method === 'GET' || req.method === 'POST') {
         try {
             let result;
-
-            // Log the body of the request (for POST)
-            console.log("Request body:", req.body);
-
+          
             switch (type) {
                 case 'price': {
                     const { foodNames } = req.body || {};
@@ -53,6 +47,25 @@ export default async function handler(req, res) {
                     // Add your SQL query for the 'usage' case here
                     const queryText = `...`;  // Your SQL query
                     result = await pool.query(queryText);
+                    break;
+                }
+
+                case 'addMenuItem': {
+                    const { name, category, price, description } = req.body || {};
+                    
+                    // Input validation
+                    if (!name || !category || isNaN(price) || !description) {
+                        return res.status(400).json({ error: 'Invalid input for adding menu item' });
+                    }
+
+                    result = await query(
+                        `
+                        INSERT INTO menu_items (name, category, price, description)
+                        VALUES ($1, $2, $3, $4)
+                        RETURNING *;
+                        `,
+                        [name, category, price, description]
+                    );
                     break;
                 }
 
