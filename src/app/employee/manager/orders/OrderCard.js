@@ -2,6 +2,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useState } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 
+
 const OrderCard = ({ order }) => {
     console.log(order); // Add this to see what the order object looks like
     const [showPopup, setShowPopup] = useState(false);
