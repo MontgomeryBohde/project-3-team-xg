@@ -47,39 +47,43 @@ const OrderInfo = () => {
     };
 
     return (
-        <div className="order-info-container">
-            <EmployeeLogInHeader />
+        <div>
+          
+          <EmployeeLogInHeader />
+      
+          <div className="order-info-container">
             <h1 className="title">Order Information</h1>
             <div className="order-cards-container">
-                {currentOrders.map(order => (
-                    <OrderCard key={order.id} order={order} />
-                ))}
+              {currentOrders.map(order => (
+                <OrderCard key={order.id} order={order} />
+              ))}
             </div>
             <div className="page-buttons d-flex justify-content-between">
-                <button 
-                    onClick={prevPage} 
-                    disabled={currentPage === 1} 
-                    className="btn btn-info"
-                >
-                    Previous Page
-                </button>
-                <button 
-                    onClick={nextPage} 
-                    disabled={currentPage === Math.ceil(orders.length/numPerPage)} 
-                    className="btn btn-info"
-                >
-                    Next Page
-                </button>
+              <button 
+                onClick={prevPage} 
+                disabled={currentPage === 1} 
+                className="btn btn-info"
+              >
+                Previous Page
+              </button>
+              <button 
+                onClick={nextPage} 
+                disabled={currentPage === Math.ceil(orders.length/numPerPage)} 
+                className="btn btn-info"
+              >
+                Next Page
+              </button>
             </div>
             <div className="page-info mt-3 text-center">
-                <p className="mb-0 fs-5 fw-bold">
-                    Page {currentPage} of {Math.ceil(orders.length / numPerPage)}
-                </p>
+              <p className="mb-0 fs-5 fw-bold">
+                Page {currentPage} of {Math.ceil(orders.length / numPerPage)}
+              </p>
             </div>
-
-
+          </div>
+     
         </div>
-    );
+      );
+      
 };
 
 export default OrderInfo;
