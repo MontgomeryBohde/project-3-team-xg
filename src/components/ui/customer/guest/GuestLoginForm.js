@@ -5,6 +5,8 @@ import React, { useState } from 'react';
 import { useRouter } from "next/navigation";
 import 'bootstrap/dist/css/bootstrap.css';
 
+import { insertCustomer } from '@/backend/customer';
+
 const GuestLoginForm = () => {
   const [name, setName] = useState('');
   const [error, setError] = useState(null);
@@ -22,7 +24,23 @@ const GuestLoginForm = () => {
       return;
     }
 
-    window.localStorage.setItem('loggedInCustomerName', name);
+    const customer = {
+      first_name: name,
+      last_name: null,
+      phone_number: null,
+      email: null,
+      rewards_points: 0,
+      is_guest: true
+    };
+
+    window.sessionStorage.setItem('loggedInCustomer', JSON.stringify(customer));
+
+    try {
+      await insertCustomer(customer);
+    } catch (error) {
+      console.error('Error during database operation:', error);
+    }
+
     router.push("/customer/kiosk/menuselection");
   };
 
