@@ -11,7 +11,7 @@ export default async function handler(req, res) {
             switch (type) {
                 case 'inventory': {
                     result = await query('SELECT * FROM inventory_items;');
-                    break;
+                    return res.status(200).json(result || []);
                 }
 
                 case 'addInventoryItem': {

@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import './OrderInfo.css';
 import OrderCard from './OrderCard';
 import EmployeeLogInHeader from '@/components/ui/employee/header/EmployeeLogInHeader';
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 const OrderInfo = () => {
     const [orders, setOrders] = useState([]);
@@ -13,7 +12,7 @@ const OrderInfo = () => {
 
     const getOrders = async () => {
         try {
-            const response = await fetch('/api/orders');
+            const response = await fetch('/api/getOrders');
             if (!response.ok) {
                 throw new Error(`Error: ${response.status}`);
             }
