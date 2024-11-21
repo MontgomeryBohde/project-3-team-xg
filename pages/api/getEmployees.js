@@ -1,18 +1,11 @@
-import { Pool } from "pg";
-
-const pool = new Pool({
-    host: "csce-315-db.engr.tamu.edu",
-    user: "team_xg",
-    database: "team_xg_db",
-    password: "palenumber97",
-    port: 5432,
-});
+// pages/api/getEmployees.js
+import { query } from "@lib/db";
 
 export default async function handler(req, res) {
     if (req.method === "GET") {
         try {
-            const result = await pool.query("SELECT * FROM employees");//want all information
-            res.status(200).json(result.rows);
+            const result = await query("SELECT * FROM employees;");
+            res.status(200).json(result);
         } catch (error) {
             console.error("Error fetching employees:", error);
             res.status(500).json({ error: "Error fetching employees" });

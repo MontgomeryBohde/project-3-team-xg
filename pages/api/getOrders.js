@@ -1,17 +1,10 @@
-import { Pool } from 'pg';
-
-const pool = new Pool({
-    host: 'csce-315-db.engr.tamu.edu',
-    user: 'team_xg',
-    password: 'palenumber97',
-    database: 'team_xg_db',
-    port: 5432,
-});
+// pages/api/getOrders.js
+import { query } from '@lib/db';
 
 export default async function handler(req, res) {
     if (req.method === 'GET') {
         try {
-            const query = `
+            const sqlQuery = `
                 SELECT
                     o.id AS order_id,
                     o.order_time,
@@ -52,30 +45,30 @@ export default async function handler(req, res) {
                 LEFT JOIN meal_items AS m ON m.id = ANY(o.meal_item_ids)
                 LEFT JOIN menu_items AS side ON side.id = m.side_id
                 ORDER BY o.order_time DESC
-                LIMIT 100;`
+                LIMIT 100;
+            `;
 
+            // Use the `query` function from @lib/db
+            const { rows } = await query(sqlQuery);
 
-            const { rows } = await pool.query(query);
-
+            // Process the rows to aggregate data
             const orders = rows.reduce((acc, row) => {
                 const existingOrder = acc.find(order => order.id === row.order_id);
-                
+
                 if (existingOrder) {
-                 
                     if (!existingOrder.entrees) existingOrder.entrees = [];
                     if (!existingOrder.food_names) existingOrder.food_names = [];
-                    
+
                     if (row.side_name) existingOrder.side = row.side_name;
                     if (row.entree_names) existingOrder.entrees.push(...row.entree_names);
                     if (row.food_names) existingOrder.food_names.push(...row.food_names);
                 } else {
-                  
                     acc.push({
                         id: row.order_id,
                         time: row.order_time,
-                        side: row.side_name || null,  
-                        food_names: row.food_names || [],  
-                        entree_names: row.entree_names || [],  
+                        side: row.side_name || null,
+                        food_names: row.food_names || [],
+                        entree_names: row.entree_names || [],
                         total: parseFloat(row.order_total).toFixed(2),
                         meal_type: row.meal_type || null,
                         payment_method: row.payment_method || null
@@ -84,8 +77,7 @@ export default async function handler(req, res) {
                 return acc;
             }, []);
 
-      
-           // console.log('Final Orders:', orders);
+            // Send the aggregated orders as the response
             res.status(200).json(orders);
         } catch (error) {
             console.error('Error fetching orders:', error);
