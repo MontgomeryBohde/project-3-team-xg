@@ -1,4 +1,3 @@
-// src/app/employee/manager/reports/sales/page.js
 "use client";
 
 import 'chartjs-adapter-date-fns';
@@ -42,11 +41,21 @@ function SalesChart() {
 
     const fetchSalesData = async (period) => {
         try {
-            const response = await fetch(`/api/getAllSales?period=${period}`);
-            const salesData = await response.json();
+            const response = await fetch(`/api/getReports?type=allSales&period=${period}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch sales data');
+            }
 
-            const labels = salesData.map(entry => new Date(entry.date));
-            const data = salesData.map(entry => entry.total);
+            const salesData = await response.json();
+            console.log('Sales Data:', salesData); // Debugging log
+
+            // Validate response format
+            if (!Array.isArray(salesData)) {
+                throw new Error('Invalid sales data format');
+            }
+
+            const labels = salesData.map(entry => new Date(entry.order_date)); // Use correct field name
+            const data = salesData.map(entry => entry.daily_total); // Use correct field name
 
             setChartData({
                 labels: labels,
@@ -85,7 +94,7 @@ function SalesChart() {
                 },
                 ticks: {
                     autoSkip: true,
-                    stepSize: 7, // Change step size as needed
+                    stepSize: 7,
                     minRotation: 45,
                     maxRotation: 90,
                 },

@@ -1,21 +1,30 @@
-import 'bootstrap/dist/css/bootstrap.css';
+// src/components/ui/employee/header/EmployeeLogInHeader.js
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import './EmployeeHeader.css';
-import getWeather from '@/backend/weather';
 
 const EmployeeLogInHeader = () => {
   const [employee, setEmployee] = useState(null);
-  const [currentTemperature, setCurrentTemperature] = useState('');
-  const [currentWeatherCondition, setCurrentWeatherCondition] = useState('');
-  const [currentWeatherIcon, setCurrentWeatherIcon] = useState('');
+  const [weather, setWeather] = useState({ temperature: '', description: '', icon: '' });
   const [currentTime, setCurrentTime] = useState('');
   const router = useRouter();
 
+  // Define weather icon mapping
+  const weatherMap = {
+    '01d': 'brightness-high',
+    '02d': 'cloud-sun',
+    '03d': 'clouds',
+    '04d': 'clouds',
+    '09d': 'cloud-drizzle',
+    '10d': 'cloud-rain',
+    '11d': 'cloud-lightning',
+    '13d': 'cloud-snow',
+    '50d': 'cloud-haze',
+  };
+
   useEffect(() => {
-    // Retrieve employee data from local storage
     const storedEmployee = localStorage.getItem('loggedInEmployee');
     if (storedEmployee) {
       setEmployee(JSON.parse(storedEmployee));
@@ -33,17 +42,26 @@ const EmployeeLogInHeader = () => {
     };
 
     const fetchWeather = async () => {
-      const response = await getWeather();
-      setCurrentTemperature(response.temperature);
-      setCurrentWeatherCondition(response.description);
-      setCurrentWeatherIcon(response.icon);
+      try {
+        const response = await fetch('/api/getWeather');
+        if (!response.ok) throw new Error('Failed to fetch weather data');
+        
+        const data = await response.json();
+        setWeather({
+          temperature: data.temperature,
+          description: data.description,
+          icon: weatherMap[data.icon] || 'cloud'  // Fallback to a default icon
+        });
+      } catch (error) {
+        console.error('Error fetching weather:', error);
+      }
     };
 
     fetchWeather();
     updateTime();
-    const intervalId = setInterval(updateTime, 60000); // Update time every minute
+    const intervalId = setInterval(updateTime, 60000);
 
-    return () => clearInterval(intervalId); // Cleanup interval on component unmount
+    return () => clearInterval(intervalId);
   }, []);
 
   const handleBackClick = () => {
@@ -58,7 +76,6 @@ const EmployeeLogInHeader = () => {
 
   return (
     <header className="bg-primary text-white p-2 d-flex align-items-center justify-content-between">
-      {/* Back Button */}
       <button className="btn btn-light me-3" onClick={handleBackClick}>
         <i className="bi bi-arrow-left"></i> Back
       </button>
@@ -74,7 +91,6 @@ const EmployeeLogInHeader = () => {
         <h4 className="mb-0 ms-2">Welcome!</h4>
       </div>
 
-      {/* Check if employee is loaded before displaying ID and Name */}
       {employee ? (
         <>
           <div className="d-flex align-items-center ms-3">
@@ -88,11 +104,10 @@ const EmployeeLogInHeader = () => {
         <div>Loading employee data...</div>
       )}
 
-      {/* Weather Info */}
       <div className="d-flex align-items-center">
-        <i className={`bi bi-${currentWeatherIcon} me-2`} style={{ fontSize: '2rem' }}></i>
+        <i className={`bi bi-${weather.icon} me-2`} style={{ fontSize: '2rem' }}></i>
         <div className="ms-2" id="vertical_container">
-          <span>{currentWeatherCondition}</span>
+          <span>{weather.description}</span>
           <span className="ms-2">{currentTime}</span>
         </div>
       </div>

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react';
-import './inventory.css';
 import EmployeeLogInHeader from '@/components/ui/employee/header/EmployeeLogInHeader';
 
 export default function Menu() {

@@ -1,20 +1,31 @@
-"use client"
+"use client";
 
-import React from "react";
-import EmployeeCard from "./EmployeeCard"; 
+import React, { useEffect, useState } from "react";
+import EmployeeCard from "./EmployeeCard";
 import "./EmployeeInfo.css";
-
-
 import EmployeeLogInHeader from "@/components/ui/employee/header/EmployeeLogInHeader";
 
 const EmployeeInfo = () => {
-    const employees = [
-        { id: "1", name: "Alisa Lu", clockedIn: true, position: "Manager" },
-        { id: "2", name: "Monte Bode", clockedIn: false, position: "Server" },
-        { id: "3", name: "Rebecca Chen", clockedIn: true, position: "Server" },
-        { id: "4", name: "Risha Thimmancherla", clockedIn: true, position: "Server" },
-        { id: "5", name: "Tee Li", clockedIn: false, position: "Cashier" },
-    ];
+    const [employees, setEmployees] = useState([]);
+
+    useEffect(() => {
+        const fetchEmployees = async () => {
+            try {
+                const response = await fetch("/api/getEmployees"); //api from apges for getting emmployee
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    setEmployees(data);
+                } else {
+                    console.error("error");
+                }
+            } catch (error) {
+                console.error("Fetching employees error:", error);
+            }
+        };
+
+        fetchEmployees();
+    }, []);
 
     return (
         <div>
@@ -24,16 +35,19 @@ const EmployeeInfo = () => {
                 <div className="employee-cards-container">
                     {employees.map((employee) => (
                         <EmployeeCard
-                            key={employee.id}
+                            key={employee.id} //all fields from db
                             employeeId={employee.id}
-                            name={employee.name}
-                            clockedIn={employee.clockedIn}
-                            position={employee.position}
+                            firstName={employee.first_name}
+                            lastName={employee.last_name}
+                            title={employee.title}
+                            isManager={employee.is_manager}
+                            hireDate={employee.hire_date}
+                            hourlyRate={employee.hourly_rate}
                         />
                     ))}
                 </div>
             </div>
-        </div>  
+        </div>
     );
 };
 
