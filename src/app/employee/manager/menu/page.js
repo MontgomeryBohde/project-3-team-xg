@@ -10,67 +10,61 @@ const Menu = () => {
     const [drinks, setDrinks] = useState([]);
     const [seasonal, setSeasonal] = useState([]);
 
-	// Fetch menu items from the database using the API endpoint
-	useEffect(() => {
-        const fetchMenuItems = async () => {
-            try {
-                const response = await fetch("/api/getProducts?type=menu-with-sizes");
-                if (!response.ok) throw new Error("Failed to fetch menu items");
+    // Fetch menu items from the database using the API endpoint
+    const fetchMenuItems = async () => {
+        try {
+            const response = await fetch("/api/getProducts?type=menu-with-sizes");
+            if (!response.ok) throw new Error("Failed to fetch menu items");
 
-                const data = await response.json();
-                console.log("API Response:", data);
+            const data = await response.json();
+            // console.log("API Response:", data);
 
-                if (!Array.isArray(data)) {
-                    throw new Error("Invalid data format from API");
-                }
-
-                // filter entrees
-                setEntrees(data.filter(item => {
-                    return item.category && item.category.trim().toLowerCase() === "entree";
-                }));
-
-                // filter sides
-                setSides(data.filter(item => {
-                    return item.category && item.category.trim().toLowerCase() === "side";
-                }));
-
-                // filter appetizers
-                setAppetizers(data.filter(item => {
-                    return item.category && item.category.trim().toLowerCase() === "appetizer";
-                }));
-
-                // filter drinks
-                setDrinks(data.filter(item => {
-                    return item.category && item.category.trim().toLowerCase() === "drink";
-                }));
-
-                // filter seasonal
-                setSeasonal(data.filter((item) => item.is_seasonal === "t")); // Adjust as necessary if seasonal is included
-                
-            } catch (err) {
-                console.error("Error fetching menu items:", err);
+            if (!Array.isArray(data)) {
+                throw new Error("Invalid data format from API");
             }
-        };
-	
-		fetchMenuItems();
-	}, []);	
+
+            // filter items by category
+            setEntrees(data.filter(item => item.category?.toLowerCase() === "entree"));
+            setSides(data.filter(item => item.category?.toLowerCase() === "side"));
+            setAppetizers(data.filter(item => item.category?.toLowerCase() === "appetizer"));
+            setDrinks(data.filter(item => item.category?.toLowerCase() === "drink"));
+            setSeasonal(data.filter(item => item.is_seasonal === "t"));  // Adjust as necessary if seasonal is included
+            
+        } catch (err) {
+            console.error("Error fetching menu items:", err);
+        }
+    };
+
+    // to only run one time
+    useEffect(() => {
+        fetchMenuItems();
+    }, []);
 
     const [selectedItem, setSelectedItem] = useState(null);
     const [itemName, setItemName] = useState('');
     const [itemSize, setItemSize] = useState('Medium');
     const [itemCategory, setItemCategory] = useState('Entree');
-    const [inventoryIds, setInventoryIds] = useState("{}");
+    const [inventoryIds, setInventoryIds] = useState("");
     const [itemPrice, setItemPrice] = useState(0.00);
 
     const handlePopup = (item, category) => {
-        console.log("Selected Item's inventory ids:", item.inventory_ids); // Debug the selected item
-        setItemName(item.name);
-        setItemSize(item.size);
-        setItemCategory(category);
-        setSelectedItem(category);
-        setInventoryIds(item.inventory_ids ? item.inventory_ids.join(', ') : '{}'); // Convert array to string
-        setItemPrice(item.price);
+        if (!item) {
+            setItemName('');
+            setItemSize('Medium');
+            setItemCategory(category); // Set the category of the item to be added
+            setInventoryIds('');
+            setItemPrice(0.00);
+            setSelectedItem(category); // Set selectedItem to the category to trigger the modal
+        } else {
+            setItemName(item.name);
+            setItemSize(item.size);
+            setItemCategory(category);
+            setSelectedItem(item);
+            setInventoryIds(item.inventory_ids ? item.inventory_ids.join(', ') : '');
+            setItemPrice(item.price);
+        }
     };
+    
 
     const handleNavigation = (sectionId) => {
         const section = document.getElementById(sectionId);
@@ -84,57 +78,71 @@ const Menu = () => {
         setItemName('');
         setItemSize('Medium');
         setItemCategory('Entree');
-        setInventoryIds('{}');
+        setInventoryIds('');
         setItemPrice(0.00);
     };
 
     // FIXME - update db
-    const addItem = () => {
-        switch (itemCategory) {
-            case 'Entree':
-                setEntrees((prev) => [...prev, itemName]);
-                break;
-            case 'Side':
-                setSides((prev) => [...prev, itemName]);
-                break;
-            case 'Appetizer':
-                setAppetizers((prev) => [...prev, itemName]);
-                break;
-            case 'Drink':
-                setDrinks((prev) => [...prev, itemName]);
-                break;
-            case 'Seasonal':
-                setSeasonal((prev) => [...prev, itemName]);
-                break;
-            default:
-                break;
-        }
-        resetFields();
-    };
+    const addItem = async () => {
+        const itemData = {
+            item_name: itemName,
+            category: itemCategory,
+            inventory_item_ids: inventoryIds.split(',').map(id => parseInt(id.trim())),
+            descr: "",  // You can set a description if needed
+            available: true,
+            is_seasonal: false,  // Set this based on your logic
+            image_url: "",  // Provide image URL if needed
+            sizes: [{ item_size: itemSize, price: itemPrice, calories: 0 }]  // You can add more sizes if needed
+        };
 
-    // FIXME - update db
-    const removeItem = () => {
-        switch (itemCategory) {
-            case 'Entree':
-                setEntrees((prev) => prev.filter(item => item !== itemName));
-                break;
-            case 'Side':
-                setSides((prev) => prev.filter(item => item !== itemName));
-                break;
-            case 'Appetizer':
-                setAppetizers((prev) => prev.filter(item => item !== itemName));
-                break;
-            case 'Drink':
-                setDrinks((prev) => prev.filter(item => item !== itemName));
-                break;
-            case 'Seasonal':
-                setSeasonal((prev) => prev.filter(item => item !== itemName));
-                break;
-            default:
-                break;
+        try {
+            const response = await fetch("/api/manageMenuItems", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(itemData),
+            });
+
+            if (response.ok) {
+                // ("Item added successfully");
+                // Refresh the menu items after adding
+                fetchMenuItems();
+                resetFields();
+            } else {
+                console.error("Failed to add item");
+            }
+        } catch (error) {
+            console.error("Error adding menu item:", error);
         }
-        resetFields();
     };
+  
+    const removeItem = async () => {
+        console.log(selectedItem);
+        const itemData = { id: selectedItem.item_id }; // Ensure you're sending the correct ID of the selected item
+        console.log("Sending remove request with data:", itemData);
+    
+        try {
+            const response = await fetch("/api/manageMenuItems", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(itemData),
+            });
+    
+            if (response.ok) {
+                console.log("Item removed successfully");
+                fetchMenuItems();  // Refresh the menu
+                resetFields();
+            } else {
+                console.error("Failed to remove item:", response.status, response.statusText);
+            }
+        } catch (error) {
+            console.error("Error removing menu item:", error);
+        }
+    };
+    
 
     const renderMenuItems = (items, category) => (
         items.length > 0 ? (
@@ -188,6 +196,12 @@ const Menu = () => {
                             <div className="row">
                                 {renderMenuItems(entrees, "Entree")}
                             </div>
+                            <button
+                                className="btn btn-outline-success btn-lg w-100 mt-3"
+                                onClick={() => handlePopup(null, "Entree")} // Opens the popup with category
+                            >
+                                Add New Item
+                            </button>
                         </section>
 
                         <section id="sides" className="mb-5">

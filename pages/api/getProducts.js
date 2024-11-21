@@ -1,11 +1,7 @@
 import { Pool } from 'pg'; 
 
 const pool = new Pool({
-  user: 'team_xg', 
-  host: 'csce-315-db.engr.tamu.edu',
-  database: 'team_xg_db',
-  password: 'palenumber97', 
-  port: 5432,
+    connectionString: process.env.POSTGRES_URL,
 });
 
 
@@ -20,7 +16,7 @@ export default async function handler(req, res) {
             let result;
 
             // Log the body of the request (for POST)
-            console.log("Request body:", req.body);
+            // console.log("Request body:", req.body);
 
             switch (type) {
                 case 'price': {
@@ -67,9 +63,10 @@ export default async function handler(req, res) {
                 }
 
                 case 'menu-with-sizes': {
-                    console.log("Fetching menu items");
+                    console.log("Fetching menu items with sizes and IDs");
                     const queryText = `
-                            SELECT 
+                        SELECT 
+                            menu_items.id AS item_id,
                             menu_items.item_name AS name, 
                             item_sizes.item_size AS size, 
                             menu_items.category, 
@@ -81,14 +78,14 @@ export default async function handler(req, res) {
                     `;
                     result = await pool.query(queryText);
                     break;
-                }
+                }                
 
                 default:
                     return res.status(400).json({ error: 'Invalid action' });
             }
 
             // Log the result before sending it back
-            console.log("Query result:", result.rows); // result.rows contains the actual data
+            // console.log("Query result:", result.rows); // result.rows contains the actual data
 
             // Send the result back as JSON
             res.status(200).json(result.rows);
