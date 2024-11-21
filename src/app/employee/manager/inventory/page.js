@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import EmployeeLogInHeader from '@/components/ui/employee/header/EmployeeLogInHeader';
 import InventoryPopUp from '@/components/ui/employee/manager/inventory/InventoryPopUp';
 import { FaAppleAlt, FaDrumstickBite, FaCarrot, FaCocktail, FaToolbox, FaUtensils } from 'react-icons/fa';
-import './Inventory.css';
+import './inventory.css';
 
 const Inventory = () => {
     const [inventoryItems, setInventoryItems] = useState({
