@@ -1,4 +1,3 @@
-// src/app/employee/clock/page.js
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -61,16 +60,13 @@ const ClockPage = () => {
 
             if (response.ok) {
                 const data = await response.json();
-                console.log("Clock-In Success:", data);
                 setShift(data.shift); // Set the new shift
                 setSuccessMessage("Clocked in successfully!");
             } else {
                 const { message } = await response.json();
-                console.error("Clock-In Error:", message);
                 setError(message || "Failed to clock in.");
             }
         } catch (err) {
-            console.error("Clock-In Exception:", err);
             setError("An error occurred while clocking in.");
         }
     };
@@ -84,18 +80,15 @@ const ClockPage = () => {
             return;
         }
 
-        console.log("Clocking out with Shift ID:", shift.id);
-
         try {
-            const response = await fetch(`/api/getShifts/${shift.id}`, {
-                method: "PATCH",
+            const response = await fetch(`/api/getShifts`, {
+                method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ action: "clock-out" }),
+                body: JSON.stringify({ id: shift.id, action: "clock-out" }),
             });
 
             if (response.ok) {
                 const data = await response.json();
-                console.log("Clock-Out Success:", data);
                 setShift(null); // Clear the current shift
                 setSuccessMessage("Clocked out successfully! Redirecting...");
 
@@ -105,11 +98,9 @@ const ClockPage = () => {
                 }, 3000);
             } else {
                 const { message } = await response.json();
-                console.error("Clock-Out Error:", message);
                 setError(message || "Failed to clock out.");
             }
         } catch (err) {
-            console.error("Clock-Out Exception:", err);
             setError("An error occurred while clocking out.");
         }
     };
@@ -119,45 +110,45 @@ const ClockPage = () => {
     }
 
     return (
-		<div className="employee-home-container vh-100 d-flex flex-column bg-light">
-			<EmployeeLogInHeader />
-			<div className="clock-page-container vh-100 d-flex flex-column align-items-center justify-content-center bg-light">
-				<div className="card p-4 shadow-lg" style={{ width: "100%", maxWidth: "500px" }}>
-					<h3 className="text-center mb-4 text-primary">Clock In / Clock Out</h3>
-					<p className="text-center text-muted">Manage your shifts easily below</p>
-	
-					{error && <div className="alert alert-danger">{error}</div>}
-					{successMessage && <div className="alert alert-success">{successMessage}</div>}
-	
-					<div className="d-flex flex-column gap-3">
-						{shift ? (
-							<button
-								className="btn btn-danger btn-lg d-flex align-items-center justify-content-center"
-								onClick={handleClockOut}
-							>
-								<i className="bi bi-box-arrow-right me-2"></i>
-								Clock Out
-							</button>
-						) : (
-							<button
-								className="btn btn-primary btn-lg d-flex align-items-center justify-content-center"
-								onClick={handleClockIn}
-							>
-								<i className="bi bi-box-arrow-in-right me-2"></i>
-								Clock In
-							</button>
-						)}
-					</div>
-	
-					<div className="text-center mt-3">
-						<small className="text-muted">
-							Having issues? Contact your manager for assistance.
-						</small>
-					</div>
-				</div>
-			</div>
-		</div>
-	);	
+        <div className="employee-home-container vh-100 d-flex flex-column bg-light">
+            <EmployeeLogInHeader />
+            <div className="clock-page-container vh-100 d-flex flex-column align-items-center justify-content-center bg-light">
+                <div className="card p-4 shadow-lg" style={{ width: "100%", maxWidth: "500px" }}>
+                    <h3 className="text-center mb-4 text-primary">Clock In / Clock Out</h3>
+                    <p className="text-center text-muted">Manage your shifts easily below</p>
+
+                    {error && <div className="alert alert-danger">{error}</div>}
+                    {successMessage && <div className="alert alert-success">{successMessage}</div>}
+
+                    <div className="d-flex flex-column gap-3">
+                        {shift ? (
+                            <button
+                                className="btn btn-danger btn-lg d-flex align-items-center justify-content-center"
+                                onClick={handleClockOut}
+                            >
+                                <i className="bi bi-box-arrow-right me-2"></i>
+                                Clock Out
+                            </button>
+                        ) : (
+                            <button
+                                className="btn btn-primary btn-lg d-flex align-items-center justify-content-center"
+                                onClick={handleClockIn}
+                            >
+                                <i className="bi bi-box-arrow-in-right me-2"></i>
+                                Clock In
+                            </button>
+                        )}
+                    </div>
+
+                    <div className="text-center mt-3">
+                        <small className="text-muted">
+                            Having issues? Contact your manager for assistance.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 };
 
 export default ClockPage;
