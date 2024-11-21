@@ -6,22 +6,11 @@
     overflow: hidden;
 }
 
-.header-container {
-    background-color: #007bff;
-    color: white;
-    padding: 1rem;
-    text-align: center;
-    font-size: 1.5rem;
-    font-weight: bold;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
 /* Sidebar */
 .sidebar {
     background-color: #f8f9fa;
     width: 300px;
     padding: 1.5rem;
-    height: calc(100vh - 80px); /* Subtract header height */
     position: sticky;
     top: 80px; /* Match the header height */
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
