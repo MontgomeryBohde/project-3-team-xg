@@ -70,11 +70,14 @@ export default async function handler(req, res) {
                             menu_items.item_name AS name, 
                             item_sizes.item_size AS size, 
                             menu_items.category, 
-                            menu_items.inventory_item_ids AS inventory_ids, 
+                            ARRAY_AGG(inventory_items.item_name) AS inventory_names, 
                             item_sizes.price,
-                            item_sizes.calories  -- Add the calories column from item_sizes
+                            item_sizes.calories
                         FROM menu_items
-                        JOIN item_sizes ON menu_items.id = item_sizes.item_id;
+                        JOIN item_sizes ON menu_items.id = item_sizes.item_id
+                        LEFT JOIN inventory_items ON inventory_items.id = ANY(menu_items.inventory_item_ids)
+                        GROUP BY menu_items.id, item_sizes.item_size, item_sizes.price, item_sizes.calories;
+
                     `;
                     
                     // Run the query and get the result
