@@ -16,7 +16,7 @@ const Side = ({ menuItems, handleAddToCurrentMeal, handleAddToCart, currentMenu 
                         }
                     }}
                 >
-                    {side.name}
+                    {side.item_name}
                 </button>
             ))}
         </div>

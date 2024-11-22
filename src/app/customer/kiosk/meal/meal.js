@@ -1,9 +1,9 @@
+// src/app/customer/kiosk/meal/meal.js
 "use client";
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import EmployeeHeader from "@/components/ui/employee/header/EmployeeHeader";
-import "bootstrap/dist/css/bootstrap.css"; // Bootstrap is already included
 import "./meal-select.css";
 
 const CustomerMealSelect = () => {
@@ -12,23 +12,34 @@ const CustomerMealSelect = () => {
 
 	// Fetch entrees and sides from the database using the API endpoint
 	useEffect(() => {
-		const fetchMenuItems = async () => {
-			try {
-				const response = await fetch('/api/menu_items');
-				if (!response.ok) throw new Error('Failed to fetch menu items');
-				const data = await response.json();
+        const fetchMenuItems = async () => {
+            try {
+                const response = await fetch("/api/getMenu?type=menu");
+                if (!response.ok) throw new Error("Failed to fetch menu items");
 
-				// Filter and set entrees and sides
-				setEntrees(data.menuItems.filter(item => item.category.toLowerCase() === 'entree').map(item => item.name));
-				setSides(data.menuItems.filter(item => item.category.toLowerCase() === 'side').map(item => item.name));
-			} catch (error) {
-				console.error('Error fetching menu items:', error);
-				alert('Error fetching menu items. Please try again later.');
-			}
-		};
+                const data = await response.json();
+                console.log("API Response:", data);
 
+                if (!Array.isArray(data)) {
+                    throw new Error("Invalid data format from API");
+                }
+
+                // Filter and set entrees and sides
+                setEntrees(
+                    data.filter((item) => item.category.toLowerCase() === "entree").map((item) => item.name)
+                );
+                setSides(
+                    data.filter((item) => item.category.toLowerCase() === "side").map((item) => item.name)
+                );
+            } catch (err) {
+                console.error("Error fetching menu items:", err);
+                setError("Failed to fetch menu items. Please try again later.");
+            }
+        };
+	
 		fetchMenuItems();
-	}, []);
+	}, []);	
+	
 
 	const mealTypes = [
 		{ name: "Bowl", sides: 1, entrees: 1, price: 8.30 },
@@ -127,7 +138,7 @@ const CustomerMealSelect = () => {
 
 	// Handle cancel action
 	const handleCancel = () => {
-		router.push("/customer/menuselection"); // TODO: Navigate to the menu page
+		router.push("/customer/kiosk/menuselection"); // TODO: Navigate to the menu page
 	};
 
 	const handleConfirm = () => {

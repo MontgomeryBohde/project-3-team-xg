@@ -1,6 +1,5 @@
 // Page.js
 'use client';
-import 'bootstrap/dist/css/bootstrap.css';
 import React, { useState, useEffect } from 'react';
 import Cart from '@/components/ui/employee/cashier/order/Cart';
 import EmployeeLogInHeader from "@/components/ui/employee/header/EmployeeLogInHeader";
@@ -28,33 +27,36 @@ const OrderPage = () => {
     const [selectedItem, setSelectedItem] = useState(null);
 
     const mealTypes = [
-        { name: "Bowl", sides: 1, entrees: 1, price: 8.30 },
-        { name: "Plate", sides: 1, entrees: 2, price: 10.00 },
-        { name: "Bigger Plate", sides: 1, entrees: 3, price: 11.75 },
-        { name: "Cub Meal", sides: 1, entrees: 1, price: 6.00 },
-        { name: "Family Meal", sides: 2, entrees: 3, price: 32.00 }
+        { item_name: "Bowl", sides: 1, entrees: 1, price: 8.30 },
+        { item_name: "Plate", sides: 1, entrees: 2, price: 10.00 },
+        { item_name: "Bigger Plate", sides: 1, entrees: 3, price: 11.75 },
+        { item_name: "Cub Meal", sides: 1, entrees: 1, price: 6.00 },
+        { item_name: "Family Meal", sides: 2, entrees: 3, price: 32.00 }
     ];
 
     // Fetch menu items from the database using the API endpoint
     useEffect(() => {
         const fetchMenuItems = async () => {
             try {
-                const response = await fetch('/api/menu_items');
+                const response = await fetch('/api/getMenu?type=menu');
                 if (!response.ok) throw new Error('Failed to fetch menu items');
-                const data = await response.json();
-                setMenuItems({
-                    appetizers: data.menuItems.filter(item => item.category.toLowerCase() === 'appetizer'),
-                    entrees: data.menuItems.filter(item => item.category.toLowerCase() === 'entree'),
-                    sides: data.menuItems.filter(item => item.category.toLowerCase() === 'side'),
-                    drinks: data.menuItems.filter(item => item.category.toLowerCase() === 'drink')
-                });
+    
+                const data = await response.json();    
+                // Filter items into categories
+                const appetizers = data.filter(item => item.category.toLowerCase() === 'appetizer');
+                const entrees = data.filter(item => item.category.toLowerCase() === 'entree');
+                const sides = data.filter(item => item.category.toLowerCase() === 'side');
+                const drinks = data.filter(item => item.category.toLowerCase() === 'drink');
+    
+                setMenuItems({ appetizers, entrees, sides, drinks });
             } catch (error) {
                 console.error('Error fetching menu items:', error);
                 setWarningMessage('Error fetching menu items. Please try again later.');
             }
         };
+    
         fetchMenuItems();
-    }, []);
+    }, []);    
 
     useEffect(() => {
         const handlePopState = () => {
@@ -133,12 +135,10 @@ const OrderPage = () => {
 
     const handleSelectItemForSize = async (item) => {
         try {
-            const response = await fetch(`/api/item_sizes?item_id=${item.id}`);
+            const response = await fetch(`/api/getItemSizes?item_id=${item.id}`);
             if (!response.ok) throw new Error('Failed to fetch item sizes');
 
             const data = await response.json();
-            console.log(`Fetching item sizes for item ID: ${item.id}`);
-            console.log('Fetch response:', data);
 
             if (Array.isArray(data) && data.length > 0) {
                 // Set the selected item including its available sizes
@@ -146,14 +146,13 @@ const OrderPage = () => {
                     ...item,
                     sizes: data.map((item_size) => ({
                         id: item_size.id,
-                        size: item_size.size,
+                        item_size: item_size.item_size,
                         price: item_size.price,
                         calories: item_size.calories,
                     })),
                 };
                 
                 setSelectedItem(updatedItem);
-                console.log('Selected item:', updatedItem);
                 setCurrentMenu('sizeSelection');
                 setWarningMessage('');
             } else {
@@ -185,11 +184,11 @@ const OrderPage = () => {
                                     <div className="menu-grid">
                                         {mealTypes.map((meal) => (
                                             <button
-                                                key={meal.name}
+                                                key={meal.item_name}
                                                 className="btn btn-outline-primary w-100 mb-3 btn-lg"
                                                 onClick={() => handleStartMealOrder(meal)}
                                             >
-                                                {meal.name}
+                                                {meal.item_name}
                                             </button>
                                         ))}
                                     </div>
@@ -234,7 +233,7 @@ const OrderPage = () => {
                     {currentMenu === 'mealSelection' && selectedMealType && (
                         <div className="row">
                             <h3 className="text-center">Entrees & Sides</h3>
-                            <p className="text-center">{selectedMealType?.name} - Remaining Entrees: {selectedMealType?.entrees - entreeCount}, Remaining Sides: {selectedMealType?.sides - sideCount}</p>
+                            <p className="text-center">{selectedMealType?.item_name} - Remaining Entrees: {selectedMealType?.entrees - entreeCount}, Remaining Sides: {selectedMealType?.sides - sideCount}</p>
                             <div className="col-md-6">
                                 <Entree 
                                     menuItems={menuItems.entrees} 

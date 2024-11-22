@@ -1,4 +1,3 @@
-// src/components/ui/employee/cashier/order/Cart.js
 import React, { useState } from 'react';
 
 const Cart = ({ cartItems, inProgressMeal, setInProgressMeal, setEntreeCount, setSideCount, setCart, showQuantityControls, handleQuantityChange, handleRemoveItem, currentMenu }) => {
@@ -8,7 +7,7 @@ const Cart = ({ cartItems, inProgressMeal, setInProgressMeal, setEntreeCount, se
         <ul className="list-group list-group-flush">
             {subItems.map((subItem, subIndex) => (
                 <li key={subIndex} className="list-group-item">
-                    <small>{subItem.name}</small>
+                    <small>{subItem.item_name}</small> {/* Changed name to item_name */}
                 </li>
             ))}
         </ul>
@@ -18,7 +17,7 @@ const Cart = ({ cartItems, inProgressMeal, setInProgressMeal, setEntreeCount, se
         <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
             <div className="d-flex flex-column">
                 <div>
-                    <strong>{item.name}</strong>
+                    <strong>{item.item_name}</strong> {/* Changed name to item_name */}
                     {/* Display size only if it is not a meal and size is defined */}
                     {item.size && currentMenu !== 'mealSelect' && (
                         <span className="text-muted"> - {item.size}</span>
@@ -75,14 +74,14 @@ const Cart = ({ cartItems, inProgressMeal, setInProgressMeal, setEntreeCount, se
         <li key="inProgressMeal" className="list-group-item d-flex justify-content-between align-items-center">
             <div className="d-flex flex-column">
                 <div>
-                    <strong>{meal.name} (In Progress)</strong>
+                    <strong>{meal.item_name} (In Progress)</strong> {/* Changed name to item_name */}
                     <span className="text-success"> - ${meal.price ? meal.price.toFixed(2) : '0.00'}</span>
                 </div>
                 {meal.items && meal.items.length > 0 && (
                     <ul className="list-group list-group-flush">
                         {meal.items.map((item, index) => (
                             <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
-                                <small>{item.name}</small>
+                                <small>{item.item_name}</small> {/* Changed name to item_name */}
                                 <button 
                                     className="btn btn-danger btn-sm"
                                     onClick={() => handleRemoveFromInProgressMeal(index)}

@@ -12,7 +12,10 @@ const MenuPopularity = () => {
     useEffect(() => {
         async function fetchPopularItems() {
             try {
-                const response = await fetch(`/api/getPopularity?n=${n}`);
+                const response = await fetch(`/api/getReports?type=popularity&n=${n}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch popular items');
+                }
                 const data = await response.json();
                 setPopularItems(data);
             } catch (error) {
@@ -21,7 +24,7 @@ const MenuPopularity = () => {
         }
 
         fetchPopularItems();
-    }, [n]); // Fetch popular items whenever `n` changes
+    }, [n]); // Fetch popular items whenever `n` changes    
 
     const handleNChange = (event) => {
         const newN = parseInt(event.target.value, 10);
@@ -77,7 +80,7 @@ const MenuPopularity = () => {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="5">Loading...</td> {/* Currently always loading because food_name undefined (name for menu_items table) */}
+                                <td colSpan="5">Loading...</td>
                             </tr>
                         )}
                     </tbody>
