@@ -82,13 +82,15 @@ const [inventoryIds, setInventoryIds] = useState(""); // This keeps it as a comm
     
     const handlePopup = (item, category) => {
         if (!item) {
+            console.log("in");
             setItemName('');
             setItemSize('Medium');
             setItemCategory(category);
-            setInventoryIds(''); // Clear inventory names
+            setInventoryIds('');
             setItemPrice(0.00);
             setItemCalories(0);
-            setSelectedItem(null);
+
+            setSelectedItem('Item Name'); // Set to default if no item is selected
         } else {
             setItemName(item.name);
             setItemCategory(category);
