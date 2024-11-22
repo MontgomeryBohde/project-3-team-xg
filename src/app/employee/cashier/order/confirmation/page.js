@@ -64,7 +64,7 @@ const ConfirmationPage = () => {
         <ul className="list-group list-group-flush mt-2">
             {subItems.map((subItem, subIndex) => (
                 <li key={subIndex} className="list-group-item ps-4">
-                    <small className="text-muted">{subItem.name}</small>
+                    <small className="text-muted">{subItem.item_name}</small>
                 </li>
             ))}
         </ul>
@@ -73,7 +73,7 @@ const ConfirmationPage = () => {
     const renderCartItem = (item, index) => (
         <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
             <div className="d-flex flex-column">
-                <strong>{item.name}</strong>
+                <strong>{item.item_name}</strong>
                 {item.size && (
                     <span className="text-muted">Size: {item.size}</span>
                 )}
@@ -116,58 +116,97 @@ const ConfirmationPage = () => {
     return (
         <div>
             <EmployeeLogInHeader />
-            <div className="container">
+            <div className="container my-5">
                 <div className="row justify-content-center">
                     <div className="col-md-10">
-                        <div className="card mb-4">
+                        <div className="card shadow-lg">
                             <div className="card-body">
-                                <h4 className="card-title text-center">Order Confirmation</h4>
-                                
-                                {/* Custom Cart Layout for Order Confirmation */}
-                                <div className="order-summary mt-4">
+                                <h2 className="card-title text-center text-primary mb-4">Order Confirmation</h2>
+    
+                                {/* Order Summary */}
+                                <div className="order-summary">
                                     {cartItems.length > 0 ? (
                                         <ul className="list-group">
                                             {cartItems.map((item, index) => renderCartItem(item, index))}
                                         </ul>
                                     ) : (
-                                        <p className="text-center mt-4">Your cart is empty. Please return to add items to your order.</p>
+                                        <p className="text-center text-muted mt-4">
+                                            Your cart is empty. Please return to add items to your order.
+                                        </p>
                                     )}
                                 </div>
-
-                                <div className="mb-3 mt-4">
-                                    <button className="btn btn-outline-info" onClick={() => setShowDiscountPopUp(true)}>Apply Discount</button>
-                                </div>
-                                <h5>Subtotal: ${calculateSubtotal().toFixed(2)}</h5>
-                                {discount > 0 && (
-                                    <h5>Discount: - ${calculateDiscountAmount().toFixed(2)} ({discount}%)</h5>
+    
+                                {/* Summary Details */}
+                                {cartItems.length > 0 && (
+                                    <div className="mt-4 p-3 border rounded bg-light">
+                                        <h5 className="mb-3">
+                                            <span className="text-secondary">Subtotal:</span> ${calculateSubtotal().toFixed(2)}
+                                        </h5>
+                                        {discount > 0 && (
+                                            <h5 className="mb-3">
+                                                <span className="text-success">Discount:</span> 
+                                                - ${calculateDiscountAmount().toFixed(2)} ({discount}%)
+                                            </h5>
+                                        )}
+                                        {taxExempt && (
+                                            <h5 className="mb-3 text-warning">
+                                                <span>Tax Exempt:</span> Yes
+                                            </h5>
+                                        )}
+                                        <h5 className="mb-3">
+                                            <span className="text-secondary">Tax:</span> 
+                                            ${taxExempt ? '0.00' : ((calculateSubtotal() - calculateDiscountAmount()) * 0.08).toFixed(2)}
+                                        </h5>
+                                        <h5 className="text-primary">
+                                            <strong>Total:</strong> ${calculateTotal()}
+                                        </h5>
+                                    </div>
                                 )}
-                                {taxExempt && (
-                                    <h5>Tax Exempt: Yes</h5>
-                                )}
-                                <h5>Tax: ${taxExempt ? '0.00' : ((calculateSubtotal() - calculateDiscountAmount()) * 0.08).toFixed(2)}</h5>
-                                <h5>Total: ${calculateTotal()}</h5>
-                                <div className="d-flex justify-content-between mt-4">
+    
+                                {/* Buttons */}
+                                <div className="d-flex justify-content-between align-items-center mt-4">
                                     <Link href="/employee/cashier/order" legacyBehavior>
-                                        <a className="btn btn-secondary" onClick={handleReturn}>Return</a>
+                                        <a className="btn btn-outline-secondary btn-lg" onClick={handleReturn}>
+                                            <i className="bi bi-arrow-left me-2"></i> Return
+                                        </a>
                                     </Link>
-                                    <button className="btn btn-primary" onClick={() => setShowPaymentPopUp(true)}>Confirm</button>
+                                    {cartItems.length > 0 && (
+                                        <button
+                                            className="btn btn-outline-info btn-lg me-3"
+                                            onClick={() => setShowDiscountPopUp(true)}
+                                        >
+                                            <i className="bi bi-tag me-2"></i> Apply Discount
+                                        </button>
+                                    )}
+                                    {cartItems.length > 0 && (
+                                        <button
+                                            className="btn btn-primary btn-lg"
+                                            onClick={() => setShowPaymentPopUp(true)}
+                                        >
+                                            <i className="bi bi-credit-card me-2"></i> Confirm
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+    
+                {/* Popups */}
                 {showPaymentPopUp && <PaymentPopUp onClose={() => setShowPaymentPopUp(false)} />}
-                {showDiscountPopUp && <DiscountPopUp 
-                    onApplyDiscount={(discountValue, taxExemptStatus) => {
-                        setDiscount(discountValue);
-                        setTaxExempt(taxExemptStatus);
-                        setShowDiscountPopUp(false);
-                    }} 
-                    onClose={() => setShowDiscountPopUp(false)} 
-                />}
+                {showDiscountPopUp && (
+                    <DiscountPopUp
+                        onApplyDiscount={(discountValue, taxExemptStatus) => {
+                            setDiscount(discountValue);
+                            setTaxExempt(taxExemptStatus);
+                            setShowDiscountPopUp(false);
+                        }}
+                        onClose={() => setShowDiscountPopUp(false)}
+                    />
+                )}
             </div>
         </div>
-    );
+    );    
 };
 
 export default ConfirmationPage;

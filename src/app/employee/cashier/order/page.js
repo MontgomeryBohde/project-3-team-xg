@@ -1,6 +1,5 @@
-// Page.js
+// src/app/employee/cashier/order/page.js
 'use client';
-import 'bootstrap/dist/css/bootstrap.css';
 import React, { useState, useEffect } from 'react';
 import Cart from '@/components/ui/employee/cashier/order/Cart';
 import EmployeeLogInHeader from "@/components/ui/employee/header/EmployeeLogInHeader";
@@ -28,28 +27,21 @@ const OrderPage = () => {
     const [selectedItem, setSelectedItem] = useState(null);
 
     const mealTypes = [
-        { name: "Bowl", sides: 1, entrees: 1, price: 8.30 },
-        { name: "Plate", sides: 1, entrees: 2, price: 10.00 },
-        { name: "Bigger Plate", sides: 1, entrees: 3, price: 11.75 },
-        { name: "Cub Meal", sides: 1, entrees: 1, price: 6.00 },
-        { name: "Family Meal", sides: 2, entrees: 3, price: 32.00 }
+        { item_name: "Bowl", sides: 1, entrees: 1, price: 8.30 },
+        { item_name: "Plate", sides: 1, entrees: 2, price: 10.00 },
+        { item_name: "Bigger Plate", sides: 1, entrees: 3, price: 11.75 },
+        { item_name: "Cub Meal", sides: 1, entrees: 1, price: 6.00 },
+        { item_name: "Family Meal", sides: 2, entrees: 3, price: 32.00 }
     ];
 
     // Fetch menu items from the database using the API endpoint
     useEffect(() => {
         const fetchMenuItems = async () => {
             try {
-                const response = await fetch('/api/getProducts?action=menu');
+                const response = await fetch('/api/getMenu?type=menu');
                 if (!response.ok) throw new Error('Failed to fetch menu items');
     
-                const data = await response.json();
-                console.log('API Response:', data); // Debugging log
-    
-                // Validate API response
-                if (!Array.isArray(data)) {
-                    throw new Error('Invalid data format from API');
-                }
-    
+                const data = await response.json();    
                 // Filter items into categories
                 const appetizers = data.filter(item => item.category.toLowerCase() === 'appetizer');
                 const entrees = data.filter(item => item.category.toLowerCase() === 'entree');
@@ -147,8 +139,6 @@ const OrderPage = () => {
             if (!response.ok) throw new Error('Failed to fetch item sizes');
 
             const data = await response.json();
-            console.log(`Fetching item sizes for item ID: ${item.id}`);
-            console.log('Fetch response:', data);
 
             if (Array.isArray(data) && data.length > 0) {
                 // Set the selected item including its available sizes
@@ -156,14 +146,13 @@ const OrderPage = () => {
                     ...item,
                     sizes: data.map((item_size) => ({
                         id: item_size.id,
-                        size: item_size.size,
+                        item_size: item_size.item_size,
                         price: item_size.price,
                         calories: item_size.calories,
                     })),
                 };
                 
                 setSelectedItem(updatedItem);
-                console.log('Selected item:', updatedItem);
                 setCurrentMenu('sizeSelection');
                 setWarningMessage('');
             } else {
@@ -184,31 +173,33 @@ const OrderPage = () => {
         <div>
             <EmployeeLogInHeader />
             <div className="container mt-4">
-                {warningMessage && <div className="alert alert-warning text-center">{warningMessage}</div>}
+                {warningMessage && (
+                    <div className="alert alert-warning text-center">{warningMessage}</div>
+                )}
+    
                 <div className="row">
-                    {/* Meal Types and Food Items */}
                     {currentMenu === 'main' && (
                         <>
                             <div className="col-md-6 mb-4">
-                                <div className="meal-types">
-                                    <h3>Meal Types</h3>
-                                    <div className="menu-grid">
+                                <div className="meal-types p-3 border rounded bg-light">
+                                    <h3 className="text-center text-primary">Meal Types</h3>
+                                    <div className="menu-grid mt-3">
                                         {mealTypes.map((meal) => (
                                             <button
-                                                key={meal.name}
+                                                key={meal.item_name}
                                                 className="btn btn-outline-primary w-100 mb-3 btn-lg"
                                                 onClick={() => handleStartMealOrder(meal)}
                                             >
-                                                {meal.name}
+                                                {meal.item_name}
                                             </button>
                                         ))}
                                     </div>
                                 </div>
                             </div>
                             <div className="col-md-6 mb-4">
-                                <div className="food-types">
-                                    <h3>Food Items</h3>
-                                    <div className="menu-grid">
+                                <div className="food-types p-3 border rounded bg-light">
+                                    <h3 className="text-center text-primary">Food Items</h3>
+                                    <div className="menu-grid mt-3">
                                         {['Appetizers', 'Entrees', 'Sides', 'Drinks'].map((food) => (
                                             <button
                                                 key={food}
@@ -239,115 +230,153 @@ const OrderPage = () => {
                             </div>
                         </>
                     )}
-
-                    {/* Dynamic Content Section */}
+    
                     {currentMenu === 'mealSelection' && selectedMealType && (
-                        <div className="row">
-                            <h3 className="text-center">Entrees & Sides</h3>
-                            <p className="text-center">{selectedMealType?.name} - Remaining Entrees: {selectedMealType?.entrees - entreeCount}, Remaining Sides: {selectedMealType?.sides - sideCount}</p>
-                            <div className="col-md-6">
-                                <Entree 
-                                    menuItems={menuItems.entrees} 
-                                    handleAddToCurrentMeal={(item) => handleAddToInProgressMeal(item, 'entree')}
-                                    setInProgressMeal={inProgressMeal}
-                                    currentMenu={currentMenu}
-                                />
+                        <div className="col-12">
+                            <div className="text-center mb-4">
+                                <h3 className="text-primary">Customize Your Meal</h3>
+                                <p>
+                                    {selectedMealType.item_name} - Remaining Entrees:{" "}
+                                    {selectedMealType.entrees - entreeCount}, Remaining Sides:{" "}
+                                    {selectedMealType.sides - sideCount}
+                                </p>
                             </div>
-                            <div className="col-md-6">
-                                <Side 
-                                    menuItems={menuItems.sides} 
-                                    handleAddToCurrentMeal={(item) => handleAddToInProgressMeal(item, 'side')}
-                                    setInProgressMeal={inProgressMeal}
-                                    currentMenu={currentMenu}
-                                />
+                            <div className="row">
+                                <div className="col-md-6">
+                                    <Entree
+                                        menuItems={menuItems.entrees}
+                                        handleAddToCurrentMeal={(item) =>
+                                            handleAddToInProgressMeal(item, 'entree')
+                                        }
+                                    />
+                                </div>
+                                <div className="col-md-6">
+                                    <Side
+                                        menuItems={menuItems.sides}
+                                        handleAddToCurrentMeal={(item) =>
+                                            handleAddToInProgressMeal(item, 'side')
+                                        }
+                                    />
+                                </div>
                             </div>
-                            <button onClick={() => { setCurrentMenu('main'); setWarningMessage(''); setInProgressMeal(null); setSelectedMealType(null); setEntreeCount(0); setSideCount(0); setWarningMessage(''); }} className="btn btn-secondary mt-3 btn-lg">Back</button>
-                            <button onClick={handleCompleteMealOrder} className="btn btn-primary mt-3 btn-lg">Complete Meal</button>
+                            <div className="text-center mt-4">
+                                <button
+                                    className="btn btn-secondary btn-lg me-3"
+                                    onClick={() => {
+                                        setCurrentMenu('main');
+                                        setWarningMessage('');
+                                        setInProgressMeal(null);
+                                        setSelectedMealType(null);
+                                        setEntreeCount(0);
+                                        setSideCount(0);
+                                    }}
+                                >
+                                    Back
+                                </button>
+                                <button
+                                    className="btn btn-primary btn-lg"
+                                    onClick={handleCompleteMealOrder}
+                                >
+                                    Complete Meal
+                                </button>
+                            </div>
                         </div>
                     )}
-
-                    {currentMenu === 'appetizer' && (
-                        <div className="row">
-                            <h3 className="text-center">Appetizers</h3>
-                            <div className="col">
-                                <Appetizer 
-                                    menuItems={menuItems.appetizers}
-                                    handleAddToCart={(item) => handleSelectItemForSize(item)}
-                                />
+    
+                    {['appetizer', 'entree', 'side', 'drink'].includes(currentMenu) && (
+                        <div className="col-12">
+                            <h3 className="text-center text-primary">
+                                {currentMenu.charAt(0).toUpperCase() + currentMenu.slice(1)}s
+                            </h3>
+                            <div className="row">
+                                <div className="col">
+                                    {currentMenu === 'appetizer' && (
+                                        <Appetizer
+                                            menuItems={menuItems.appetizers}
+                                            handleAddToCart={(item) => handleSelectItemForSize(item)}
+                                        />
+                                    )}
+                                    {currentMenu === 'entree' && (
+                                        <Entree
+                                            menuItems={menuItems.entrees}
+                                            handleAddToCart={(item) => handleSelectItemForSize(item)}
+                                        />
+                                    )}
+                                    {currentMenu === 'side' && (
+                                        <Side
+                                            menuItems={menuItems.sides}
+                                            handleAddToCart={(item) => handleSelectItemForSize(item)}
+                                        />
+                                    )}
+                                    {currentMenu === 'drink' && (
+                                        <Drink
+                                            menuItems={menuItems.drinks}
+                                            handleAddToCart={(item) => handleSelectItemForSize(item)}
+                                        />
+                                    )}
+                                </div>
                             </div>
-                            <button onClick={() => { setCurrentMenu('main'); setWarningMessage(''); setWarningMessage(''); }} className="btn btn-secondary mt-3 btn-lg">Back</button>
+                            <div className="text-center mt-4">
+                                <button
+                                    className="btn btn-secondary btn-lg"
+                                    onClick={() => {
+                                        setCurrentMenu('main');
+                                        setWarningMessage('');
+                                    }}
+                                >
+                                    Back
+                                </button>
+                            </div>
                         </div>
                     )}
-
-                    {currentMenu === 'entree' && (
-                        <div className="row">
-                            <h3 className="text-center">Entrees</h3>
-                            <div className="col">
-                                <Entree 
-                                    menuItems={menuItems.entrees} 
-                                    handleAddToCart={(item) => handleSelectItemForSize(item)}
-                                />
-                            </div>
-                            <button onClick={() => { setCurrentMenu('main'); setWarningMessage(''); setWarningMessage(''); }} className="btn btn-secondary mt-3 btn-lg">Back</button>
-                        </div>
-                    )}
-
-                    {currentMenu === 'side' && (
-                        <div className="row">
-                            <h3 className="text-center">Sides</h3>
-                            <div className="col">
-                                <Side 
-                                    menuItems={menuItems.sides} 
-                                    handleAddToCart={(item) => handleSelectItemForSize(item)}
-                                />
-                            </div>
-                            <button onClick={() => { setCurrentMenu('main'); setWarningMessage(''); setWarningMessage(''); }} className="btn btn-secondary mt-3 btn-lg">Back</button>
-                        </div>
-                    )}
-
-                    {currentMenu === 'drink' && (
-                        <div className="row">
-                            <h3 className="text-center">Drinks</h3>
-                            <div className="col">
-                                <Drink 
-                                    menuItems={menuItems.drinks} 
-                                    handleAddToCart={(item) => handleSelectItemForSize(item)}
-                                />
-                            </div>
-                            <button onClick={() => { setCurrentMenu('main'); setWarningMessage(''); setWarningMessage(''); }} className="btn btn-secondary mt-3 btn-lg">Back</button>
-                        </div>
-                    )}
-
+    
                     {currentMenu === 'sizeSelection' && (
-                        <div className="row justify-content-center">
-                            <div className="col-md-8">
-                                <SizeSelection item={selectedItem} handleAddToCart={handleAddToCart} />
+                        <div className="col-12">
+                            <h3 className="text-center text-primary">Choose Size</h3>
+                            <div className="row justify-content-center">
+                                <div className="col-md-8">
+                                    <SizeSelection
+                                        item={selectedItem}
+                                        handleAddToCart={handleAddToCart}
+                                    />
+                                </div>
                             </div>
-                            <button onClick={() => { setCurrentMenu(selectedItem.category.toLowerCase()); setWarningMessage(''); }} className="btn btn-secondary mt-3 btn-uniform">Back</button>
-                        </div>                        
+                            <div className="text-center mt-4">
+                                <button
+                                    className="btn btn-secondary btn-lg"
+                                    onClick={() => {
+                                        setCurrentMenu(selectedItem.category.toLowerCase());
+                                        setWarningMessage('');
+                                    }}
+                                >
+                                    Back
+                                </button>
+                            </div>
+                        </div>
                     )}
                 </div>
-
-                {/* Cart Component */}
-                <div className="position-relative">
-                    <Cart 
-                        cartItems={cart} 
+    
+                <div className="mt-4">
+                    <Cart
+                        cartItems={cart}
                         inProgressMeal={inProgressMeal}
                         setInProgressMeal={setInProgressMeal}
                         setEntreeCount={setEntreeCount}
                         setSideCount={setSideCount}
                         setCart={setCart}
-                        showQuantityControls={currentMenu === 'main'} 
+                        showQuantityControls={currentMenu === 'main'}
                         handleQuantityChange={(index, quantity) => {
                             const updatedCart = [...cart];
                             updatedCart[index].quantity = quantity || 1;
                             setCart(updatedCart);
-                        }} 
+                        }}
                         handleRemoveItem={(index, type = null, itemIndex = null) => {
                             let updatedCart = [...cart];
                             if (type && type === 'meal') {
                                 const updatedMeal = { ...updatedCart[index] };
-                                updatedMeal.items = updatedMeal.items.filter((_, i) => i !== itemIndex);
+                                updatedMeal.items = updatedMeal.items.filter(
+                                    (_, i) => i !== itemIndex
+                                );
                                 updatedCart[index] = updatedMeal;
                             } else {
                                 updatedCart = updatedCart.filter((_, i) => i !== index);
@@ -357,26 +386,25 @@ const OrderPage = () => {
                         }}
                         currentMenu={currentMenu}
                     />
-
-                    {/* Clear Cart Button */}
-                    <button 
-                        onClick={() => setCart([])} 
-                        className="btn btn-danger"
-                    >
-                        Clear Cart
-                    </button>
-                </div>
-
-                {cart.length > 0 && currentMenu === 'main' && (
                     <div className="text-center mt-4">
-                        <Link href="/employee/cashier/order/confirmation" legacyBehavior>
-                            <a className="btn btn-success btn-lg" onClick={handleNavigateToConfirmation}>Check Out</a>
-                        </Link>
+                        <button className="btn btn-danger btn-lg" onClick={() => setCart([])}>
+                            Clear Cart
+                        </button>
+                        {cart.length > 0 && currentMenu === 'main' && (
+                            <Link href="/employee/cashier/order/confirmation" legacyBehavior>
+                                <a
+                                    className="btn btn-success btn-lg ms-3"
+                                    onClick={handleNavigateToConfirmation}
+                                >
+                                    Check Out
+                                </a>
+                            </Link>
+                        )}
                     </div>
-                )}
+                </div>
             </div>
         </div>
-    );
+    );    
 };
 
 export default OrderPage;

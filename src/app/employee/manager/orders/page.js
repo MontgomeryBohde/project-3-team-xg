@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import './OrderInfo.css';
 import OrderCard from './OrderCard';
 import EmployeeLogInHeader from '@/components/ui/employee/header/EmployeeLogInHeader';
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 const OrderInfo = () => {
     const [orders, setOrders] = useState([]);
@@ -13,7 +12,7 @@ const OrderInfo = () => {
 
     const getOrders = async () => {
         try {
-            const response = await fetch('/api/orders');
+            const response = await fetch('/api/getOrders');
             if (!response.ok) {
                 throw new Error(`Error: ${response.status}`);
             }
@@ -47,38 +46,44 @@ const OrderInfo = () => {
     };
 
     return (
+        <>
+        <EmployeeLogInHeader />
         <div className="order-info-container">
-            <EmployeeLogInHeader />
+            
+      
+     
             <h1 className="title">Order Information</h1>
             <div className="order-cards-container">
-                {currentOrders.map(order => (
-                    <OrderCard key={order.id} order={order} />
-                ))}
+              {currentOrders.map(order => (
+                <OrderCard key={order.id} order={order} />
+              ))}
             </div>
             <div className="page-buttons d-flex justify-content-between">
-                <button 
-                    onClick={prevPage} 
-                    disabled={currentPage === 1} 
-                    className="btn btn-info"
-                >
-                    Previous Page
-                </button>
-                <button 
-                    onClick={nextPage} 
-                    disabled={currentPage === Math.ceil(orders.length/numPerPage)} 
-                    className="btn btn-info"
-                >
-                    Next Page
-                </button>
+              <button 
+                onClick={prevPage} 
+                disabled={currentPage === 1} 
+                className="btn btn-info"
+              >
+                Previous Page
+              </button>
+              <button 
+                onClick={nextPage} 
+                disabled={currentPage === Math.ceil(orders.length/numPerPage)} 
+                className="btn btn-info"
+              >
+                Next Page
+              </button>
             </div>
             <div className="page-info mt-3 text-center">
                 <p className="mb-0 fs-5 fw-bold">
                     Page {currentPage} of {Math.ceil(orders.length / numPerPage)}
                 </p>
             </div>
-
-
+            
         </div>
+
+      
+        </>
     );
 };
 
