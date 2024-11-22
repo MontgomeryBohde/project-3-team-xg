@@ -28,13 +28,13 @@ const XReport = () => {
 
     const fetchReportForHour = async (hour) => {
         try {
-            const response = await fetch(`/api/getXReport?hour=${hour}`);
+            const response = await fetch(`/api/getReports?type=xReport&hour=${hour}`);
             const data = await response.json();
             setHourlyData(data);
         } catch (error) {
             console.error('Error fetching X report data:', error);
         }
-    };
+    };    
 
     useEffect(() => {
         fetchReportForHour(selectedHour);

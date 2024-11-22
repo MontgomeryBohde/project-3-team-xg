@@ -94,20 +94,21 @@ const CartPage = () => {
     }, [cart]); // This effect runs whenever the `cart` state changes.  
 
     const calculateSubtotal = () => {
-        return cart.reduce((total, item) => {
-            let itemPrice;
-    
-            // If it's a mealItem, use the price from the mealItem itself
-            if (item.mealItem) {
-                itemPrice = item.price || item.mealItem.price || 0; // Fallback to mealItem.price if item.price is not set
-            } else {
-                // For regular items, use the fetched prices or special deal prices
-                itemPrice = prices[item.name]?.[item.size] || specialDealPrices[item.name] || 0;
-            }
-    
-            return total + (itemPrice * item.quantity);
-        }, 0);
-    };    
+    return cart.reduce((total, item) => {
+        let itemPrice;
+
+      
+        if (item.mealItem) {
+            itemPrice = item.price || item.mealItem.price || 0; 
+        } else {
+            // For regular items, use the fetched prices or special deal prices
+            itemPrice = prices[item.name]?.[item.size] || specialDealPrices[item.name] || 0;
+        }
+
+        return total + (itemPrice * item.quantity);
+    }, 0);
+};
+
 
     const subtotal = calculateSubtotal();
 
