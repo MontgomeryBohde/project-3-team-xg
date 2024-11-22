@@ -1,5 +1,8 @@
-// pages/api/getMenu.js
-import { query } from '@lib/db';
+import { Pool } from 'pg'; 
+
+const pool = new Pool({
+    connectionString: process.env.POSTGRES_URL,
+});
 
 export default async function handler(req, res) {
     const { type } = req.query;
@@ -16,6 +19,36 @@ export default async function handler(req, res) {
                     result = await query(queryText); // Using `query` from @lib/db
                     break;
                 }
+
+                case 'menu': {
+                    console.log("Fetching menu items");
+                    const queryText = `
+                        SELECT menu_items.item_name AS name, menu_items.category
+                        FROM menu_items;
+                    `;
+                    result = await pool.query(queryText);
+                    break;
+                }
+
+                case 'menu-with-sizes': {
+                    console.log("Fetching menu items with sizes, IDs, and calories");
+                    const queryText = `
+                        SELECT 
+                            menu_items.id AS item_id,
+                            menu_items.item_name AS name, 
+                            item_sizes.item_size AS size, 
+                            menu_items.category, 
+                            menu_items.inventory_item_ids AS inventory_ids, 
+                            item_sizes.price,
+                            item_sizes.calories  -- Add the calories column from item_sizes
+                        FROM menu_items
+                        JOIN item_sizes ON menu_items.id = item_sizes.item_id;
+                    `;
+                    
+                    // Run the query and get the result
+                    result = await pool.query(queryText);
+                    break;
+                }                              
 
                 default:
                     return res.status(400).json({ error: 'Invalid action' });
