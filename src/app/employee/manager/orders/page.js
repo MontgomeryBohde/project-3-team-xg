@@ -47,8 +47,10 @@ const OrderInfo = () => {
     };
 
     return (
+        <>
+        <EmployeeLogInHeader />
         <div className="order-info-container">
-            <EmployeeLogInHeader />
+            
             <h1 className="title">Order Information</h1>
             <div className="order-cards-container">
                 {currentOrders.map(order => (
@@ -79,6 +81,7 @@ const OrderInfo = () => {
 
 
         </div>
+        </>
     );
 };
 
