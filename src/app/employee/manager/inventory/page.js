@@ -1,9 +1,11 @@
 // src/app/employee/manager/inventory/page.js
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import EmployeeLogInHeader from '@/components/ui/employee/header/EmployeeLogInHeader';
 import InventoryPopUp from '@/components/ui/employee/manager/inventory/InventoryPopUp';
+import { FaAppleAlt, FaDrumstickBite, FaCarrot, FaCocktail, FaToolbox, FaUtensils } from 'react-icons/fa';
+import './inventory.css';
 
 const Inventory = () => {
     const [inventoryItems, setInventoryItems] = useState({
@@ -26,20 +28,37 @@ const Inventory = () => {
     const [isAllergen, setIsAllergen] = useState(false);
     const [isVegan, setIsVegan] = useState(false);
 
-    // Fetch inventory items function
+    const categoryRefs = {
+        Appetizer: useRef(null),
+        Meats: useRef(null),
+        Vegetables: useRef(null),
+        Assorted: useRef(null),
+        Drinks: useRef(null),
+        Utensils: useRef(null),
+    };
+
+    const categoryIcons = {
+        Appetizer: <FaAppleAlt />,
+        Meats: <FaDrumstickBite />,
+        Vegetables: <FaCarrot />,
+        Assorted: <FaToolbox />,
+        Drinks: <FaCocktail />,
+        Utensils: <FaUtensils />,
+    };
+
+    // Fetch inventory items
     const fetchInventoryItems = async () => {
         try {
             const response = await fetch('/api/getInventory?type=inventory');
             if (!response.ok) throw new Error('Failed to fetch inventory items');
-    
+
             const data = await response.json();
             const categorizedItems = data.reduce((acc, item) => {
-                if (!acc[item.category]) acc[item.category] = [];
+                acc[item.category] = acc[item.category] || [];
                 acc[item.category].push(item);
                 return acc;
             }, {});
-    
-            // Ensure all categories exist in the state
+
             setInventoryItems((prev) => ({
                 ...prev,
                 ...categorizedItems,
@@ -53,31 +72,36 @@ const Inventory = () => {
         fetchInventoryItems();
     }, []);
 
+    const handleNavigation = (category) => {
+        const ref = categoryRefs[category];
+        if (ref && ref.current) {
+            ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    };
+
     const handlePopup = (item) => {
         if (item) {
-            // Set fields for editing
             setItemId(item.id || null);
             setItemName(item.item_name || '');
             setItemCategory(item.category || 'Appetizer');
             setItemPrice(item.unit_price || 0.50);
             setCurrentStock(item.current_stock || 0);
-            setRestockDate(item.restock_date ? item.restock_date.split('T')[0] : '');
+            setRestockDate(item.restock_date?.split('T')[0] || '');
             setIsAllergen(item.is_allergen || false);
             setIsVegan(item.is_vegan || false);
-            setSelectedItem(item); // Set the actual item for editing
+            setSelectedItem(item);
         } else {
-            // Reset fields for adding a new item
             resetFields();
-            setSelectedItem(true); // Set to true to show the "Add New Item" form
+            setSelectedItem(true);
         }
-    };    
+    };
 
     const addItem = async () => {
         if (!itemName.trim() || !itemCategory || isNaN(itemPrice) || isNaN(currentStock) || !restockDate) {
             alert('All fields are required and must have valid values!');
             return;
         }
-    
+
         try {
             const response = await fetch('/api/getInventory?type=addInventoryItem', {
                 method: 'POST',
@@ -92,7 +116,7 @@ const Inventory = () => {
                     is_vegan: isVegan,
                 }),
             });
-    
+
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Failed to add inventory item');
@@ -102,19 +126,17 @@ const Inventory = () => {
             console.error('Error adding item:', error);
             alert(`Error adding item: ${error.message}`);
         } finally {
-            resetFields(); // Reset fields after adding the item
+            resetFields();
         }
-    };    
+    };
 
     const editItem = async () => {
         if (!itemId || !itemName.trim() || !itemCategory || isNaN(itemPrice) || isNaN(currentStock) || !restockDate) {
             alert('All fields are required and must have valid values!');
             return;
         }
-    
+
         try {
-            console.log('Editing item with ID:', itemId);
-    
             const response = await fetch('/api/getInventory?type=editInventoryItem', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -129,50 +151,41 @@ const Inventory = () => {
                     is_vegan: isVegan,
                 }),
             });
-    
+
             if (response.status === 404) {
-                console.warn(`Item with ID ${itemId} not found for editing.`);
-                alert(`Item not found. Please refresh and try again.`);
+                alert('Item not found. Please refresh and try again.');
                 return;
             }
-    
+
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Failed to edit inventory item');
             }
-    
-            console.log('Edited item successfully.');
-    
-            // Add a small delay before fetching updated inventory to ensure the backend has fully processed the request
+
             await new Promise((resolve) => setTimeout(resolve, 500));
-    
-            // Refetch the updated inventory items from the server
             await fetchInventoryItems();
         } catch (error) {
             console.error('Error editing item:', error);
             alert(`Error editing item: ${error.message}`);
         } finally {
-            resetFields(); // Reset fields after editing the item
+            resetFields();
         }
-    };    
-    
+    };
+
     const removeItem = async () => {
         if (!selectedItem?.id) {
             alert('Item ID is required!');
             return;
         }
-    
+
         try {
             const response = await fetch('/api/getInventory?type=removeInventoryItem', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id: selectedItem.id }),
             });
-    
-            // Check if the response was successful
-            if (response.status === 404) {
-                console.warn(`Item with ID ${selectedItem.id} was not found, which means it has likely already been deleted.`);
-            } else if (!response.ok) {
+
+            if (!response.ok && response.status !== 404) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Failed to remove inventory item');
             }
@@ -181,9 +194,9 @@ const Inventory = () => {
             console.error('Error removing item:', error);
             alert(`Error removing item: ${error.message}`);
         } finally {
-            resetFields(); // Reset fields after deleting an item
+            resetFields();
         }
-    };    
+    };
 
     const resetFields = () => {
         setItemId(null);
@@ -195,52 +208,58 @@ const Inventory = () => {
         setIsAllergen(false);
         setIsVegan(false);
         setSelectedItem(false);
-    };    
+    };
 
     const renderItems = () => inventoryItems[selectedCategory] || [];
 
     return (
         <div>
+            {/* Header */}
             <div className="header-container">
                 <EmployeeLogInHeader />
             </div>
-            <div className="container mt-4">
-                <h1 className="text-center mb-4">Inventory Management</h1>
-                <div className="row">
-                    <div className="col-md-3">
-                        <nav className="list-group">
-                            {Object.keys(inventoryItems).map((category) => (
+    
+            {/* Main Content */}
+            <div className="main-content d-flex">
+                {/* Sidebar */}
+                <div className="sidebar">
+                    <nav className="list-group">
+                        {Object.keys(inventoryItems).map((category) => (
+                            <button
+                                key={category}
+                                className={`list-group-item list-group-item-action d-flex align-items-center ${selectedCategory === category ? "active" : ""}`}
+                                onClick={() => setSelectedCategory(category)}
+                            >
+                                <span className="me-3 fs-4">{categoryIcons[category]}</span>
+                                <span className="fs-5">{category}</span>
+                            </button>
+                        ))}
+                    </nav>
+                </div>
+    
+                {/* Items for Selected Category */}
+                <div className="content-container container">
+                    <h1 className="text-center mb-4">Inventory Management</h1>
+                    <h2 className="text-center mb-4">{selectedCategory}</h2>
+                    <div className="row g-4">
+                        {renderItems().map((item, index) => (
+                            <div key={index} className="col-md-4 col-sm-6">
                                 <button
-                                    key={category}
-                                    className={`list-group-item list-group-item-action ${selectedCategory === category ? "active" : ""}`}
-                                    onClick={() => setSelectedCategory(category)}
+                                    className="btn btn-outline-primary btn-lg w-100"
+                                    onClick={() => item && handlePopup(item)}
                                 >
-                                    {category}
+                                    {item?.item_name || 'Unnamed Item'}
                                 </button>
-                            ))}
-                        </nav>
+                            </div>
+                        ))}
                     </div>
-                    <div className="col-md-9">
-                        <h2 className="text-center">{selectedCategory}</h2>
-                        <div className="row g-3">
-                            {renderItems().map((item, index) => (
-                                <div key={index} className="col-4">
-                                    <button
-                                        className="btn btn-outline-primary w-100"
-                                        onClick={() => item && handlePopup(item)}
-                                    >
-                                        {item?.item_name || 'Unnamed Item'}
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
-                        <button className="btn btn-success w-100 mt-3" onClick={() => handlePopup(null)}>
-                            Add New Item
-                        </button>
-                    </div>
+                    <button className="btn btn-success btn-lg w-100 mt-4" onClick={() => handlePopup(null)}>
+                        Add New {selectedCategory} Item
+                    </button>
                 </div>
             </div>
-
+    
+            {/* Inventory Popup */}
             {selectedItem && (
                 <InventoryPopUp
                     itemId={itemId}
@@ -265,7 +284,7 @@ const Inventory = () => {
                 />
             )}
         </div>
-    );
+    );    
 };
 
 export default Inventory;
