@@ -12,7 +12,7 @@ const Drink = ({ menuItems, handleAddToCart }) => (
                             className="btn btn-outline-primary w-100 btn-lg"
                             onClick={() => handleAddToCart(Drink)}
                         >
-                            {Drink.name}
+                            {Drink.item_name}
                         </button>
                     </div>
                 ))}

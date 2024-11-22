@@ -14,7 +14,7 @@ const CustomerMealSelect = () => {
 	useEffect(() => {
         const fetchMenuItems = async () => {
             try {
-                const response = await fetch("/api/getProducts?action=menu");
+                const response = await fetch("/api/getMenu?type=menu");
                 if (!response.ok) throw new Error("Failed to fetch menu items");
 
                 const data = await response.json();

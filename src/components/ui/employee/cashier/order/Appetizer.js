@@ -11,7 +11,7 @@ const Appetizer = ({ menuItems, handleAddToCart }) => (
                             className="btn btn-outline-primary w-100 py-3 btn-lg"
                             onClick={() => handleAddToCart(appetizer)}
                         >
-                            {appetizer.name}
+                            {appetizer.item_name}
                         </button>
                     </div>
                 ))}

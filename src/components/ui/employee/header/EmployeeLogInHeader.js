@@ -29,6 +29,8 @@ const EmployeeLogInHeader = () => {
     if (storedEmployee) {
       setEmployee(JSON.parse(storedEmployee));
     }
+    // Set loggedIn to true in localStorage if employee data exists
+    localStorage.setItem('loggedIn', 'true');
 
     const updateTime = () => {
       const now = new Date();
@@ -66,12 +68,24 @@ const EmployeeLogInHeader = () => {
     router.back();
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('loggedInEmployee'); // Optional: clear employee data
+    localStorage.setItem('loggedIn', 'false'); // Set loggedIn to false on logout
+    router.push('/employee');
+  };
+
   return (
     <header className="bg-primary text-white p-2 d-flex align-items-center justify-content-between">
       <button className="btn btn-light me-3" onClick={handleBackClick}>
         <i className="bi bi-arrow-left"></i> Back
       </button>
 
+      {/* Logout Button */}
+      <button className="btn btn-light me-3" onClick={handleLogout}>
+        Logout
+      </button>
+
+      {/* Panda Icon and Welcome Message */}
       <div className="d-flex align-items-center">
         <Image src="/panda-icon.png" alt="Panda Icon" width={50} height={50} />
         <h4 className="mb-0 ms-2">Welcome!</h4>

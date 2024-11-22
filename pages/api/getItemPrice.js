@@ -1,24 +1,18 @@
-import { Pool } from 'pg';
-
-const pool = new Pool({
-    host: 'csce-315-db.engr.tamu.edu',
-    user: 'team_xg',
-    password: 'palenumber97',
-    database: 'team_xg_db',
-    port: 5432,
-});
+// pages/api/getItemPrice.js
+import { query } from "@lib/db";
 
 export default async function handler(req, res) {
     if (req.method === 'POST') {
         const { menuItemId, itemSizeId } = req.body;
+
         try {
-            const query = `
+            const sqlQuery = `
                 SELECT ROUND(price, 2) AS price
                 FROM item_sizes
                 WHERE id = $1 AND menu_item_id = $2;
             `;
             const values = [itemSizeId, menuItemId];
-            const { rows } = await pool.query(query, values);
+            const { rows } = await query(sqlQuery, values); // Use the query function from @lib/db
 
             if (rows.length > 0) {
                 res.status(200).json({ price: rows[0].price });
@@ -26,6 +20,7 @@ export default async function handler(req, res) {
                 res.status(404).json({ message: 'Price not found' });
             }
         } catch (error) {
+            console.error("Error fetching price:", error);
             res.status(500).json({ error: 'Error fetching price' });
         }
     } else {
