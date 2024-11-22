@@ -80,7 +80,7 @@ const OrderInfo = () => {
                 </p>
             </div>
             
-            </div>
+        </div>
 
       
         </>
