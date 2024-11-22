@@ -46,11 +46,12 @@ const OrderInfo = () => {
     };
 
     return (
-        <div>
-          
-          <EmployeeLogInHeader />
+        <>
+        <EmployeeLogInHeader />
+        <div className="order-info-container">
+            
       
-          <div className="order-info-container">
+     
             <h1 className="title">Order Information</h1>
             <div className="order-cards-container">
               {currentOrders.map(order => (
@@ -74,15 +75,16 @@ const OrderInfo = () => {
               </button>
             </div>
             <div className="page-info mt-3 text-center">
-              <p className="mb-0 fs-5 fw-bold">
-                Page {currentPage} of {Math.ceil(orders.length / numPerPage)}
-              </p>
+                <p className="mb-0 fs-5 fw-bold">
+                    Page {currentPage} of {Math.ceil(orders.length / numPerPage)}
+                </p>
             </div>
-          </div>
-     
+            
         </div>
-      );
+
       
+        </>
+    );
 };
 
 export default OrderInfo;
