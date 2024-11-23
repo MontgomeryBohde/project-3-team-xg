@@ -18,7 +18,7 @@ const OrderCard = ({ order, onDelete }) => {
 
     return (
         <>
-            {/* Main Order Card */}
+            {/* order card */}
             <div className="card mb-3" style={{ backgroundColor: '#ADD8E4' }} onClick={handleOpenPopup}>
                 <div className="card-body">
                     <div className="d-flex justify-content-between align-items-center">
@@ -69,7 +69,7 @@ const OrderCard = ({ order, onDelete }) => {
                     </div>
                 </div>
 
-                {/* Delete Button at the Bottom */}
+                {/* delete button */}
                 <div className="card-footer text-center">
                     <button onClick={handleDelete} className="btn btn-danger">
                         Delete Order
@@ -77,7 +77,7 @@ const OrderCard = ({ order, onDelete }) => {
                 </div>
             </div>
 
-            {/* Details Popup */}
+            {/* popup */}
             <Modal show={showPopup} onHide={handleClosePopup}>
                 <Modal.Header closeButton>
                     <Modal.Title>Order Details</Modal.Title>
@@ -87,7 +87,7 @@ const OrderCard = ({ order, onDelete }) => {
                     <p><strong>Discounts:</strong> {order.discounts || 0}</p>
                     <p><strong>Date/Time:</strong> {new Date(order.time).toLocaleString()}</p>
 
-                    {/* Show Payment Method in Popup */}
+                   
                     <p><strong>Payment Method:</strong> {order.payment_method || 'N/A'}</p>
                 </Modal.Body>
                 <Modal.Footer>

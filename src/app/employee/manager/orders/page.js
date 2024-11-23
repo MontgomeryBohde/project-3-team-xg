@@ -27,27 +27,25 @@ const OrderInfo = () => {
         getOrders();
     }, []);
 
-    // Delete order function
+   
     const deleteOrder = async (orderId) => {
         try {
-            // Send DELETE request to your API to delete the order
             const response = await fetch(`/api/deleteOrder?id=${orderId}`, {
                 method: 'DELETE',
             });
 
             if (response.ok) {
-                // Remove the order from the local state to update the UI
                 setOrders(orders.filter(order => order.id !== orderId));
             } else {
                 const data = await response.json();
-                console.error(data.message);  // Handle errors from the backend
+                console.error(data.message);  
             }
         } catch (error) {
             console.error("Error deleting order:", error);
         }
     };
 
-    // Filter orders by ID based on search query
+    //seraching by id
     const filteredOrders = orders.filter(order =>
         order.id.toString().includes(searchQuery)
     );
@@ -70,7 +68,7 @@ const OrderInfo = () => {
 
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
-        setCurrentPage(1);  // Reset to first page when searching
+        setCurrentPage(1);  
     };
 
     return (
@@ -79,7 +77,7 @@ const OrderInfo = () => {
             <div className="order-info-container">
                 <h1 className="title">Order Information</h1>
                 
-                {/* Search Box */}
+                {/* search */}
                 <div className="search-container">
                     <input
                         type="text"
@@ -96,7 +94,7 @@ const OrderInfo = () => {
                             <OrderCard
                                 key={order.id}
                                 order={order}
-                                onDelete={deleteOrder}  // Pass the deleteOrder function here
+                                onDelete={deleteOrder}  
                             />
                         ))
                     ) : (
@@ -104,7 +102,7 @@ const OrderInfo = () => {
                     )}
                 </div>
 
-                {/* Pagination Controls */}
+                {/* page buttons */}
                 <div className="page-buttons d-flex justify-content-between">
                     <button
                         onClick={prevPage}
@@ -122,7 +120,7 @@ const OrderInfo = () => {
                     </button>
                 </div>
 
-                {/* Page Info */}
+              
                 <div className="page-info mt-3 text-center">
                     <p className="mb-0 fs-5 fw-bold">
                         Page {currentPage} of {Math.ceil(filteredOrders.length / numPerPage)}
