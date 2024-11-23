@@ -69,7 +69,7 @@ const OrderCard = ({ order, onDelete }) => {
                     </div>
                 </div>
 
-                {/*DELETE BUTTON*/}
+                {/* Delete Button at the Bottom */}
                 <div className="card-footer text-center">
                     <button onClick={handleDelete} className="btn btn-danger">
                         Delete Order
@@ -87,7 +87,7 @@ const OrderCard = ({ order, onDelete }) => {
                     <p><strong>Discounts:</strong> {order.discounts || 0}</p>
                     <p><strong>Date/Time:</strong> {new Date(order.time).toLocaleString()}</p>
 
-                    
+                    {/* Show Payment Method in Popup */}
                     <p><strong>Payment Method:</strong> {order.payment_method || 'N/A'}</p>
                 </Modal.Body>
                 <Modal.Footer>

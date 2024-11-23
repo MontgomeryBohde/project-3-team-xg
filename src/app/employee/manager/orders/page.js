@@ -7,7 +7,7 @@ import EmployeeLogInHeader from '@/components/ui/employee/header/EmployeeLogInHe
 const OrderInfo = () => {
     const [orders, setOrders] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [searchQuery, setSearchQuery] = useState('');  
+    const [searchQuery, setSearchQuery] = useState('');
     const numPerPage = 3;
 
     const getOrders = async () => {
@@ -27,7 +27,27 @@ const OrderInfo = () => {
         getOrders();
     }, []);
 
-    //sahow the order based on the entered ID
+    // Delete order function
+    const deleteOrder = async (orderId) => {
+        try {
+            // Send DELETE request to your API to delete the order
+            const response = await fetch(`/api/deleteOrder?id=${orderId}`, {
+                method: 'DELETE',
+            });
+
+            if (response.ok) {
+                // Remove the order from the local state to update the UI
+                setOrders(orders.filter(order => order.id !== orderId));
+            } else {
+                const data = await response.json();
+                console.error(data.message);  // Handle errors from the backend
+            }
+        } catch (error) {
+            console.error("Error deleting order:", error);
+        }
+    };
+
+    // Filter orders by ID based on search query
     const filteredOrders = orders.filter(order =>
         order.id.toString().includes(searchQuery)
     );
@@ -50,7 +70,7 @@ const OrderInfo = () => {
 
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
-        setCurrentPage(1);
+        setCurrentPage(1);  // Reset to first page when searching
     };
 
     return (
@@ -59,7 +79,7 @@ const OrderInfo = () => {
             <div className="order-info-container">
                 <h1 className="title">Order Information</h1>
                 
-                
+                {/* Search Box */}
                 <div className="search-container">
                     <input
                         type="text"
@@ -76,7 +96,7 @@ const OrderInfo = () => {
                             <OrderCard
                                 key={order.id}
                                 order={order}
-                                onDelete={(id) => deleteOrder(id)}  //delete
+                                onDelete={deleteOrder}  // Pass the deleteOrder function here
                             />
                         ))
                     ) : (
@@ -84,7 +104,7 @@ const OrderInfo = () => {
                     )}
                 </div>
 
-                {/*paage buttons*/}
+                {/* Pagination Controls */}
                 <div className="page-buttons d-flex justify-content-between">
                     <button
                         onClick={prevPage}
@@ -102,6 +122,7 @@ const OrderInfo = () => {
                     </button>
                 </div>
 
+                {/* Page Info */}
                 <div className="page-info mt-3 text-center">
                     <p className="mb-0 fs-5 fw-bold">
                         Page {currentPage} of {Math.ceil(filteredOrders.length / numPerPage)}
