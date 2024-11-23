@@ -47,7 +47,7 @@ const OrderInfo = () => {
 
     //seraching by id
     const filteredOrders = orders.filter(order =>
-        order.id.toString().includes(searchQuery)
+      order.id.toString() === searchQuery
     );
 
     const indexOfLastOrder = currentPage * numPerPage;
