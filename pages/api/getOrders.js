@@ -53,7 +53,7 @@ LEFT JOIN meal_items AS m ON m.id = ANY(o.meal_item_ids)  -- Join meal_items on 
 LEFT JOIN menu_items AS side ON side.id = m.side_id  -- Join menu_items as side for side_id
 LEFT JOIN menu_items AS entree ON entree.id = ANY(m.entree_ids)  -- Join menu_items as entree for entree_ids
 ORDER BY o.placed_time DESC
-LIMIT 100;
+;
 
 `
 
