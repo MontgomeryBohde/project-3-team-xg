@@ -3,17 +3,17 @@ import { useState } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 
 const OrderCard = ({ order, onDelete }) => {
-    console.log(order); // Add this to see what the order object looks like
+    console.log(order);
     const [showPopup, setShowPopup] = useState(false);
     const totalAmount = typeof order.total === 'number' && !isNaN(order.total) ? order.total : 0;
 
     const handleOpenPopup = () => setShowPopup(true);
     const handleClosePopup = () => setShowPopup(false);
     const handleDelete = (event) => {
-        // Calling the onDelete prop passed from parent (OrderInfo)
-        event.stopPropagation(); // Prevent the card from opening when deleting
+       
+        event.stopPropagation(); //dont open the popup if just clicking delete 
         setShowPopup(false);
-        onDelete(order.id);  // Now it will work since onDelete is passed correctly
+        onDelete(order.id); 
     };
 
     return (
@@ -69,7 +69,7 @@ const OrderCard = ({ order, onDelete }) => {
                     </div>
                 </div>
 
-                {/* Delete Button at the Bottom */}
+                {/*DELETE BUTTON*/}
                 <div className="card-footer text-center">
                     <button onClick={handleDelete} className="btn btn-danger">
                         Delete Order
@@ -87,7 +87,7 @@ const OrderCard = ({ order, onDelete }) => {
                     <p><strong>Discounts:</strong> {order.discounts || 0}</p>
                     <p><strong>Date/Time:</strong> {new Date(order.time).toLocaleString()}</p>
 
-                    {/* Show Payment Method in Popup */}
+                    
                     <p><strong>Payment Method:</strong> {order.payment_method || 'N/A'}</p>
                 </Modal.Body>
                 <Modal.Footer>
