@@ -2,14 +2,19 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useState } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 
-
-const OrderCard = ({ order }) => {
+const OrderCard = ({ order, onDelete }) => {
     console.log(order); // Add this to see what the order object looks like
     const [showPopup, setShowPopup] = useState(false);
     const totalAmount = typeof order.total === 'number' && !isNaN(order.total) ? order.total : 0;
 
     const handleOpenPopup = () => setShowPopup(true);
     const handleClosePopup = () => setShowPopup(false);
+    const handleDelete = (event) => {
+        // Calling the onDelete prop passed from parent (OrderInfo)
+        event.stopPropagation(); // Prevent the card from opening when deleting
+        setShowPopup(false);
+        onDelete(order.id);  // Now it will work since onDelete is passed correctly
+    };
 
     return (
         <>
@@ -24,59 +29,60 @@ const OrderCard = ({ order }) => {
 
                         {/* MID */}
                         <div className="text-center">
-                        <div className="fs-4 fw-bold">Meal Type:</div>
-                        <div className="fs-4">
-                            {order.meal_type.length > 0 ? order.meal_type.join(', ') : 'N/A'}
-                        </div>
-
-                        {order.side && order.side.length > 0 && (
-                            <div className="mt-3">
-                                <div className="fs-4 fw-bold mt-2">Side(s):</div>
-                                <div className="fs-5">{order.side.join(', ')}</div>
+                            <div className="fs-4 fw-bold">Meal Type:</div>
+                            <div className="fs-4">
+                                {order.meal_type.length > 0 ? order.meal_type.join(', ') : 'N/A'}
                             </div>
-                        )}
 
-                        <div className="mt-3">
-                            <div className="fs-4 fw-bold mt-2">Entrees, Appetizers, and Drinks:</div>
-                            {Array.isArray(order.entree_names) && order.entree_names.length > 0 ? (
-                                order.entree_names.map((entree, index) => (
-                                    <div key={index} className="fs-5">{entree}</div>
-                                ))
-                            ) : (
-                                <div className="fs-5">N/A</div>
+                            {order.side && order.side.length > 0 && (
+                                <div className="mt-3">
+                                    <div className="fs-4 fw-bold mt-2">Side(s):</div>
+                                    <div className="fs-5">{order.side.join(', ')}</div>
+                                </div>
                             )}
 
-                        
-                            {Array.isArray(order.food_names) && order.food_names.length > 0 ? (
-                                order.food_names.map((food, index) => (
-                                    <div key={index} className="fs-5">{food}</div>
-                                ))
-                            ) : (
-                                <div className="fs-5">None</div>
-                            )}
-                        </div>
+                            <div className="mt-3">
+                                <div className="fs-4 fw-bold mt-2">Entrees, Appetizers, and Drinks:</div>
+                                {Array.isArray(order.entree_names) && order.entree_names.length > 0 ? (
+                                    order.entree_names.map((entree, index) => (
+                                        <div key={index} className="fs-5">{entree}</div>
+                                    ))
+                                ) : (
+                                    <div className="fs-5">N/A</div>
+                                )}
+
+                                {Array.isArray(order.food_names) && order.food_names.length > 0 ? (
+                                    order.food_names.map((food, index) => (
+                                        <div key={index} className="fs-5">{food}</div>
+                                    ))
+                                ) : (
+                                    <div className="fs-5">None</div>
+                                )}
+                            </div>
                         </div>
 
                         {/* RIGHT */}
                         <div className="text-right">
                             <strong className="fs-5">Total:</strong> 
                             <span className="fs-5">${parseFloat(order.total).toFixed(2)}</span>
-                            
-
                         </div>
                     </div>
                 </div>
+
+                {/* Delete Button at the Bottom */}
+                <div className="card-footer text-center">
+                    <button onClick={handleDelete} className="btn btn-danger">
+                        Delete Order
+                    </button>
+                </div>
             </div>
 
-            {/*Details Popup*/}
+            {/* Details Popup */}
             <Modal show={showPopup} onHide={handleClosePopup}>
                 <Modal.Header closeButton>
                     <Modal.Title>Order Details</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                   
-                    
-                
                     <p><strong>Total:</strong> ${parseFloat(order.total).toFixed(2)}</p>
                     <p><strong>Discounts:</strong> {order.discounts || 0}</p>
                     <p><strong>Date/Time:</strong> {new Date(order.time).toLocaleString()}</p>
