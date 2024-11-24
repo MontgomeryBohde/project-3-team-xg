@@ -13,14 +13,15 @@ export default async function handler(req, res) {
           const today = new Date().toISOString().split('T')[0];
           result = await query(
             `
-            SELECT EXTRACT(HOUR FROM order_time) AS order_hour,
-                   SUM(order_total) AS total_sales,
-                   COUNT(*) AS transaction_count,
-                   SUM(CASE WHEN payment_method = 'cash' THEN order_total ELSE 0 END) AS cash_collected,
-                   SUM(CASE WHEN payment_method = 'credit card' THEN order_total ELSE 0 END) AS credit_card_payments
+            SELECT 
+                EXTRACT(HOUR FROM placed_time) AS order_hour, 
+                SUM(order_total) AS total_sales,
+                COUNT(*) AS transaction_count,
+                SUM(CASE WHEN payment_method = 'cash' THEN order_total ELSE 0 END) AS cash_collected,
+                SUM(CASE WHEN payment_method = 'credit card' THEN order_total ELSE 0 END) AS credit_card_payments
             FROM orders
-            WHERE DATE(order_time) = $1
-              AND EXTRACT(HOUR FROM order_time) BETWEEN 9 AND 21
+            WHERE DATE(placed_time) = $1
+              AND EXTRACT(HOUR FROM placed_time) BETWEEN 9 AND 21
             GROUP BY order_hour
             ORDER BY order_hour;
             `,
@@ -50,27 +51,27 @@ export default async function handler(req, res) {
 
         case 'allSales': {
           const dateFilter = period
-              ? `WHERE order_time >= NOW() - INTERVAL '${parseInt(period)} days'`
-              : '';
+            ? `WHERE placed_time >= NOW() - INTERVAL '${parseInt(period)} days'`
+            : '';
           const salesData = await query(`
-              SELECT DATE(order_time) AS order_date, SUM(order_total) AS daily_total
+              SELECT DATE(placed_time) AS order_date, SUM(order_total) AS daily_total
               FROM orders
               ${dateFilter}
-              GROUP BY DATE(order_time)
+              GROUP BY DATE(placed_time)
               ORDER BY order_date;
           `);
           res.status(200).json(salesData);
           break;
-      }
-
-      case 'popularity': {
-        if (!n || isNaN(parseInt(n, 10))) {
-            return res.status(400).json({ error: 'Invalid or missing "n" parameter' });
         }
-    
-        try {
+
+        case 'popularity': {
+          if (!n || isNaN(parseInt(n, 10))) {
+            return res.status(400).json({ error: 'Invalid or missing "n" parameter' });
+          }
+
+          try {
             const result = await query(
-                `
+              `
                 WITH combined_items AS (
                     SELECT menu_item_id AS item_id, 'menu_item' AS item_type
                     FROM orders o CROSS JOIN UNNEST(o.menu_item_ids) AS menu_item_id
@@ -93,16 +94,16 @@ export default async function handler(req, res) {
                 ORDER BY times_ordered DESC
                 LIMIT $1;
                 `,
-                [parseInt(n, 10)]
+              [parseInt(n, 10)]
             );
-    
+
             res.status(200).json(result);
-        } catch (error) {
+          } catch (error) {
             console.error('Error fetching popularity data:', error);
             res.status(500).json({ error: 'Failed to fetch popularity data' });
+          }
+          break;
         }
-        break;
-    }    
 
         default:
           return res.status(400).json({ error: 'Invalid report type' });
