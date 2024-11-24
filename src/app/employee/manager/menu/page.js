@@ -13,18 +13,18 @@ const Menu = () => {
 
 const fetchInventoryItems = async () => {
     try {
-        const response = await fetch("/api/inventory-items"); // Endpoint to get inventory items
+        const response = await fetch("/api/inventory-items");
         if (!response.ok) throw new Error("Failed to fetch inventory items");
 
         const data = await response.json();
-        setInventoryItems(data); // Assume the response returns an array of inventory items
+        setInventoryItems(data); 
     } catch (err) {
         console.error("Error fetching inventory items:", err);
     }
 };
 
 useEffect(() => {
-    fetchInventoryItems(); // Call it when the component mounts
+    fetchInventoryItems(); 
 }, []);
 
     const fetchMenuItems = async () => {
@@ -76,9 +76,9 @@ useEffect(() => {
     const [itemSize, setItemSize] = useState('Medium');
     const [itemCategory, setItemCategory] = useState('Entree');
    // const [inventoryItems, setInventoryItems] = useState([]);  // This will hold the inventory items
-const [inventoryIds, setInventoryIds] = useState(""); // This keeps it as a comma-separated string for display
+    const [inventoryIds, setInventoryIds] = useState(""); 
     const [itemPrice, setItemPrice] = useState(0.00);
-    const [itemCalories, setItemCalories] = useState(0);  // default to current calories if selected item exists
+    const [itemCalories, setItemCalories] = useState(0); 
     
     const handlePopup = (item, category) => {
         if (!item) {
@@ -90,12 +90,12 @@ const [inventoryIds, setInventoryIds] = useState(""); // This keeps it as a comm
             setItemPrice(0.00);
             setItemCalories(0);
 
-            setSelectedItem('Item Name'); // Set to default if no item is selected
+            setSelectedItem('Item Name'); 
         } else {
             setItemName(item.name);
             setItemCategory(category);
             setSelectedItem(item);
-            setInventoryIds(item.inventory_names ? item.inventory_names.join(', ') : ''); // Use inventory_names
+            setInventoryIds(item.inventory_names ? item.inventory_names.join(', ') : ''); 
             setItemSize(item.sizes[0]?.size || 'Medium');
             setItemPrice(item.sizes[0]?.price || 0.00);
             setItemCalories(item.sizes[0]?.calories || 0);
@@ -106,12 +106,12 @@ const [inventoryIds, setInventoryIds] = useState(""); // This keeps it as a comm
 
     const handleSizeChange = (selectedSize) => {
         console.log("chanfing");
-        setItemSize(selectedSize); // Update the selected size
+        setItemSize(selectedSize); 
         const selectedSizeDetails = selectedItem.sizes.find(size => size.item_size === selectedSize);
     
         if (selectedSizeDetails) {
-            setItemPrice(selectedSizeDetails.price); // Update price based on selected size
-            setItemCalories(selectedSizeDetails.calories); // Update calories based on selected size
+            setItemPrice(selectedSizeDetails.price); 
+            setItemCalories(selectedSizeDetails.calories); 
         }
     };  
     
@@ -133,26 +133,25 @@ const [inventoryIds, setInventoryIds] = useState(""); // This keeps it as a comm
         setItemCalories(0);
     };
 
-    const [availableInventoryItems, setAvailableInventoryItems] = useState([]); // State to store available inventory items
-   // const [inventoryIds, setInventoryIds] = useState(""); // State for the selected items as a comma-separated string
+    const [availableInventoryItems, setAvailableInventoryItems] = useState([]);
+   
 
-    // Function to fetch inventory items from your API or backend
+    
     const fetchAvailableInventoryItems = async () => {
         try {
-            const response = await fetch("/api/inventory-items"); // Endpoint to get inventory items
+            const response = await fetch("/api/inventory-items");
             if (!response.ok) throw new Error("Failed to fetch inventory items");
     
             const data = await response.json();
-            setAvailableInventoryItems(data); // Assume the response returns an array of inventory items
+            setAvailableInventoryItems(data); 
         } catch (err) {
             console.error("Error fetching inventory items:", err);
         }
     };
 
     
-    
 
-    // UseEffect to fetch data when the component mounts
+    
     useEffect(() => {
         fetchAvailableInventoryItems();
     }, []);
@@ -162,8 +161,7 @@ const [inventoryIds, setInventoryIds] = useState(""); // This keeps it as a comm
         const itemData = {
             item_name: itemName,
             category: itemCategory,
-            inventory_item_names: inventoryIds.split(',').map(name => name.trim()), // Send names instead of IDs
-            descr: "",
+            inventory_item_names: inventoryIds.split(',').map(name => name.trim()), 
             available: true,
             is_seasonal: itemCategory === "Seasonal",
             image_url: "",
@@ -201,10 +199,10 @@ const [inventoryIds, setInventoryIds] = useState(""); // This keeps it as a comm
     const removeItem = async () => {
         if (!selectedItem || !selectedItem.item_id) {
             console.error("No item selected for removal.");
-            return; // Ensure you don't try to remove an item if none is selected.
+            return; 
         }
     
-        const itemData = { id: selectedItem.item_id };  // Make sure you are sending the item_id for removal
+        const itemData = { id: selectedItem.item_id };  
         
         try {
             const response = await fetch("/api/manageMenuItems", {
@@ -212,13 +210,13 @@ const [inventoryIds, setInventoryIds] = useState(""); // This keeps it as a comm
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(itemData),  // Send the item ID to the backend
+                body: JSON.stringify(itemData), 
             });
     
             if (response.ok) {
                 console.log("Item removed successfully");
-                fetchMenuItems();  // Refresh the menu after removal
-                resetFields();  // Reset form fields
+                fetchMenuItems(); 
+                resetFields(); 
             } else {
                 console.error("Failed to remove item:", response.status, response.statusText);
             }
@@ -226,13 +224,13 @@ const [inventoryIds, setInventoryIds] = useState(""); // This keeps it as a comm
             console.error("Error removing menu item:", error);
         }
     };
-    // Function to handle item addition to the inventory list
+  
     const handleAddInventoryItem = async (selectedInventoryItemName) => {
         try {
-            // Step 1: Fetch the inventory item ID by name
+           
             console.log("Selected ITEM :", selectedItem);
             console.log("Selected Inventory Item Name:", selectedInventoryItemName);
-        console.log("Selected Menu Item ID:", selectedItem.item_id);  // Check if this ID is correct
+        console.log("Selected Menu Item ID:", selectedItem.item_id);  
 
             const inventoryResponse = await fetch(`/api/getInventoryId?name=${encodeURIComponent(selectedInventoryItemName)}`);
             const inventoryData = await inventoryResponse.json();
@@ -242,25 +240,25 @@ const [inventoryIds, setInventoryIds] = useState(""); // This keeps it as a comm
                 return;
             }
     
-            const inventoryItemId = inventoryData.id;  // Extract the ID
+            const inventoryItemId = inventoryData.id; 
     
-            // Step 2: Use the ID to update the menu item (with 'add' action)
+          
             const response = await fetch('/api/updateInventory', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    menuItemId: selectedItem.item_id,        // Ensure selectedItem holds the correct menu item ID
-                    inventoryItemId: inventoryItemId,   // Use the fetched ID
-                    action: 'add',                      // Explicitly specify 'add' action
+                    menuItemId: selectedItem.item_id,
+                    inventoryItemId: inventoryItemId,   
+                    action: 'add',                    
                 }),
             });
             
             if (response.ok) {
                 const updatedItem = await response.json();
                 setInventoryIds(updatedItem.inventory_item_ids.join(", "));
-                setInventoryIds(selectedItem.inventory_names ? selectedItem.inventory_names.join(', ') : ''); // Use inventory_names
+                setInventoryIds(selectedItem.inventory_names ? selectedItem.inventory_names.join(', ') : ''); 
     
                 console.log("Inventory updated successfully:", updatedItem);
             } else {
@@ -285,9 +283,9 @@ const [inventoryIds, setInventoryIds] = useState(""); // This keeps it as a comm
                 return;
             }
 
-            const inventoryItemId = inventoryData.id;  // Extract the ID
+            const inventoryItemId = inventoryData.id;  
 
-            // Step 2: Use the ID to update the menu item (with 'remove' action)
+           
             const response = await fetch('/api/updateInventory', {
                 method: 'POST',
                 headers: {
@@ -296,7 +294,7 @@ const [inventoryIds, setInventoryIds] = useState(""); // This keeps it as a comm
                 body: JSON.stringify({
                     menuItemId: selectedItem.item_id,
                     inventoryItemId: inventoryItemId,
-                    action: 'remove', // Specify 'remove' action
+                    action: 'remove',
                 }),
             });
 
@@ -423,31 +421,31 @@ const [inventoryIds, setInventoryIds] = useState(""); // This keeps it as a comm
         />
 
         {/* Dropdown for adding new inventory items */}
-<div className="mt-2">
-    <select
-        className="form-select"
-        onChange={(e) => {
-            const selectedItem = e.target.value;
-            // Call the function only if a valid item is selected (not empty string)
-            if (selectedItem) {
-                handleAddInventoryItem(selectedItem);
-            }
-        }}
-    >
+        <div className="mt-2">
+            <select
+                className="form-select"
+                onChange={(e) => {
+                    const selectedItem = e.target.value;
+                    // Call the function only if a valid item is selected (not empty string)
+                    if (selectedItem) {
+                        handleAddInventoryItem(selectedItem);
+                    }
+                }}
+            >
         <option value="">Select an item to add</option>
         {availableInventoryItems.map((item, idx) => {
-            // Log the inventoryIds value and the item being checked
+            
             console.log("Checking item:", item.item_name);
             console.log("inventoryIds:", inventoryIds);
 
-            // Filter logic - comparing current inventory with available items
+           
             const isItemSelected = inventoryIds
                 .split(',')
                 .map((id) => id.trim().toLowerCase())
                 .includes(item.item_name.toLowerCase());
             console.log("Is item selected?", isItemSelected);
 
-            // Render item if not already selected
+           
             return !isItemSelected && (
                 <option key={idx} value={item.item_name}>
                     {item.item_name}
@@ -455,19 +453,19 @@ const [inventoryIds, setInventoryIds] = useState(""); // This keeps it as a comm
             );
         })}
     </select>
-</div>
-                            </div>
-                             {/* Dropdown for removing inventory items */}
-            <div className="mt-2">
-                <select
-                    className="form-select"
-                    onChange={(e) => {
-                        const selectedItem = e.target.value;
-                        if (selectedItem) {
-                            handleRemoveInventoryItem(selectedItem);
-                        }
-                    }}
-                >
+            </div>
+                </div>
+                    {/*Remove inventory items*/}
+                        <div className="mt-2">
+                            <select
+                                className="form-select"
+                                onChange={(e) => {
+                                    const selectedItem = e.target.value;
+                                    if (selectedItem) {
+                                        handleRemoveInventoryItem(selectedItem);
+                                    }
+                                }}
+                            >
                     <option value="">Select an item to remove</option>
                     {inventoryIds.length > 0 && inventoryIds.split(',').map((inventoryItemName, idx) => (
                         <option key={idx} value={inventoryItemName.trim()}>
@@ -629,7 +627,7 @@ const [inventoryIds, setInventoryIds] = useState(""); // This keeps it as a comm
                 </div>
             </div>
 
-            {/* Render the popup modal dynamically */}
+            
             {renderPopup()}
         </div>
     );
