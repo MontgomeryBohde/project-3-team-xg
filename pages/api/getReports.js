@@ -69,56 +69,47 @@ export default async function handler(req, res) {
 					if (!n || isNaN(parseInt(n, 10))) {
 						return res.status(400).json({ error: 'Invalid or missing "n" parameter' });
 					}
-
+				
 					try {
 						const result = await query(
 							`
-								WITH combined_items AS (
-									SELECT 
-										UNNEST(o.item_size_ids) AS item_id, 
-										'menu_item' AS item_type
-									FROM orders o
-
-									UNION ALL
-
-									SELECT 
-										UNNEST(mi.entree_ids) AS item_id, 
-										'entree_item' AS item_type
-									FROM orders o
-									JOIN meal_items mi ON mi.id = ANY(o.meal_item_ids)
-
-									UNION ALL
-
-									SELECT 
-										mi.side_id AS item_id, 
-										'side_item' AS item_type
-									FROM orders o
-									JOIN meal_items mi ON mi.id = ANY(o.meal_item_ids)
-								)
-
-								SELECT 
-									COALESCE(m.item_name, ei.item_name, si.item_name, mi.meal_type) AS food_name,
-									
-									CASE 
-										WHEN ci.item_type = 'entree_item' THEN 'Entree'
-										WHEN ci.item_type = 'side_item' THEN 'Side'
-										ELSE COALESCE(m.category, 'Meal')
-									END AS menu_category,
-
-									COUNT(*) AS times_ordered
-								FROM combined_items ci
-								LEFT JOIN menu_items m ON m.id = ci.item_id
-								LEFT JOIN meal_items mi ON mi.id = ci.item_id
-								LEFT JOIN item_sizes s ON s.id = ci.item_id
-								LEFT JOIN menu_items ei ON ei.id = ANY(mi.entree_ids)  -- Entree items
-								LEFT JOIN menu_items si ON si.id = mi.side_id        -- Side items
-								GROUP BY food_name, menu_category
-								ORDER BY times_ordered DESC
-								LIMIT $1;
-                			`,
+							WITH combined_items AS (
+								-- Get item sizes from orders (only considering the menu_item_ids)
+								SELECT unnest(o.item_size_ids) AS item_id, 'menu_item' AS item_type
+								FROM orders o
+				
+								UNION ALL
+				
+								-- Get entree items from meal_items in orders (considered the same as menu items)
+								SELECT unnest(mi.entree_ids) AS item_id, 'entree_item' AS item_type
+								FROM orders o
+								JOIN meal_items mi ON mi.id = ANY(o.meal_item_ids)
+				
+								UNION ALL
+				
+								-- Get side items from meal_items in orders (considered the same as menu items)
+								SELECT mi.side_id AS item_id, 'side_item' AS item_type
+								FROM orders o
+								JOIN meal_items mi ON mi.id = ANY(o.meal_item_ids)
+							)
+				
+							SELECT 
+								COALESCE(m.item_name, ei.item_name, si.item_name) AS food_name, 
+								COALESCE(m.category, ei.category, si.category) AS menu_category,  -- Add menu_category
+								COUNT(*) AS times_ordered
+							FROM combined_items ci
+							LEFT JOIN item_sizes isz ON isz.id = ci.item_id
+							LEFT JOIN menu_items m ON m.id = isz.item_id
+							LEFT JOIN meal_items mi ON mi.id = ci.item_id
+							LEFT JOIN menu_items ei ON ei.id = ANY(mi.entree_ids)
+							LEFT JOIN menu_items si ON si.id = mi.side_id
+							GROUP BY food_name, menu_category  -- Group by both food_name and menu_category
+							ORDER BY times_ordered DESC
+							LIMIT $1;
+							`,
 							[parseInt(n, 10)]
 						);
-
+				
 						res.status(200).json(result);
 					} catch (error) {
 						console.error('Error fetching popularity data:', error);
