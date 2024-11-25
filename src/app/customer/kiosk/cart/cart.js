@@ -346,8 +346,11 @@ const CartPage = () => {
             const data = await response.json();
     
             if (response.ok) {
-                // Navigate to the confirmation page with the order ID
-                router.push(`/customer/kiosk/confirmation?orderId=${data.orderId}`);
+                // Save the orderId to localStorage
+                localStorage.setItem('orderId', data.orderId);
+
+                // Navigate to the confirmation page
+                router.push('/customer/kiosk/confirmation');
             } else {
                 alert(`Failed to create order: ${data.error}`);
             }

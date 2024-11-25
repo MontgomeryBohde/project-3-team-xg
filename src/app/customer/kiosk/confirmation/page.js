@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Head from 'next/head';
 import CustomerHeader from "@/components/ui/customer/header/CustomerHeader";
 import 'bootstrap/dist/css/bootstrap.css';
@@ -14,15 +14,17 @@ const CashConfirmation = () => {
 	const [paymentMethod, setPaymentMethod] = useState("Cash");
 	const [orderId, setOrderId] = useState(null); // State to store orderId
 	const router = useRouter();
-	const searchParams = useSearchParams(); // Get access to query params
 
-	// Fetch orderId from the query parameters
+	// Retrieve orderId and paymentMethod from localStorage
 	useEffect(() => {
-		const id = searchParams.get("orderId");
-		if (id) {
-			setOrderId(id); // Update orderId state
+		if (typeof window !== 'undefined') {
+			const storedOrderId = localStorage.getItem('orderId');
+			const storedPaymentMethod = localStorage.getItem('paymentMethod');
+
+			if (storedOrderId) setOrderId(storedOrderId);
+			if (storedPaymentMethod) setPaymentMethod(storedPaymentMethod);
 		}
-	}, [searchParams]);
+	}, []);
 
 	// Set up the timer countdown
 	useEffect(() => {
