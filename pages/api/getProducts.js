@@ -1,12 +1,4 @@
-import { Pool } from 'pg'; 
-
-const pool = new Pool({
-  user: 'team_xg', 
-  host: 'csce-315-db.engr.tamu.edu',
-  database: 'team_xg_db',
-  password: 'palenumber97', 
-  port: 5432,
-});
+import { query } from "@lib/db";
 
 
 export default async function handler(req, res) {
@@ -43,7 +35,7 @@ export default async function handler(req, res) {
                     const queryParams = [foodNames];
 
                   
-                    result = await pool.query(queryText, queryParams);
+                    result = await query(queryText, queryParams);
 
                     break;
                 }
@@ -52,7 +44,7 @@ export default async function handler(req, res) {
                     console.log("Executing usage query");
                     // Add your SQL query for the 'usage' case here
                     const queryText = `...`;  // Your SQL query
-                    result = await pool.query(queryText);
+                    result = await query(queryText);
                     break;
                 }
 
@@ -62,7 +54,7 @@ export default async function handler(req, res) {
                         SELECT menu_items.item_name AS name, menu_items.category
                         FROM menu_items;
                     `;
-                    result = await pool.query(queryText);
+                    result = await query(queryText);
                     break;
                 }
 
