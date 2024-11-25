@@ -22,15 +22,36 @@ export default async function handler(req, res) {
                             o.payment_method,
                             o.placed_time,
                             ARRAY(
-                                SELECT mi.item_name
-                                FROM menu_items mi
-                                WHERE mi.id = ANY(o.item_size_ids)
-                            ) AS item_size_names,
+                                SELECT 
+                                    CONCAT(
+                                        mi.item_name, 
+                                        ' (', 
+                                        isize.item_size, 
+                                        ') - $', 
+                                        isize.price::TEXT
+                                    )
+                                FROM item_sizes isize
+                                JOIN menu_items mi ON mi.id = isize.item_id
+                                WHERE isize.id = ANY(o.item_size_ids)
+                            ) AS item_size_details,
                             ARRAY(
-                                SELECT mi.item_name
-                                FROM menu_items mi
-                                WHERE mi.id = ANY(o.meal_item_ids)
-                            ) AS meal_item_names
+                                SELECT 
+                                    CONCAT(
+                                        mi.item_name, 
+                                        ' (Side: ', 
+                                        side.item_name, 
+                                        ', Entrees: ', 
+                                        STRING_AGG(entree.item_name, ', '), 
+                                        ') - $', 
+                                        m.price::TEXT
+                                    )
+                                FROM meal_items m
+                                JOIN menu_items mi ON mi.id = m.id
+                                LEFT JOIN menu_items side ON side.id = m.side_id
+                                LEFT JOIN menu_items entree ON entree.id = ANY(m.entree_ids)
+                                WHERE m.id = ANY(o.meal_item_ids)
+                                GROUP BY mi.item_name, side.item_name, m.price
+                            ) AS meal_item_details
                         FROM orders o
                         WHERE o.customer_id = $1
                         ORDER BY o.placed_time DESC
