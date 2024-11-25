@@ -9,6 +9,23 @@ const Menu = () => {
     const [appetizers, setAppetizers] = useState([]);
     const [drinks, setDrinks] = useState([]);
     const [seasonal, setSeasonal] = useState([]);
+    const [inventoryItems, setInventoryItems] = useState([]);
+
+const fetchInventoryItems = async () => {
+    try {
+        const response = await fetch("/api/inventory-items");
+        if (!response.ok) throw new Error("Failed to fetch inventory items");
+
+        const data = await response.json();
+        setInventoryItems(data); 
+    } catch (err) {
+        console.error("Error fetching inventory items:", err);
+    }
+};
+
+useEffect(() => {
+    fetchInventoryItems(); 
+}, []);
 
     const fetchMenuItems = async () => {
         try {
@@ -21,15 +38,14 @@ const Menu = () => {
                 throw new Error("Invalid data format from API");
             }
     
-            // Group items by item_id to handle sizes
             const groupedItems = data.reduce((acc, item) => {
                 if (!acc[item.item_id]) {
                     acc[item.item_id] = {
                         ...item,
-                        sizes: []
+                        sizes: [],
                     };
                 }
-                // Push the size for each item
+    
                 acc[item.item_id].sizes.push({
                     size: item.size,
                     price: item.price,
@@ -37,24 +53,17 @@ const Menu = () => {
                 });
                 return acc;
             }, {});
-
-            console.log(groupedItems);
     
-            // Now group them into categories
             setEntrees(Object.values(groupedItems).filter(item => item.category?.toLowerCase() === "entree"));
             setSides(Object.values(groupedItems).filter(item => item.category?.toLowerCase() === "side"));
             setAppetizers(Object.values(groupedItems).filter(item => item.category?.toLowerCase() === "appetizer"));
             setDrinks(Object.values(groupedItems).filter(item => item.category?.toLowerCase() === "drink"));
             setSeasonal(Object.values(groupedItems).filter(item => item.category?.toLowerCase() === "seasonal"));
-
-
-            console.log("huh");
-            console.log(entrees);
-    
         } catch (err) {
             console.error("Error fetching menu items:", err);
         }
     };
+    
     
 
     // to only run one time
@@ -66,12 +75,12 @@ const Menu = () => {
     const [itemName, setItemName] = useState('');
     const [itemSize, setItemSize] = useState('Medium');
     const [itemCategory, setItemCategory] = useState('Entree');
-    const [inventoryIds, setInventoryIds] = useState("");
+   // const [inventoryItems, setInventoryItems] = useState([]);  // This will hold the inventory items
+    const [inventoryIds, setInventoryIds] = useState(""); 
     const [itemPrice, setItemPrice] = useState(0.00);
-    const [itemCalories, setItemCalories] = useState(0);  // default to current calories if selected item exists
-
+    const [itemCalories, setItemCalories] = useState(0); 
+    
     const handlePopup = (item, category) => {
-        console.log("in popup");
         if (!item) {
             console.log("in");
             setItemName('');
@@ -81,34 +90,28 @@ const Menu = () => {
             setItemPrice(0.00);
             setItemCalories(0);
 
-            setSelectedItem('Item Name'); // Set to default if no item is selected
-
-
-
-            console.log(selectedItem);
+            setSelectedItem('Item Name'); 
         } else {
             setItemName(item.name);
             setItemCategory(category);
-            setSelectedItem(item); // This will trigger re-render
-            setInventoryIds(item.inventory_ids ? item.inventory_ids.join(', ') : '');
-        
-            // Set the size and price of the first size by default
-            setItemSize(item.sizes[0].size);
-            setItemPrice(item.sizes[0].price);
-            setItemCalories(item.sizes[0].calories);
-        
-            console.log("selectedItem sizes: ", item.sizes);  // Check the sizes array here
+            setSelectedItem(item);
+            setInventoryIds(item.inventory_names ? item.inventory_names.join(', ') : ''); 
+            setItemSize(item.sizes[0]?.size || 'Medium');
+            setItemPrice(item.sizes[0]?.price || 0.00);
+            setItemCalories(item.sizes[0]?.calories || 0);
         }
-    };    
+    };
+    
+      
 
     const handleSizeChange = (selectedSize) => {
         console.log("chanfing");
-        setItemSize(selectedSize); // Update the selected size
+        setItemSize(selectedSize); 
         const selectedSizeDetails = selectedItem.sizes.find(size => size.item_size === selectedSize);
     
         if (selectedSizeDetails) {
-            setItemPrice(selectedSizeDetails.price); // Update price based on selected size
-            setItemCalories(selectedSizeDetails.calories); // Update calories based on selected size
+            setItemPrice(selectedSizeDetails.price); 
+            setItemCalories(selectedSizeDetails.calories); 
         }
     };  
     
@@ -130,38 +133,59 @@ const Menu = () => {
         setItemCalories(0);
     };
 
+    const [availableInventoryItems, setAvailableInventoryItems] = useState([]);
+   
+
+    
+    const fetchAvailableInventoryItems = async () => {
+        try {
+            const response = await fetch("/api/inventory-items");
+            if (!response.ok) throw new Error("Failed to fetch inventory items");
+    
+            const data = await response.json();
+            setAvailableInventoryItems(data); 
+        } catch (err) {
+            console.error("Error fetching inventory items:", err);
+        }
+    };
+
+    
+
+    
+    useEffect(() => {
+        fetchAvailableInventoryItems();
+    }, []);
+
+
     const addItem = async () => {
-        // Ensure inventory IDs are processed correctly, and item size is passed as an array
         const itemData = {
             item_name: itemName,
             category: itemCategory,
-            inventory_item_ids: inventoryIds.split(',').map(id => parseInt(id.trim())), // parse inventory IDs
-            descr: "",
+            inventory_item_names: inventoryIds.split(',').map(name => name.trim()), 
             available: true,
-            is_seasonal: itemCategory === "Seasonal",  // Set is_seasonal to true if category is "Seasonal", else false
-            image_url: "",  // default for now
+            is_seasonal: itemCategory === "Seasonal",
+            image_url: "",
             sizes: [
                 { 
                     item_size: itemSize, 
-                    price: parseFloat(itemPrice), // ensure price is in float format
-                    calories: 0  // default for now
+                    price: parseFloat(itemPrice), 
+                    calories: itemCalories 
                 }
             ]
         };
-    
         try {
             const response = await fetch("/api/manageMenuItems", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(itemData),  // Send the formatted data
+                body: JSON.stringify(itemData),
             });
     
             if (response.ok) {
                 console.log("Item added successfully");
-                fetchMenuItems();  // Refresh the menu items after adding
-                resetFields();  // Clear form fields
+                fetchMenuItems();
+                resetFields();
             } else {
                 console.error("Failed to add item");
             }
@@ -170,14 +194,15 @@ const Menu = () => {
         }
     };
     
+    
   
     const removeItem = async () => {
         if (!selectedItem || !selectedItem.item_id) {
             console.error("No item selected for removal.");
-            return; // Ensure you don't try to remove an item if none is selected.
+            return; 
         }
     
-        const itemData = { id: selectedItem.item_id };  // Make sure you are sending the item_id for removal
+        const itemData = { id: selectedItem.item_id };  
         
         try {
             const response = await fetch("/api/manageMenuItems", {
@@ -185,13 +210,13 @@ const Menu = () => {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(itemData),  // Send the item ID to the backend
+                body: JSON.stringify(itemData), 
             });
     
             if (response.ok) {
                 console.log("Item removed successfully");
-                fetchMenuItems();  // Refresh the menu after removal
-                resetFields();  // Reset form fields
+                fetchMenuItems(); 
+                resetFields(); 
             } else {
                 console.error("Failed to remove item:", response.status, response.statusText);
             }
@@ -199,8 +224,106 @@ const Menu = () => {
             console.error("Error removing menu item:", error);
         }
     };
+  
+    const handleAddInventoryItem = async (selectedInventoryItemName) => {
+        try {
+           
+            console.log("Selected ITEM :", selectedItem);
+            console.log("Selected Inventory Item Name:", selectedInventoryItemName);
+        console.log("Selected Menu Item ID:", selectedItem.item_id);  
+
+            const inventoryResponse = await fetch(`/api/getInventoryId?name=${encodeURIComponent(selectedInventoryItemName)}`);
+            const inventoryData = await inventoryResponse.json();
+    
+            if (!inventoryResponse.ok) {
+                console.error("Error fetching inventory ID:", inventoryData.error);
+                return;
+            }
+    
+            const inventoryItemId = inventoryData.id; 
+    
+          
+            const response = await fetch('/api/updateInventory', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    menuItemId: selectedItem.item_id,
+                    inventoryItemId: inventoryItemId,   
+                    action: 'add',                    
+                }),
+            });
+            
+            if (response.ok) {
+                const updatedItem = await response.json();
+                setInventoryIds(updatedItem.inventory_item_ids.join(", "));
+                setInventoryIds(selectedItem.inventory_names ? selectedItem.inventory_names.join(', ') : ''); 
+    
+                console.log("Inventory updated successfully:", updatedItem);
+            } else {
+                const errorData = await response.json();
+                console.error("Error updating inventory:", errorData.error);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    };
+    const handleRemoveInventoryItem = async (selectedInventoryItemName) => {
+        try {
+            console.log("Selected ITEM:", selectedItem);
+            console.log("Selected Inventory Item Name:", selectedInventoryItemName);
+            console.log("Selected Menu Item ID:", selectedItem.item_id);
+
+            const inventoryResponse = await fetch(`/api/getInventoryId?name=${encodeURIComponent(selectedInventoryItemName)}`);
+            const inventoryData = await inventoryResponse.json();
+
+            if (!inventoryResponse.ok) {
+                console.error("Error fetching inventory ID:", inventoryData.error);
+                return;
+            }
+
+            const inventoryItemId = inventoryData.id;  
+
+           
+            const response = await fetch('/api/updateInventory', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    menuItemId: selectedItem.item_id,
+                    inventoryItemId: inventoryItemId,
+                    action: 'remove',
+                }),
+            });
+
+            if (response.ok) {
+                const updatedItem = await response.json();
+                setInventoryIds(updatedItem.inventory_item_ids.join(", "));
+                console.log("Inventory updated successfully:", updatedItem);
+            } else {
+                const errorData = await response.json();
+                console.error("Error updating inventory:", errorData.error);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    };
     
     
+    
+
+  
+    
+    
+  
+    
+    
+
+    
+
+
 
     const renderMenuItems = (items, category) => (
         items.length > 0 ? (
@@ -222,8 +345,7 @@ const Menu = () => {
 
     const renderPopup = () => {
         if (!selectedItem) return null;
-        
-        // item exists
+    
         return (
             <div className="modal fade show d-block" tabIndex="-1" role="dialog" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
                 <div className="modal-dialog modal-dialog-centered" role="document">
@@ -243,12 +365,11 @@ const Menu = () => {
                                     onChange={(e) => setItemName(e.target.value)} 
                                 />
                             </div>
-    
+        
                             {/* Conditional Size Input */}
                             <div className="mb-3">
                                 <label className="form-label">Size:</label>
                                 {selectedItem === 'Item Name' ? (
-                                    // Render input field when itemName is "Item Name"
                                     <input 
                                         type="text" 
                                         className="form-control" 
@@ -256,11 +377,10 @@ const Menu = () => {
                                         onChange={(e) => setItemSize(e.target.value)} 
                                     />
                                 ) : (
-                                    // Render select dropdown when itemName is not "Item Name"
                                     <select 
                                         className="form-select" 
                                         value={itemSize} 
-                                        onChange={(e) => handleSizeChange(e.target.value)} // Call handleSizeChange
+                                        onChange={(e) => handleSizeChange(e.target.value)}
                                     >
                                         {selectedItem.sizes.map((size, idx) => (
                                             <option key={idx} value={size.size}>
@@ -270,7 +390,7 @@ const Menu = () => {
                                     </select>
                                 )}
                             </div>
-    
+        
                             {/* Category Dropdown */}
                             <div className="mb-3">
                                 <label className="form-label">Category:</label>
@@ -286,18 +406,75 @@ const Menu = () => {
                                     <option value="Seasonal">Seasonal</option>
                                 </select>
                             </div>
-    
-                            {/* Inventory Item IDs Input */}
+        
+                            {/* Inventory Items: Text Input + Dropdown */}
                             <div className="mb-3">
-                                <label className="form-label">Inventory Item IDs:</label>
-                                <input 
-                                    type="text" 
-                                    className="form-control" 
-                                    value={inventoryIds} 
-                                    onChange={(e) => setInventoryIds(e.target.value)} 
-                                />
-                            </div>
-    
+                                <label className="form-label">Inventory Items:</label>
+                                
+                                  {/* Current Inventory Items */}
+        <input
+            type="text"
+            className="form-control"
+            value={inventoryIds}
+            onChange={(e) => setInventoryIds(e.target.value)}
+            placeholder="Comma-separated inventory item names"
+        />
+
+        {/* Dropdown for adding new inventory items */}
+        <div className="mt-2">
+            <select
+                className="form-select"
+                onChange={(e) => {
+                    const selectedItem = e.target.value;
+                    // Call the function only if a valid item is selected (not empty string)
+                    if (selectedItem) {
+                        handleAddInventoryItem(selectedItem);
+                    }
+                }}
+            >
+        <option value="">Select an item to add</option>
+        {availableInventoryItems.map((item, idx) => {
+            
+            console.log("Checking item:", item.item_name);
+            console.log("inventoryIds:", inventoryIds);
+
+           
+            const isItemSelected = inventoryIds
+                .split(',')
+                .map((id) => id.trim().toLowerCase())
+                .includes(item.item_name.toLowerCase());
+            console.log("Is item selected?", isItemSelected);
+
+           
+            return !isItemSelected && (
+                <option key={idx} value={item.item_name}>
+                    {item.item_name}
+                </option>
+            );
+        })}
+    </select>
+            </div>
+                </div>
+                    {/*Remove inventory items*/}
+                        <div className="mt-2">
+                            <select
+                                className="form-select"
+                                onChange={(e) => {
+                                    const selectedItem = e.target.value;
+                                    if (selectedItem) {
+                                        handleRemoveInventoryItem(selectedItem);
+                                    }
+                                }}
+                            >
+                    <option value="">Select an item to remove</option>
+                    {inventoryIds.length > 0 && inventoryIds.split(',').map((inventoryItemName, idx) => (
+                        <option key={idx} value={inventoryItemName.trim()}>
+                            {inventoryItemName.trim()}
+                        </option>
+                    ))}
+                </select>
+            </div>
+        
                             {/* Price Input */}
                             <div className="mb-3">
                                 <label className="form-label">Price:</label>
@@ -308,7 +485,7 @@ const Menu = () => {
                                     onChange={(e) => setItemPrice(parseFloat(e.target.value))} 
                                 />
                             </div>
-    
+        
                             {/* Calories Input */}
                             <div className="mb-3">
                                 <label className="form-label">Calories:</label>
@@ -347,7 +524,10 @@ const Menu = () => {
                 </div>
             </div>
         );
-    }    
+        
+    }
+        
+    
     
 
     return (
@@ -447,7 +627,7 @@ const Menu = () => {
                 </div>
             </div>
 
-            {/* Render the popup modal dynamically */}
+            
             {renderPopup()}
         </div>
     );
