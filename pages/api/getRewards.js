@@ -66,6 +66,21 @@ export default async function handler(req, res) {
                     break;
                 }
 
+                case 'month': {
+                    console.log("Fetching number of orders made this month");
+
+                    const queryText = `
+                        SELECT COUNT(*) AS orders_this_month
+                        FROM orders
+                        WHERE customer_id = $1
+                            AND EXTRACT(MONTH FROM placed_time) = EXTRACT(MONTH FROM CURRENT_DATE)
+                            AND EXTRACT(YEAR FROM placed_time) = EXTRACT(YEAR FROM CURRENT_DATE);
+                    `;
+
+                    result = await query(queryText, [customer_id]);
+                    break;
+                }
+
                 default:
                     return res.status(400).json({ error: 'Invalid action' });
             }
