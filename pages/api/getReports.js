@@ -55,12 +55,12 @@ export default async function handler(req, res) {
 						? `WHERE placed_time >= NOW() - INTERVAL '${parseInt(period)} days'`
 						: '';
 					const salesData = await query(`
-              SELECT DATE(placed_time) AS order_date, SUM(order_total) AS daily_total
-              FROM orders
-              ${dateFilter}
-              GROUP BY DATE(placed_time)
-              ORDER BY order_date;
-          `);
+						SELECT DATE(placed_time) AS order_date, SUM(order_total) AS daily_total
+						FROM orders
+						${dateFilter}
+						GROUP BY DATE(placed_time)
+						ORDER BY order_date;
+					`);
 					res.status(200).json(salesData);
 					break;
 				}
