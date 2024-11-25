@@ -18,8 +18,9 @@ const EmployeeInfo = () => {
     };
 
     return (
+        <>
+        <EmployeeLogInHeader />
         <div className="container mt-4">
-            <EmployeeLogInHeader />
             <div className="d-flex justify-content-center my-3">
                 <button
                     className={`btn me-2 ${
@@ -42,6 +43,7 @@ const EmployeeInfo = () => {
             </div>
             <div className="tab-content p-4 border rounded shadow">{renderTabContent()}</div>
         </div>
+        </>
     );
 };
 
