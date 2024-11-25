@@ -58,8 +58,6 @@ const CartPage = () => {
                     item.price = item.mealItem.price || 0; // Default to 0 if price is undefined
                 }
 
-                console.log(item.mealItem.price);
-
                 // Return the mealItem name for further processing (if needed)
                 return item.mealItem.name;
             }
@@ -72,8 +70,6 @@ const CartPage = () => {
         
     // Now, fetch prices for the non-mealCartItem items from the server
     const nonMealItems = cart.filter(item => !item.mealItem).map(item => item.name);
-    console.log('Food names to send:', foodNames);
-
         if (nonMealItems.length > 0) {
         fetch('/api/getProducts?type=price', {
             method: 'POST',
@@ -84,9 +80,6 @@ const CartPage = () => {
         })
         .then(response => response.json())
         .then(data => {
-           // console.log("Server response:", data); 
-        
-        
             const priceMap = data.reduce((acc, item) => {
                 if (!acc[item.item_name]) {
                     acc[item.item_name] = {};  
@@ -182,110 +175,96 @@ const CartPage = () => {
         const mealItemIds = [];
         for(const item of cart)
         {
-            console.log("item handling:");
-
-            let entreeIds = [];
-            let sideId = null;
-
-            // if mealItem
-            if(item.mealItem)
+            console.log(item.quantity);
+            for(let i = 0; i < item.quantity; i++)
             {
-                console.log("meal item");
+                let entreeIds = [];
+                let sideId = null;
 
-                // process entrees
-                for(const entree of item.entrees)
+                // if mealItem
+                if(item.mealItem)
                 {
-                    console.log("processing: ", entree);
-                   try {
-                    // Get entree ID from menu_items
-                    const entreeResponse = await fetch(`/api/menu_items?id=${entree.item_name}`);
-                    const entreeData = await entreeResponse.json();
-                    if (entreeData && entreeData.id) {
-                        entreeIds.push(entreeData.id);
+                    // process entrees
+                    for(const entree of item.entrees)
+                    {
+                    try {
+                            // Fetch the entree ID using the entree's name
+                            const menuItemResponse = await fetch(`/api/getMenuItemId?name=${encodeURIComponent(entree)}`);
+                            const menuItemData = await menuItemResponse.json();
+
+                            entreeIds.push(menuItemData.id);
+                        } catch (error) {
+                            console.error("Error fetching entree ID:", error);
+                        }
                     }
-                    } catch (error) {
-                        console.error("Error fetching entree ID:", error);
+                    // get side ID
+                    if (item.sides && item.sides.length > 0) {
+                        const side = item.sides[0]; // Assuming first side is chosen
+                        try {
+                            // Fetch the side ID using the side's name
+                            const menuItemResponse = await fetch(`/api/getMenuItemId?name=${encodeURIComponent(side)}`);
+                            const menuItemData = await menuItemResponse.json();
+
+                            if (menuItemData && menuItemData.id) {
+                                sideId = menuItemData.id;
+                            }
+                        } catch (error) {
+                            console.error("Error fetching side ID:", error);
+                        }
+
+                        // after pushing into db, add that order to mealItemIds array
+                        console.log(item);
+                        try {
+                            const mealItemResponse = await fetch('/api/meal_items', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    meal_type: item.mealItem,
+                                    side_id: sideId,
+                                    entree_ids: entreeIds,
+                                    price: item.price,
+                                }),
+                            });
+            
+                            const mealItemData = await mealItemResponse.json();
+            
+                            if (mealItemData && mealItemData.id) {
+                                mealItemIds.push(mealItemData.id);
+                            } else {
+                                console.error("Failed to add meal item to the database");
+                            }
+                        } catch (error) {
+                            console.error("Error creating meal item:", error);
+                        }
                     }
                 }
-                // get side ID
-                if (item.sides && item.sides.length > 0) {
-                    const side = item.sides[0]; // Assuming first side is chosen
+                else {
                     try {
-                        // Get side ID from item_sizes
-                        const sideResponse = await fetch(`/api/item_sizes?id=${side.name}`);
-                        const sideData = await sideResponse.json();
-                        if (sideData && sideData.id) {
-                            sideId = sideData.id;
-                        }
-                    } catch (error) {
-                        console.error("Error fetching side ID:", error);
-                    }
+                        // fetch the menu item ID using the item name
+                        const menuItemResponse = await fetch(`/api/getMenuItemId?name=${encodeURIComponent(item.name)}`);
+                        const menuItemData = await menuItemResponse.json();
+                
+                        if (menuItemData && menuItemData.id) {
+                            const menuItemId = menuItemData.id;
+                
+                            // fetch the item size ID using the menu item ID and size
+                            const itemSizeResponse = await fetch(`/api/item_sizes?item_id=${menuItemId}&size=${encodeURIComponent(item.size)}`);
+                            const itemSizeData = await itemSizeResponse.json();
 
-                    // after pushing into db, add that order to mealItemIds array
-                    try {
-                        const mealItemResponse = await fetch('/api/meal_items', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                meal_type: item.mealType,  // Assuming mealType is part of the item object
-                                side_id: sideId,
-                                entree_ids: entreeIds,
-                                price: item.price,  // Assuming item has a price
-                            }),
-                        });
-        
-                        const mealItemData = await mealItemResponse.json();
-        
-                        if (mealItemData && mealItemData.id) {
-                            mealItemIds.push(mealItemData.id);
-                        } else {
-                            console.error("Failed to add meal item to the database");
-                        }
-                    } catch (error) {
-                        console.error("Error creating meal item:", error);
-                    }
-                }
-            }
-            else {
-                console.log("Not a meal item");
-            
-                try {
-                    console.log("Item size:", item.size);
-                    console.log("Item name:", item.name);
-            
-                    // Step 1: Fetch the menu item ID using the item name
-                    const menuItemResponse = await fetch(`/api/getMenuItemId?name=${encodeURIComponent(item.name)}`);
-                    const menuItemData = await menuItemResponse.json();
-
-                    console.log(menuItemData);
-                    console.log(menuItemData.id);
-            
-                    if (menuItemData && menuItemData.id) {
-                        const menuItemId = menuItemData.id;
-                        console.log("Menu item ID:", menuItemId);
-            
-                        // Step 2: Fetch the item size ID using the menu item ID and size
-                        const itemSizeResponse = await fetch(`/api/item_sizes?item_id=${menuItemId}&size=${encodeURIComponent(item.size)}`);
-                        const itemSizeData = await itemSizeResponse.json();
-
-                        console.log(itemSizeData);
-
-                        for(const sizeItems of itemSizeData)
-                        {
-                            console.log(sizeItems);
-                            if(sizeItems.item_size == item.size)
+                            for(const sizeItems of itemSizeData)
                             {
-                                console.log(sizeItems.item_size);
-                                console.log(sizeItems.id);
-                                itemSizeIds.push(sizeItems.id);
-                                break;
+                                if(sizeItems.item_size == item.size)
+                                {
+                                    itemSizeIds.push(sizeItems.id);
+                                    break;
+                                }
                             }
                         }
+                    } catch (error) {
+                        console.error("Error fetching item size ID:", error);
                     }
-                } catch (error) {
-                    console.error("Error fetching item size ID:", error);
                 }
             }
         }
@@ -320,6 +299,10 @@ const CartPage = () => {
             console.error("Error during checkout:", error);
             alert("An error occurred while processing your order. Please try again.");
         }
+
+
+        // clear cart
+        handleClearCart();
     };
     
     
