@@ -1,3 +1,4 @@
+
 // pages/api/getProducts.js
 import { query } from '@lib/db';
 
@@ -5,11 +6,41 @@ export default async function handler(req, res) {
     const { type, limit } = req.query;
     const limitValue = limit ? parseInt(limit, 10) : 10; // Default limit is 10
 
+    
+
     if (req.method === 'GET' || req.method === 'POST') {
         try {
             let result;
 
+            // Log the body of the request (for POST)
+            console.log("Request body:", req.body);
+
             switch (type) {
+                case 'price': {
+                    const { foodNames } = req.body || {};
+
+                   
+                    if (!foodNames || !Array.isArray(foodNames) || foodNames.length === 0) {
+                        return res.status(400).json({ error: 'Invalid or empty foodNames array' });
+                    }
+
+                    console.log("Food names:", foodNames);
+
+                    
+                    const queryText = `
+                        SELECT menu_items.item_name, item_sizes.item_size, item_sizes.price
+                        FROM menu_items
+                        JOIN item_sizes ON item_sizes.item_id = menu_items.id
+                        WHERE menu_items.item_name = ANY($1);
+                    `;
+                    const queryParams = [foodNames];
+
+                  
+                    result = await query(queryText, queryParams);
+
+                    break;
+                }
+
                 case 'usage': {
                     console.log("Executing usage query");
 
@@ -52,60 +83,7 @@ export default async function handler(req, res) {
 
                     result = await query(queryText);
                     break;
-                }
-
-                case 'menu-with-sizes': {
-                    console.log("Fetching menu items with sizes, IDs, and calories");
-
-                    const queryText = `
-                        SELECT 
-                            menu_items.id AS item_id,
-                            menu_items.item_name AS name, 
-                            item_sizes.item_size AS size, 
-                            menu_items.category, 
-                            menu_items.inventory_item_ids AS inventory_ids, 
-                            item_sizes.price,
-                            item_sizes.calories  -- Add the calories column from item_sizes
-                        FROM menu_items
-                        JOIN item_sizes ON menu_items.id = item_sizes.item_id;
-                    `;
-
-                    result = await query(queryText);
-                    break;
-                }
-
-                case 'menu': {
-                    console.log("Fetching menu items");
-                    const queryText = `
-                        SELECT menu_items.item_name AS name, menu_items.category
-                        FROM menu_items;
-                    `;
-                    result = await pool.query(queryText);
-                    break;
-                }
-
-                case 'menu-with-sizes': {
-                    console.log("Fetching menu items with sizes, IDs, and calories");
-                    const queryText = `
-                        SELECT 
-                            menu_items.id AS item_id,
-                            menu_items.item_name AS name, 
-                            item_sizes.item_size AS size, 
-                            menu_items.category, 
-                            ARRAY_AGG(inventory_items.item_name) AS inventory_names, 
-                            item_sizes.price,
-                            item_sizes.calories
-                        FROM menu_items
-                        JOIN item_sizes ON menu_items.id = item_sizes.item_id
-                        LEFT JOIN inventory_items ON inventory_items.id = ANY(menu_items.inventory_item_ids)
-                        GROUP BY menu_items.id, item_sizes.item_size, item_sizes.price, item_sizes.calories;
-
-                    `;
-                    
-                    // Run the query and get the result
-                    result = await pool.query(queryText);
-                    break;
-                }                              
+                }                            
 
                 default:
                     return res.status(400).json({ error: 'Invalid action' });
@@ -125,7 +103,7 @@ export default async function handler(req, res) {
             res.status(500).json({ error: 'Failed to execute query', details: error.message });
         }
     } else {
-        // Handle unsupported HTTP methods
+        // Handle method not allowed
         console.log(`Method ${req.method} not allowed`);
         res.setHeader('Allow', ['GET', 'POST']);
         res.status(405).end(`Method ${req.method} Not Allowed`);
