@@ -48,8 +48,10 @@ const OrderInfo = () => {
     };
 
     const filteredOrders = searchQuery.trim() === ''
-        ? orders
-        : orders.filter(order => order.id.toString() === searchQuery);
+    ? orders
+    : [...new Map(orders.filter(order => order.id.toString() === searchQuery)
+        .map(order => [order.id, order])).values()];
+
 
     const indexOfLastOrder = currentPage * numPerPage;
     const indexOfFirstOrder = indexOfLastOrder - numPerPage;
