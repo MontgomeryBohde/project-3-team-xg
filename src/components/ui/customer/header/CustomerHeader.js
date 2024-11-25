@@ -7,9 +7,10 @@ import Image from "next/image";
 import "./CustomerHeader.css";
 
 const CustomerHeader = () => {
-  const [customer, setCustomer] = useState(null); // Changed to null to differentiate when no customer is logged in
-  const [weather, setWeather] = useState({ temperature: "", description: "", icon: "" });
-  const [currentTime, setCurrentTime] = useState("");
+  const [customer, setCustomer] = useState('');
+  const [weather, setWeather] = useState({ temperature: '', description: '', icon: '' });
+  const [currentTime, setCurrentTime] = useState('');
+  const [fontSize, setFontSize] = useState(16); // Default font size in pixels
   const router = useRouter();
 
   // Define weather icon mapping
@@ -71,6 +72,24 @@ const CustomerHeader = () => {
     router.push("/customer");
   };
 
+  // Increase font size
+  const increaseFontSize = () => {
+    setFontSize((prev) => {
+      const newFontSize = Math.min(prev + 2, 24); // Cap at 24px
+      document.documentElement.style.fontSize = `${newFontSize}px`;
+      return newFontSize;
+    });
+  };
+
+  // Decrease font size
+  const decreaseFontSize = () => {
+    setFontSize((prev) => {
+      const newFontSize = Math.max(prev - 2, 12); // Minimum 12px
+      document.documentElement.style.fontSize = `${newFontSize}px`;
+      return newFontSize;
+    });
+  };
+
   return (
     <header className="bg-danger text-white p-2 d-flex align-items-center justify-content-between">
       <div className="d-flex align-items-center">
@@ -92,6 +111,14 @@ const CustomerHeader = () => {
           <span>{weather.description}</span>
           <span className="ms-2">{currentTime}</span>
         </div>
+      </div>
+      <div>
+        <button className="btn btn-light me-2" onClick={increaseFontSize}>
+          <i className="bi bi-zoom-in"></i>
+        </button>
+        <button className="btn btn-light" onClick={decreaseFontSize}>
+          <i className="bi bi-zoom-out"></i>
+        </button>
       </div>
     </header>
   );
