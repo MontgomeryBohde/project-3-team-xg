@@ -46,9 +46,10 @@ const OrderInfo = () => {
     };
 
     //seraching by id
-    const filteredOrders = orders.filter(order =>
-      order.id.toString() === searchQuery
-    );
+    const filteredOrders = searchQuery.trim() === ''
+    ? orders  //show all orders if the searc is empty
+    : orders.filter(order => order.id.toString() === searchQuery);
+
 
     const indexOfLastOrder = currentPage * numPerPage;
     const indexOfFirstOrder = indexOfLastOrder - numPerPage;
