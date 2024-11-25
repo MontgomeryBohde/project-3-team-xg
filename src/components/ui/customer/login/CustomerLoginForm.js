@@ -1,10 +1,11 @@
+// src/components/ui/customer/header/CustomerHeader.js
 "use client";
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
 const CustomerLoginForm = () => {
-    const [code, setCode] = useState('');
+    const [code, setCode] = useState("");
     const [error, setError] = useState(null);
     const router = useRouter();
 
@@ -18,24 +19,28 @@ const CustomerLoginForm = () => {
         try {
             // Validate the 4-digit code
             if (code === "1234") {
-                // Simulate fetching customer data associated with the code (if needed)
+                // Simulate fetching customer data associated with the code
                 const customer = { name: "Guest 1", id: 1 }; // Replace with real customer data if applicable
-                localStorage.setItem("loggedInCustomer", JSON.stringify(customer));
-                localStorage.setItem("loggedInCustomerName", customer.name);
 
-                // Navigate to the meal selection page
+                // Store customer in sessionStorage
+                window.sessionStorage.setItem("loggedInCustomer", JSON.stringify(customer));
+                window.sessionStorage.setItem("loggedInCustomerName", customer.name);
+
+                // Navigate to menu selection
                 router.push("/customer/kiosk/menuselection/");
             } else {
-                setError("Invalid code. Please enter a valid 4-digit code.");
+                // Invalid code
+                setError("No login found for code. Please enter a valid code.");
             }
-        } catch (error) {
-            console.error("Error during login:", error);
-            setError("An error occurred. Please try again later.");
+        } catch (err) {
+            setError("An error occurred. Please try again.");
+            console.error(err);
         }
     };
 
+    // Navigate back to the kiosk page
     const navigateToKioskPage = () => {
-        router.push("/customer/kiosk"); // Navigate back to the Kiosk Page
+        router.push("/customer/kiosk/");
     };
 
     return (

@@ -1,9 +1,10 @@
-import { query } from "@lib/db";
 
+// pages/api/getProducts.js
+import { query } from '@lib/db';
 
 export default async function handler(req, res) {
-    console.log("API route reached: /api/getProducts");
-    const { type } = req.query;
+    const { type, limit } = req.query;
+    const limitValue = limit ? parseInt(limit, 10) : 10; // Default limit is 10
 
     
 
@@ -42,35 +43,64 @@ export default async function handler(req, res) {
 
                 case 'usage': {
                     console.log("Executing usage query");
-                    // Add your SQL query for the 'usage' case here
-                    const queryText = `...`;  // Your SQL query
-                    result = await query(queryText);
+
+                    const queryText = `
+                        WITH combined_meal_items AS (
+                            -- Get entree items from meal_items in orders
+                            SELECT unnest(mi.entree_ids) AS item_id, 'entree' AS item_type, mi.meal_type
+                            FROM orders o
+                            JOIN meal_items mi ON mi.id = ANY(o.meal_item_ids)
+
+                            UNION ALL
+
+                            -- Get side items from meal_items in orders
+                            SELECT mi.side_id AS item_id, 'side' AS item_type, mi.meal_type
+                            FROM orders o
+                            JOIN meal_items mi ON mi.id = ANY(o.meal_item_ids)
+                        )
+                        -- Get the total number of orders for each individual meal item
+                        SELECT 
+                            COALESCE(m.item_name, 'Unknown') AS meal_item_name,  -- Display the actual item name or 'Unknown' if not found
+                            COUNT(*) AS times_ordered
+                        FROM combined_meal_items cm
+                        LEFT JOIN menu_items m ON m.id = cm.item_id   -- Join with menu_items to get the actual name of the item
+                        GROUP BY meal_item_name  -- Group by the meal_item_name which is the alias created above
+                        ORDER BY times_ordered DESC
+                        LIMIT $1;  -- Use the limit parameter
+                    `;
+
+                    result = await query(queryText, [limitValue]);
                     break;
                 }
 
                 case 'menu': {
                     console.log("Fetching menu items");
+
                     const queryText = `
                         SELECT menu_items.item_name AS name, menu_items.category
                         FROM menu_items;
                     `;
+
                     result = await query(queryText);
                     break;
-                }
+                }                            
 
                 default:
                     return res.status(400).json({ error: 'Invalid action' });
             }
 
-            // Log the result before sending it back
-            console.log("Query result:", result.rows); // result.rows contains the actual data
+            // Log the query result for debugging
+            console.log("Query result:", result);
 
-            // Send the result back as JSON
-            res.status(200).json(result.rows);
+            // Send the query result as the response
+            res.status(200).json(result);
+
         } catch (error) {
-            // Log any errors
-            console.error('Error fetching product data:', error);
-            res.status(500).json({ error: 'Failed to fetch product data' });
+            // Log the error for debugging
+            console.error('Error executing query:', error);
+
+            // Return a 500 error with the message
+            res.status(500).json({ error: 'Failed to execute query', details: error.message });
         }
     } else {
         // Handle method not allowed
