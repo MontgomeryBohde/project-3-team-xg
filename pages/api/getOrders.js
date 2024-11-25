@@ -53,12 +53,18 @@ LEFT JOIN meal_items AS m ON m.id = ANY(o.meal_item_ids)  -- Join meal_items on 
 LEFT JOIN menu_items AS side ON side.id = m.side_id  -- Join menu_items as side for side_id
 LEFT JOIN menu_items AS entree ON entree.id = ANY(m.entree_ids)  -- Join menu_items as entree for entree_ids
 ORDER BY o.placed_time DESC
+LIMIT $1 OFFSET $2;
+
 ;
 
 `
 
+const limit = parseInt(req.query.limit) || 100;  //100 items per page
+const offset = parseInt(req.query.offset) || 0;  //offset starts at 0
 
-const { rows } = await pool.query(query);
+
+const { rows } = await pool.query(query, [limit, offset]);
+
 
 const orders = rows.reduce((acc, row) => {
     const existingOrder = acc.find(order => order.id === row.order_id);
