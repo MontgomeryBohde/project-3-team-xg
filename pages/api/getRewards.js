@@ -23,28 +23,19 @@ export default async function handler(req, res) {
                             o.placed_time,
                             ARRAY(
                                 SELECT 
-                                    CONCAT(
-                                        mi.item_name, 
-                                        ' (', 
-                                        isize.item_size, 
-                                        ') - $', 
-                                        isize.price::TEXT
-                                    )
+                                    mi.item_name, 
+                                    isize.item_size, 
+                                    isize.price
                                 FROM item_sizes isize
                                 JOIN menu_items mi ON mi.id = isize.item_id
                                 WHERE isize.id = ANY(o.item_size_ids)
                             ) AS item_size_details,
                             ARRAY(
                                 SELECT 
-                                    CONCAT(
-                                        mi.item_name, 
-                                        ' (Side: ', 
-                                        side.item_name, 
-                                        ', Entrees: ', 
-                                        STRING_AGG(entree.item_name, ', '), 
-                                        ') - $', 
-                                        m.price::TEXT
-                                    )
+                                    mi.item_name, 
+                                    side.item_name AS side_name, 
+                                    STRING_AGG(entree.item_name, ', ') AS entree_names, 
+                                    m.price
                                 FROM meal_items m
                                 JOIN menu_items mi ON mi.id = m.id
                                 LEFT JOIN menu_items side ON side.id = m.side_id
