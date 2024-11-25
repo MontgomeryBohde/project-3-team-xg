@@ -5,6 +5,8 @@ export default async function handler(req, res) {
   if (req.method === 'GET') {
     const { phoneNumber } = req.query;
 
+    console.log("what:", phoneNumber);
+
     try {
       const sanitizedPhoneNumber = phoneNumber.replace(/[()-]/g, '');
       const customer = await query(
