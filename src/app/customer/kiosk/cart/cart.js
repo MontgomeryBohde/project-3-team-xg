@@ -17,6 +17,57 @@ const CartPage = () => {
     const [discount, setDiscount] = useState(0);
     const [taxRate] = useState(0.08); 
 
+
+    const [customerId, setCustomerId] = useState(null);
+    const [guestName, setGuestName] = useState(null);
+    const [orderId, setOrderId] = useState(null);
+
+    useEffect(() => {
+        async function initializeCustomerId() {
+            const loggedInCustomer = JSON.parse(localStorage.getItem('loggedInCustomer'));
+            const loggedInCustomerName = localStorage.getItem('loggedInCustomerName');
+
+            console.log("Fetched loggedInCustomerName from localStorage:", loggedInCustomerName);
+
+            // Logged in customer
+            if (loggedInCustomer && loggedInCustomer.id) {
+                setCustomerId(loggedInCustomer.id);
+            }
+            // Guest
+            else {
+                // Set guest name from localStorage
+                setGuestName(loggedInCustomerName);
+                await fetchNextCustomerId();
+              }
+        }
+
+        initializeCustomerId();
+    }, []);
+    // Fetch the next customer ID for guest
+    const fetchNextCustomerId = async () => {
+        try {
+        const response = await fetch('/api/customers', {
+            method: 'GET',
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Next Customer ID:', data.next_id);
+            setCustomerId(data.next_id);
+        } else {
+            console.error('Failed to fetch next customer ID. Status:', response.status);
+        }
+        } catch (error) {
+        console.error('Error fetching next customer ID:', error);
+        }
+    };
+    useEffect(() => {
+        if (guestName !== null) {
+        console.log("Guest name: ", guestName);
+        }
+    }, [guestName]);
+
+
     const [currentTime, setCurrentTime] = useState('');
     useEffect(() => {
         const updateTime = () => {
@@ -268,15 +319,20 @@ const CartPage = () => {
                 }
             }
         }
+
+        // get customerID
     
         // Prepare the data to send to the backend
         const requestBody = {
             itemSizeIds,
             mealItemIds,
+            customerId,
             cashierId,
             paymentMethod,
             price: orderTotal,
         };
+
+        console.log(requestBody);
     
         try {
             const response = await fetch('/api/orders', {
@@ -295,16 +351,73 @@ const CartPage = () => {
             } else {
                 alert(`Failed to create order: ${data.error}`);
             }
+
+            setOrderId(response);
         } catch (error) {
             console.error("Error during checkout:", error);
             alert("An error occurred while processing your order. Please try again.");
         }
+
+        // update customer db with data
+        handleCustomerData();
 
 
         // clear cart
         handleClearCart();
     };
     
+    // +10 this customer's points
+    const handleCustomerData = async () => {
+        const loggedInCustomer = JSON.parse(localStorage.getItem('loggedInCustomer'));
+
+        // Logged in customer
+        if (loggedInCustomer && loggedInCustomer.id) {
+            try {
+                const response = await fetch('/api/customers', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ customer_id: loggedInCustomer.id }),
+                });
+
+                if (response.ok) {
+                    const updatedCustomer = await response.json();
+                    console.log('Customer updated successfully:', updatedCustomer);
+                } else {
+                    console.error('Failed to update customer. Status:', response.status);
+                }
+            } catch (error) {
+                console.error('Error updating customer:', error);
+            }
+        }
+        // Guest
+        else {
+            // put in a brand new customer into the db, firstname is guestName from localStorage, order id is stored in orderId
+            try {
+                const response = await fetch('/api/customers', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({ firstName: guestName }),
+                });
+            
+                const data = await response.json();
+            
+                if (response.ok) {
+                  // Handle the successful creation of a guest customer
+                  console.log('New Guest Customer Created:', data.customerId);
+                  // Navigate or update state as needed
+                } else {
+                  alert(`Failed to create guest customer: ${data.error}`);
+                }
+              } catch (error) {
+                console.error('Error creating guest customer:', error);
+                alert('An error occurred while creating the guest customer.');
+              }
+        }
+    }
     
 
     return (
