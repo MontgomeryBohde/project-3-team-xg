@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { Client } from 'pg';
 
 export async function POST(request) {
+  console.log("inside the api file");
   const connectionString = process.env.POSTGRES_URL;
   const client = new Client({ connectionString });
 
