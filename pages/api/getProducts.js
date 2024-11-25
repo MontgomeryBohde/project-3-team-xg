@@ -1,9 +1,5 @@
 // pages/api/getProducts.js
-import { Pool } from 'pg'; 
-
-const pool = new Pool({
-    connectionString: process.env.POSTGRES_URL,
-});
+import { query } from '@lib/db';
 
 export default async function handler(req, res) {
     const { type, limit } = req.query;
@@ -42,7 +38,7 @@ export default async function handler(req, res) {
                         LIMIT $1;  -- Use the limit parameter
                     `;
 
-                    result = await pool.query(queryText, [limitValue]);
+                    result = await query(queryText, [limitValue]);
                     break;
                 }
 
@@ -54,7 +50,7 @@ export default async function handler(req, res) {
                         FROM menu_items;
                     `;
 
-                    result = await pool.query(queryText);
+                    result = await query(queryText);
                     break;
                 }
 
@@ -74,7 +70,7 @@ export default async function handler(req, res) {
                         JOIN item_sizes ON menu_items.id = item_sizes.item_id;
                     `;
 
-                    result = await pool.query(queryText);
+                    result = await query(queryText);
                     break;
                 }
 
@@ -83,10 +79,10 @@ export default async function handler(req, res) {
             }
 
             // Log the query result for debugging
-            console.log("Query result:", result.rows);
+            console.log("Query result:", result);
 
             // Send the query result as the response
-            res.status(200).json(result.rows);
+            res.status(200).json(result);
 
         } catch (error) {
             // Log the error for debugging
