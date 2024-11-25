@@ -43,7 +43,7 @@ const CashConfirmation = () => {
 	// Redirect when timeLeft reaches 0
 	useEffect(() => {
 		if (timeLeft === 0) {
-			router.push('/');
+			router.push('/customer/kiosk/login');
 		}
 	}, [timeLeft, router]);
 
