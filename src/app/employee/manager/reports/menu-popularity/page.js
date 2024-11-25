@@ -62,7 +62,6 @@ const MenuPopularity = () => {
                         <tr>
                             <th>Rank</th>
                             <th>Menu Item</th>
-                            <th>Type</th>
                             <th>Category</th>
                             <th>Times Ordered</th>
                         </tr>
@@ -70,17 +69,16 @@ const MenuPopularity = () => {
                     <tbody>
                         {popularItems.length > 0 ? (
                             popularItems.map((item, index) => (
-                                <tr key={item.menu_item_id || index}>
+                                <tr key={item.food_name || index}>
                                     <td>{index + 1}</td>
                                     <td>{item.food_name}</td>
-                                    <td>{item.item_size}</td>
                                     <td>{item.menu_category}</td>
                                     <td>{item.times_ordered}</td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="5">Loading...</td>
+                                <td colSpan="4">Loading...</td>
                             </tr>
                         )}
                     </tbody>
