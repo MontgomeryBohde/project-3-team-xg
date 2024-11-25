@@ -1,4 +1,4 @@
-// pages/api/reports.js
+// pages/api/getReports.js
 import { query } from '@lib/db';
 
 export default async function handler(req, res) {
@@ -32,25 +32,23 @@ export default async function handler(req, res) {
 				}
 				
                 case 'zReport': {
-                    const today = new Date().toISOString().split('T')[0];
-                    const now = new Date().toISOString();
-                    const openTime = `${today} 10:00:00`;
-                    result = await query(
-                        `
-                        SELECT 
-                            CURRENT_DATE AS date,
-                            SUM(order_total) AS total_sales,
-                            COUNT(*) AS transaction_count,
-                            SUM(CASE WHEN payment_method = 'cash' THEN order_total ELSE 0 END) AS cash_total,
-                            SUM(CASE WHEN payment_method = 'credit card' THEN order_total ELSE 0 END) AS credit_card_total
-                        FROM orders
-                        WHERE placed_time BETWEEN $1 AND $2;
-                        `,
-                        [openTime, now]
-                    );
-                    result = result || [];
-                    break;
-                }
+					result = await query(
+						`
+						SELECT 
+							CURRENT_DATE AS date,
+							SUM(order_total) AS total_sales,
+							COUNT(*) AS transaction_count,
+							SUM(CASE WHEN payment_method = 'cash' THEN order_total ELSE 0 END) AS cash_total,
+							SUM(CASE WHEN payment_method = 'credit card' THEN order_total ELSE 0 END) AS credit_card_total
+						FROM orders
+						WHERE DATE(placed_time) = CURRENT_DATE;
+						`,
+						[]
+					);
+				
+					result = result || [];
+					break;
+				}
 
                 case 'allSales': {
                     const dateFilter = period

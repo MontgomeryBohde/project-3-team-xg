@@ -16,17 +16,22 @@ const ZReport = () => {
                     throw new Error('Failed to fetch Z Report');
                 }
                 const data = await response.json();
-                setReportData(data);
+                console.log('API Response:', data);  // Log the full response
+                setReportData(data.data);  // Update the state with the API data
             } catch (error) {
                 console.error('Error fetching Z report data:', error);
             }
         }
-    
+
         fetchZReport();
     }, []);    
 
     const formatCurrency = (value) => {
-        return value !== null && value !== undefined ? `$${value.toFixed(2)}` : '$0.00';
+        const numericValue = parseFloat(value); // Convert string to number
+        if (isNaN(numericValue)) {
+            return '$0.00'; // Return '$0.00' if the value is not a valid number
+        }
+        return `$${numericValue.toFixed(2)}`; // Format the number to two decimal places
     };
 
     return (
@@ -47,16 +52,16 @@ const ZReport = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {reportData ? (
+                        {reportData && reportData.length > 0 ? (
                             <tr>
-                                <td>{formatCurrency(reportData.total_sales)}</td>
-                                <td>{reportData.transaction_count}</td>
-                                <td>{formatCurrency(reportData.cash_total)}</td>
-                                <td>{formatCurrency(reportData.credit_card_total)}</td>
+                                <td>{formatCurrency(reportData[0].total_sales)}</td>
+                                <td>{reportData[0].transaction_count}</td>
+                                <td>{formatCurrency(reportData[0].cash_total)}</td>
+                                <td>{formatCurrency(reportData[0].credit_card_total)}</td>
                             </tr>
                         ) : (
                             <tr>
-                                <td colSpan="4">Loading...</td>
+                                <td colSpan="4">No data available for today</td>
                             </tr>
                         )}
                     </tbody>
