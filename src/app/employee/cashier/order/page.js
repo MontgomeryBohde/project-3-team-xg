@@ -34,6 +34,11 @@ const OrderPage = () => {
         { item_name: "Family Meal", sides: 2, entrees: 3, price: 32.00 }
     ];
 
+    useEffect(() => {
+        console.log('Current inProgressMeal:', inProgressMeal);
+    }, [inProgressMeal]);
+
+    
     // Fetch menu items from the database using the API endpoint
     useEffect(() => {
         const fetchMenuItems = async () => {
@@ -60,9 +65,9 @@ const OrderPage = () => {
 
     useEffect(() => {
         const handlePopState = () => {
-            // Retrieve cart items from local storage when navigating back
+            // Retrieve cart items from sessionStorage when navigating back
             const storedCart = JSON.parse(sessionStorage.getItem('cart')) || [];
-            setCart(storedCart);
+            setCart(storedCart); // Make sure storedCart is defined before using it
         };
     
         // Add event listener for the popstate event (browser back button)
@@ -75,37 +80,48 @@ const OrderPage = () => {
         return () => {
             window.removeEventListener('popstate', handlePopState);
         };
-    }, []);
+    }, []);    
 
     // Start meal order without adding it to the cart immediately
     const handleStartMealOrder = (mealType) => {
-        setInProgressMeal({ ...mealType, items: [], price: mealType.price, quantity: 1 });
+        setInProgressMeal({ 
+            ...mealType, 
+            items: [], 
+            price: mealType.price, 
+            quantity: 1 
+        });
         setSelectedMealType(mealType);
         setEntreeCount(0);
         setSideCount(0);
         setWarningMessage('');
         setCurrentMenu('mealSelection');
-    };
-
+    };    
     // Add entree or side to the in-progress meal
     const handleAddToInProgressMeal = (item, type) => {
-        if (!inProgressMeal) return;
-
+        if (!inProgressMeal) {
+            console.log('In-progress meal is null');
+            return;
+        }
+    
         const updatedMeal = { ...inProgressMeal };
-
+    
         if (type === 'entree' && selectedMealType && entreeCount < selectedMealType.entrees) {
             updatedMeal.items.push(item);
+            console.log('Added entree:', item);
             setEntreeCount(entreeCount + 1);
         } else if (type === 'side' && selectedMealType && sideCount < selectedMealType.sides) {
             updatedMeal.items.push(item);
+            console.log('Added side:', item);
             setSideCount(sideCount + 1);
         } else {
             setWarningMessage('You cannot add more items than allowed for this meal type.');
+            console.log('Warning message set.');
             return;
         }
-
+    
         setInProgressMeal(updatedMeal);
-    };
+        console.log('Updated meal:', updatedMeal);
+    };    
 
     // Complete the in-progress meal and add to cart
     const handleCompleteMealOrder = () => {
@@ -243,19 +259,19 @@ const OrderPage = () => {
                             </div>
                             <div className="row">
                                 <div className="col-md-6">
-                                    <Entree
-                                        menuItems={menuItems.entrees}
-                                        handleAddToCurrentMeal={(item) =>
-                                            handleAddToInProgressMeal(item, 'entree')
-                                        }
+                                    <Entree 
+                                        menuItems={menuItems.entrees} 
+                                        handleAddToCurrentMeal={(item) => handleAddToInProgressMeal(item, 'entree')}
+                                        setInProgressMeal={inProgressMeal}
+                                        currentMenu={currentMenu}
                                     />
                                 </div>
                                 <div className="col-md-6">
-                                    <Side
-                                        menuItems={menuItems.sides}
-                                        handleAddToCurrentMeal={(item) =>
-                                            handleAddToInProgressMeal(item, 'side')
-                                        }
+                                    <Side 
+                                        menuItems={menuItems.sides} 
+                                        handleAddToCurrentMeal={(item) => handleAddToInProgressMeal(item, 'side')}
+                                        setInProgressMeal={inProgressMeal}
+                                        currentMenu={currentMenu}
                                     />
                                 </div>
                             </div>
