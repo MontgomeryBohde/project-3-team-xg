@@ -5,8 +5,11 @@ import CustomerHeader from "@/components/ui/customer/header/CustomerHeader";
 import CustomerLoginForm from "@/components/ui/customer/login/CustomerLoginForm";
 
 const CustomerLoginPage = () => {
-    localStorage.removeItem('loggedInCustomer');
-	localStorage.removeItem('loggedInCustomerName');
+    useEffect(() => {
+        // Clear localStorage items after component mounts (in the browser)
+        localStorage.removeItem("loggedInCustomer");
+        localStorage.removeItem("loggedInCustomerName");
+    }, []);
 
     return (
         <div className="customer-login-container vh-100 d-flex flex-column bg-light">
