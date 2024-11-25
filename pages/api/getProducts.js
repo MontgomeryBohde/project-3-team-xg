@@ -74,6 +74,39 @@ export default async function handler(req, res) {
                     break;
                 }
 
+                case 'menu': {
+                    console.log("Fetching menu items");
+                    const queryText = `
+                        SELECT menu_items.item_name AS name, menu_items.category
+                        FROM menu_items;
+                    `;
+                    result = await pool.query(queryText);
+                    break;
+                }
+
+                case 'menu-with-sizes': {
+                    console.log("Fetching menu items with sizes, IDs, and calories");
+                    const queryText = `
+                        SELECT 
+                            menu_items.id AS item_id,
+                            menu_items.item_name AS name, 
+                            item_sizes.item_size AS size, 
+                            menu_items.category, 
+                            ARRAY_AGG(inventory_items.item_name) AS inventory_names, 
+                            item_sizes.price,
+                            item_sizes.calories
+                        FROM menu_items
+                        JOIN item_sizes ON menu_items.id = item_sizes.item_id
+                        LEFT JOIN inventory_items ON inventory_items.id = ANY(menu_items.inventory_item_ids)
+                        GROUP BY menu_items.id, item_sizes.item_size, item_sizes.price, item_sizes.calories;
+
+                    `;
+                    
+                    // Run the query and get the result
+                    result = await pool.query(queryText);
+                    break;
+                }                              
+
                 default:
                     return res.status(400).json({ error: 'Invalid action' });
             }
