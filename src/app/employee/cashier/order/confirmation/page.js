@@ -15,18 +15,19 @@ const ConfirmationPage = () => {
     const [showDiscountPopUp, setShowDiscountPopUp] = useState(false);
 
     useEffect(() => {
-        // Retrieve cart items from query params or local storage
         const queryCart = new URLSearchParams(window.location.search).get('cart');
-        const storedCart = queryCart ? JSON.parse(queryCart) : JSON.parse(localStorage.getItem('cart')) || [];
+        const storedCart = queryCart 
+            ? JSON.parse(queryCart) 
+            : JSON.parse(sessionStorage.getItem('cart')) || [];
         setCartItems(storedCart);
-
+    
         // Retrieve discount details from localStorage
         const storedDiscount = localStorage.getItem('selectedDiscount');
         const storedTaxExempt = localStorage.getItem('isTaxExempt');
-
+    
         if (storedDiscount) setDiscount(Number(storedDiscount));
         if (storedTaxExempt) setTaxExempt(storedTaxExempt === 'true');
-    }, []);
+    }, []);    
 
     const calculateSubtotal = () => {
         return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
@@ -45,8 +46,8 @@ const ConfirmationPage = () => {
     };
 
     const handleReturn = () => {
-        // Save the cart items to local storage before returning
-        localStorage.setItem('cart', JSON.stringify(cartItems));
+        // Save the cart items to sessionStorage before returning
+        sessionStorage.setItem('cart', JSON.stringify(cartItems));
     };
 
     const handleQuantityChange = (index, quantity) => {
