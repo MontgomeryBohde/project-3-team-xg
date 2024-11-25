@@ -13,8 +13,8 @@ export async function POST(request) {
     // Insert new order into the database
     const result = await client.query(
       `INSERT INTO orders (customer_id, cashier_id, order_total, item_size_ids, meal_item_ids, payment_method, placed_time, order_status) 
-       VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP, 'Complete') 
-       RETURNING id`,
+      VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP AT TIME ZONE 'America/Chicago', 'Complete') 
+      RETURNING id;`,
       [customerId, cashierId, price, itemSizeIds, mealItemIds, paymentMethod]
     );
 

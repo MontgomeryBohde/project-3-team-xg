@@ -319,8 +319,6 @@ const CartPage = () => {
                 }
             }
         }
-
-        // get customerID
     
         // Prepare the data to send to the backend
         const requestBody = {
