@@ -61,7 +61,7 @@ const OrderPage = () => {
     useEffect(() => {
         const handlePopState = () => {
             // Retrieve cart items from local storage when navigating back
-            const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
+            const storedCart = JSON.parse(sessionStorage.getItem('cart')) || [];
             setCart(storedCart);
         };
     
@@ -166,7 +166,7 @@ const OrderPage = () => {
 
     const handleNavigateToConfirmation = () => {
         // Save the current cart state to local storage before navigating
-        localStorage.setItem('cart', JSON.stringify(cart));
+        sessionStorage.setItem('cart', JSON.stringify(cart));
     };    
 
     return (
