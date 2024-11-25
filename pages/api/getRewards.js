@@ -2,14 +2,17 @@
 import { query } from '@lib/db';
 
 export default async function handler(req, res) {
-    const { type, customer_id } = req.query;
+    const { type, customer_id, n } = req.query;
+
+    // Default n to 5 if not provided
+    const limit = n ? Math.min(parseInt(n), 100) : 5; // Limit to a maximum of 100 orders, default to 5
 
     if (req.method === 'GET' || req.method === 'POST') {
         try {
             let result;
 
             switch (type) {
-                case 'orders': { // Get past <= 5 orders
+                case 'orders': { // Get past <= n orders
                     console.log("Executing orders query");
 
                     const queryText = `
@@ -31,10 +34,10 @@ export default async function handler(req, res) {
                         FROM orders o
                         WHERE o.customer_id = $1
                         ORDER BY o.placed_time DESC
-                        LIMIT 5;
+                        LIMIT $2;
                     `;
 
-                    result = await query(queryText, [customer_id]);
+                    result = await query(queryText, [customer_id, limit]);
                     break;
                 }
 
