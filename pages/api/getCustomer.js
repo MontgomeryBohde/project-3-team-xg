@@ -153,7 +153,7 @@ export default async function handler(req, res) {
                             .json({ error: "Failed to remove customer" });
                     }
                 }
-
+                
                 case "getCustomerByNum": {
                   const { phoneNumber } = req.query;
               
@@ -182,8 +182,7 @@ export default async function handler(req, res) {
                       console.error("Database Error in getCustomerByNum:", error);
                       return res.status(500).json({ error: "Failed to fetch customer data" });
                   }
-              }              
-
+              }
                 default:
                     return res.status(400).json({ error: "Invalid action" });
             }

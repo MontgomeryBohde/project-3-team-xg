@@ -2,6 +2,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import "./globals.css";
 import { Inter } from "next/font/google";
 import BootstrapClient from '@/components/BootstrapClient.js';
+import ChatBot from '@/components/ui/chatbot/popup/ChatBotPopup.js';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -16,6 +17,7 @@ export default function RootLayout({ children }) {
       <body className={inter.className}>
         {children}
         <BootstrapClient />
+        <ChatBot />
       </body>
     </html>
   );

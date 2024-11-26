@@ -12,7 +12,19 @@ import './confirmation.css';
 const CashConfirmation = () => {
 	const [timeLeft, setTimeLeft] = useState(15);
 	const [paymentMethod, setPaymentMethod] = useState("Cash");
+	const [orderId, setOrderId] = useState(null); // State to store orderId
 	const router = useRouter();
+
+	// Retrieve orderId and paymentMethod from localStorage
+	useEffect(() => {
+		if (typeof window !== 'undefined') {
+			const storedOrderId = localStorage.getItem('orderId');
+			const storedPaymentMethod = localStorage.getItem('paymentMethod');
+
+			if (storedOrderId) setOrderId(storedOrderId);
+			if (storedPaymentMethod) setPaymentMethod(storedPaymentMethod);
+		}
+	}, []);
 
 	// Set up the timer countdown
 	useEffect(() => {
@@ -33,7 +45,12 @@ const CashConfirmation = () => {
 	// Redirect when timeLeft reaches 0
 	useEffect(() => {
 		if (timeLeft === 0) {
-			router.push('/');
+			// delete old login info
+			localStorage.removeItem('loggedInCustomer');
+			localStorage.removeItem('loggedInCustomerName');
+
+			// go to login
+			router.push('/customer/kiosk/login');
 		}
 	}, [timeLeft, router]);
 
@@ -46,7 +63,7 @@ const CashConfirmation = () => {
 				<CustomerHeader />
 				<div className="confirm-content">
 					<h3>Your Order Number is:</h3>
-					<h1>123456</h1>
+					<h1>{orderId || "Loading..."}</h1>
 					{paymentMethod === 'Cash' && <h2>Please pay at counter.</h2>}
 					<Image src="/panda-icon.png" alt="Panda Icon" width={100} height={100} />
 					<h2>Thank you!</h2>

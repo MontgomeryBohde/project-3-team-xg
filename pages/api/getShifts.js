@@ -2,13 +2,37 @@
 import { query } from "@lib/db";
 
 export default async function handler(req, res) {
-    const { method, body } = req;
+    const { method, body, query: queryParams } = req;
 
     try {
         if (method === "GET") {
-            // Get all shifts
-            const result = await query("SELECT * FROM shifts");
-            return res.status(200).json({ shifts: result });
+            // Check if the request includes payData parameter
+            if (queryParams.includePayData === "true") {
+                const payDataQuery = `
+                    SELECT 
+                        e.id,
+                        e.first_name,
+                        e.last_name,
+                        e.hourly_rate,
+                        SUM(EXTRACT(EPOCH FROM (COALESCE(s.end_time, NOW()) - s.start_time)) / 3600) AS total_hours,
+                        SUM(EXTRACT(EPOCH FROM (COALESCE(s.end_time, NOW()) - s.start_time)) / 3600) * e.hourly_rate AS total_pay
+                    FROM 
+                        employees e
+                    LEFT JOIN 
+                        shifts s ON e.id = s.employee_id
+                    GROUP BY 
+                        e.id, e.first_name, e.last_name, e.hourly_rate
+                    ORDER BY 
+                        e.id;
+                `;
+
+                const payData = await query(payDataQuery);
+                return res.status(200).json({ payData });
+            }
+
+            // Default behavior: get all shifts
+            const shifts = await query("SELECT * FROM shifts");
+            return res.status(200).json({ shifts });
         }
 
         if (method === "POST") {
