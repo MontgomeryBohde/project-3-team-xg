@@ -18,7 +18,7 @@ const LoyaltyLoginForm = () => {
 
             console.log("num: ", num);
 
-            const response = await fetch(`/api/getCustomer?phoneNumber=${encodeURIComponent(num)}`);
+            const response = await fetch(`/api/getCustomer?type=getCustomerByNum&phoneNumber=${encodeURIComponent(num)}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch customer data');
             }
