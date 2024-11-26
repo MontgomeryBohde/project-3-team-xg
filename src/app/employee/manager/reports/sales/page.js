@@ -45,18 +45,17 @@ function SalesChart() {
             if (!response.ok) {
                 throw new Error('Failed to fetch sales data');
             }
-
+    
             const salesData = await response.json();
             console.log('Sales Data:', salesData); // Debugging log
-
-            // Validate response format
-            if (!Array.isArray(salesData)) {
+    
+            if (!salesData.success || !Array.isArray(salesData.data)) {
                 throw new Error('Invalid sales data format');
             }
-
-            const labels = salesData.map(entry => new Date(entry.order_date)); // Use correct field name
-            const data = salesData.map(entry => entry.daily_total); // Use correct field name
-
+    
+            const labels = salesData.data.map(entry => new Date(entry.order_date));
+            const data = salesData.data.map(entry => parseFloat(entry.daily_total));
+    
             setChartData({
                 labels: labels,
                 datasets: [
@@ -73,7 +72,7 @@ function SalesChart() {
         } catch (error) {
             console.error('Error fetching sales data:', error);
         }
-    };
+    };    
 
     useEffect(() => {
         fetchSalesData(selectedPeriod);

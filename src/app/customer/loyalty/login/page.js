@@ -1,14 +1,13 @@
-// src/app/customer/kiosk/login/page.js
 "use client";
 import React, { useEffect } from "react";
 import CustomerHeader from "@/components/ui/customer/header/CustomerHeader";
-import CustomerLoginForm from "@/components/ui/customer/login/CustomerLoginForm";
+import LoyaltyLoginForm from "@/components/ui/customer/loyalty/LoyaltyLoginForm";
 
-const CustomerLoginPage = () => {
+const LoyaltyLoginPage = () => {
     useEffect(() => {
-        // Clear localStorage items after component mounts (in the browser)
-        localStorage.removeItem("loggedInCustomer");
-        localStorage.removeItem("loggedInCustomerName");
+        // Delete items from localStorage on page load
+        localStorage.removeItem('loyaltyCustomer');
+        localStorage.removeItem('loggedInCustomerName');
     }, []);
 
     return (
@@ -16,11 +15,11 @@ const CustomerLoginPage = () => {
             <CustomerHeader />
             <div className="flex-grow-1 d-flex flex-column align-items-center justify-content-center" style={{ padding: '2rem' }}>
                 <div className="card p-5 shadow-lg" style={{ width: '100%', maxWidth: '500px' }}>
-                    <CustomerLoginForm />
+                    <LoyaltyLoginForm />
                 </div>
             </div>
         </div>
     );
 };
 
-export default CustomerLoginPage;
+export default LoyaltyLoginPage;

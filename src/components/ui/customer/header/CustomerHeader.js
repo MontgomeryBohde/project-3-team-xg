@@ -1,10 +1,11 @@
 // src/components/ui/customer/header/CustomerHeader.js
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import "./CustomerHeader.css";
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import './CustomerHeader.css';
+import GoogleTranslate from '@/components/GoogleTranslate';
 
 const CustomerHeader = () => {
   const [customer, setCustomer] = useState('');
@@ -65,8 +66,10 @@ const CustomerHeader = () => {
     updateTime();
     const intervalId = setInterval(updateTime, 60000); // Update time every minute
 
-    return () => clearInterval(intervalId); // Cleanup interval on component unmount
-  }, []);
+    return () => {
+      clearInterval(intervalId);
+    };
+}, []);
 
   const handleHomePush = () => {
     router.push("/customer");
@@ -112,6 +115,7 @@ const CustomerHeader = () => {
           <span className="ms-2">{currentTime}</span>
         </div>
       </div>
+      <GoogleTranslate />
       <div>
         <button className="btn btn-light me-2" onClick={increaseFontSize}>
           <i className="bi bi-zoom-in"></i>

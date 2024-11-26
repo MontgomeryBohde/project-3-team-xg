@@ -153,7 +153,36 @@ export default async function handler(req, res) {
                             .json({ error: "Failed to remove customer" });
                     }
                 }
-
+                
+                case "getCustomerByNum": {
+                  const { phoneNumber } = req.query;
+              
+                  if (!phoneNumber) {
+                      console.error("Validation Error: Missing customer phoneNumber");
+                      return res.status(400).json({ error: "Customer phoneNumber is required." });
+                  }
+              
+                  try {
+                      const customer = await query(
+                          `
+                          SELECT * 
+                          FROM customers 
+                          WHERE phone_number = $1;
+                          `,
+                          [phoneNumber]
+                      );
+              
+                      if (!customer || customer.length === 0) {
+                          console.error("No customer found with phoneNumber:", phoneNumber);
+                          return res.status(404).json({ error: "Customer not found" });
+                      }
+              
+                      return res.status(200).json(customer[0]); // Return the first customer record
+                  } catch (error) {
+                      console.error("Database Error in getCustomerByNum:", error);
+                      return res.status(500).json({ error: "Failed to fetch customer data" });
+                  }
+              }
                 default:
                     return res.status(400).json({ error: "Invalid action" });
             }

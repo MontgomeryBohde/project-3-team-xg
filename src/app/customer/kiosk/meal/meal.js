@@ -83,6 +83,8 @@ const CustomerMealSelect = () => {
 
 	// Handle item button press
 	const handlePressed = (item, type) => {
+		console.log(`Pressed: ${item} | Type: ${type}`);  // Log to check if the handler is triggered
+	
 		if (type === "Side") {
 			setSelectedSides((prevSelectedSides) => {
 				if (prevSelectedSides.includes(item)) {
@@ -100,7 +102,7 @@ const CustomerMealSelect = () => {
 				}
 			});
 		}
-	};
+	};	
 
 	// Handle quantity change for selected entrees
 	const handleQuantityChange = (item, increment) => {
