@@ -1,7 +1,5 @@
-// DiscountPopUp.js
 // src/components/ui/employee/cashier/order/confirmation/DiscountPopUp.js
 import React, { useState, useEffect } from 'react';
-import 'bootstrap/dist/css/bootstrap.css';
 
 const DiscountPopUp = ({ onClose, onApplyDiscount }) => {
     const [selectedDiscount, setSelectedDiscount] = useState(0);

@@ -201,3 +201,118 @@ Integrating when everyone is done
 Rebecca
 Doing rest of sales reports
 -Checked on track for sprint 2
+_________Sprint 3_________
+11/15 Fri
+11:36-11:52
+Alisa
+Did: cart page, added orders margin
+Today: add back quantity selection for menu page on customer
+Risha
+Did: customer integration, cart page
+Today: continue cart page, fix prices, add logout button
+Monte
+Working on translation API
+Roadblock: deciding what API and implementation to use
+Tee
+Did integrations of all pages + API, refactored pages
+Rebecca
+Finished all sales pages, did some small edits for integrations and styling, added passwords for each employee - change customer login to phone number + 4 digit code (should log in using either)
+Roadblock: db query isn’t working because based on new database implementation
+-Due Monday: make look cleaner + fixes
+-Cashier - confirm order, card payment
+-Customer - send order to db
+-Cart doesn’t clear after order is made
+-1st is database changes
+-Then accessibility
+-Then rewards
+-Then employee shift tracking
+-Then Trevor-mode
+Retrospective of Sprint 2:
+-Scrum board was good for this sprint since we had more stuff
+-Forgot to put description of task
+-Liked PRs for quality checks
+-MVP looks good
+-Vercel was annoying
+Loyalty program:
+-See past orders
+-Located on customer interface but (go to see my rewards) (kiosk order)
+-Goal: 10 orders = free bowl
+-Member specific rewards show up on menu during ordering
+-Discount: 10% discount on rest of orders this month after 12 orders
+-After 5 orders of the same item, get 30% off the same item next time within 1 month
+-Customer kiosk when logged in has reorder at the top with the cart they ordered last time
+
+11/18 Mon
+2:25-2:36
+Alisa
+Did: adding inventory id to dropdowns on menu change, fixing conflicts with on order branch
+Today: finishing menu change
+Risha
+Finished logout button for employee header, fixed price display on customers cart
+Today: working on sending order for customers
+Monte
+Finished database, added card payment page on cashier
+Today: working on submit order and go back to order page, working on translations api
+Tee
+Did: refactored api stuff (combined products and sales)
+fixing cashier menu page, connecting inventory changes to database
+Rebecca
+Working on written materials, approved pull requests
+Work on fixing backend after db changes
+-Monte-start working on protection against SQL injections if possible
+
+11/20 Wed
+3:05-3:14
+Alisa
+Employee info connect to db, menu selection same
+Fixing orders page to connect to db
+Risha
+Finished cart page and sends orders, doing meal connect to db
+Continuing to work on for testing, waiting for menu part to merge, working on manager menu
+Monte
+Updated credit card popup, making updates to login and customer header (insert customer to db for guest login)
+Working on translations
+Issue with local storage updating customer header
+Tee
+Fixed cashier order page, can add + edit + delete new inventory items
+Connect employee page to db
+Rebecca
+Written materials
+Will working approving PRs and connecting sales pages to db
+
+11/22 Fri
+11:37-11:45
+Alisa
+Fixing orders view for db, adding employee work times
+Fixing menu inventory association
+Risha
+Finished manager menu page
+Working on adjusting text size
+Monte
+Fixing translations bugs
+Tee
+Added clock in clock out page
+Working on allergen, vegan info
+Rebecca
+Approved some PRs
+Working on rewards
+
+11/25 Mon
+11:34-11:40
+Alisa
+Worked on order search and delete, menu inventory assoc changes
+Finish menu change
+Risha
+Screen magnification, finished db connection for inserting orders
+Halfway through loyalty page
+Monte
+Almost done with translate
+Halfway through chatbot, will work on seasonal menu items
+Weird bug with translation icon disappearing when changing pages
+Tee
+Added pay page in employees
+Waiting for everything to be merged in for nutrition on kiosk, refactoring for Trevor-mode
+Rebecca
+Finished loyalty backend, finished up sales reports bugs
+Approving PRs
+Product usage chart bug
