@@ -16,15 +16,19 @@ const MenuPopularity = () => {
                 if (!response.ok) {
                     throw new Error('Failed to fetch popular items');
                 }
-                const data = await response.json();
+                const { success, data } = await response.json();
+                if (!success || !Array.isArray(data)) {
+                    throw new Error('Invalid API response format');
+                }
                 setPopularItems(data);
             } catch (error) {
                 console.error('Error fetching popular items:', error);
+                setPopularItems([]); // Fallback to an empty array
             }
         }
-
+    
         fetchPopularItems();
-    }, [n]); // Fetch popular items whenever `n` changes    
+    }, [n]); // Refetch when `n` changes    
 
     const handleNChange = (event) => {
         const newN = parseInt(event.target.value, 10);

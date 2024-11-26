@@ -75,23 +75,23 @@ export default async function handler(req, res) {
                             SELECT unnest(o.item_size_ids) AS item_id, 'menu_item' AS item_type
                             FROM orders o
                             UNION ALL
-                            SELECT unnest(mi.entree_ids) AS item_id, 'entree_item' AS item_type
+                            SELECT unnest(meal_items.entree_ids) AS item_id, 'entree_item' AS item_type
                             FROM orders o
-                            JOIN meal_items mi ON mi.id = ANY(o.meal_item_ids)
+                            JOIN meal_items ON meal_items.id = ANY(o.meal_item_ids)
                             UNION ALL
-                            SELECT mi.side_id AS item_id, 'side_item' AS item_type
+                            SELECT meal_items.side_id AS item_id, 'side_item' AS item_type
                             FROM orders o
-                            JOIN meal_items mi ON mi.id = ANY(o.meal_item_ids)
+                            JOIN meal_items ON meal_items.id = ANY(o.meal_item_ids)
                         )
                         SELECT 
-                            COALESCE(m.item_name, ei.item_name, si.item_name) AS food_name, 
-                            COALESCE(m.category, ei.category, si.category) AS menu_category,
+                            COALESCE(menu_items.item_name, entree_items.item_name, side_items.item_name) AS food_name, 
+                            COALESCE(menu_items.category, entree_items.category, side_items.category) AS menu_category,
                             COUNT(*) AS times_ordered
-                        FROM combined_items ci
-                        LEFT JOIN item_sizes isz ON isz.id = ci.item_id
-                        LEFT JOIN menu_items m ON m.id = isz.item_id
-                        LEFT JOIN menu_items ei ON ei.id = ANY(mi.entree_ids)
-                        LEFT JOIN menu_items si ON si.id = mi.side_id
+                        FROM combined_items
+                        LEFT JOIN item_sizes ON item_sizes.id = combined_items.item_id
+                        LEFT JOIN menu_items ON menu_items.id = item_sizes.item_id
+                        LEFT JOIN menu_items entree_items ON entree_items.id = combined_items.item_id
+                        LEFT JOIN menu_items side_items ON side_items.id = combined_items.item_id
                         GROUP BY food_name, menu_category
                         ORDER BY times_ordered DESC
                         LIMIT $1;
