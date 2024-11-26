@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 const LoyaltyLoginForm = () => {
@@ -10,19 +10,19 @@ const LoyaltyLoginForm = () => {
     const [customer, setCustomer] = useState(null);
     const router = useRouter();
 
-    // fetch customer data
+    // Fetch customer data
     const fetchCustomerData = async () => {
         try {
             setLoading(true);
             setError(null);
 
             console.log("num: ", num);
-        
+
             const response = await fetch(`/api/getCustomer?phoneNumber=${encodeURIComponent(num)}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch customer data');
             }
-        
+
             const data = await response.json();
             return data;
         } catch (err) {
@@ -41,10 +41,10 @@ const LoyaltyLoginForm = () => {
 
         console.log("num: ", num);
         try {
-            // Validate the entered in phone number
+            // Validate the entered phone number
             if (num) {
-                // fetching customer data associated with the num
-                const customerData = await fetchCustomerData(num);
+                // Fetch customer data associated with the num
+                const customerData = await fetchCustomerData();
 
                 if (!customerData || Object.keys(customerData).length === 0) {
                     setError("No customer found with the provided phone number.");
@@ -52,17 +52,14 @@ const LoyaltyLoginForm = () => {
                 }
 
                 setCustomer(customerData);
+                console.log("customerData: ", customerData);
 
-                // log for debugging
-                console.log(customerData);
-                console.log(customer);
-
-                // push to local storage
-                localStorage.setItem("loyaltyCustomer", JSON.stringify(customer));
-                localStorage.setItem("loggedInCustomerName", customer.first_name);
+                // Store customer data in local storage and navigate
+                localStorage.setItem("loyaltyCustomer", JSON.stringify(customerData));
+                localStorage.setItem("loggedInCustomerName", customerData.first_name);
 
                 // Navigate to the meal selection page
-                router.push("/customer/kiosk/loyalty/main");
+                router.push("/customer/loyalty/main");
             } else {
                 setError("Invalid phone number. Please enter a valid phone number.");
             }
@@ -98,8 +95,8 @@ const LoyaltyLoginForm = () => {
                     </div>
                 )}
 
-                <button type="submit" className="btn btn-danger w-100">
-                    Submit
+                <button type="submit" className="btn btn-danger w-100" disabled={loading}>
+                    {loading ? "Loading..." : "Submit"}
                 </button>
             </form>
             <button

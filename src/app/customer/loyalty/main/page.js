@@ -6,7 +6,7 @@ export default function Home() {
   const [customer, setCustomer] = useState(null);
   const [points, setPoints] = useState(null);
   const [numOrders, setNumOrders] = useState(null);
-  const [orders, setOrders] = useState(null);
+  const [orders, setOrders] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -42,6 +42,8 @@ export default function Home() {
         if (!response.ok) throw new Error("Failed to fetch points");
         const data = await response.json();
         setPoints(data[0]?.rewards_points || 0);
+
+        console.log("points:", points);
       } catch (err) {
         console.error("Error fetching points:", err);
         setError("Unable to fetch points.");
@@ -54,6 +56,8 @@ export default function Home() {
         if (!response.ok) throw new Error("Failed to fetch orders this month");
         const data = await response.json();
         setNumOrders(data[0]?.orders_this_month || 0);
+
+        console.log("num orders this month:", numOrders);
       } catch (err) {
         console.error("Error fetching orders:", err);
         setError("Unable to fetch orders this month.");
@@ -62,37 +66,29 @@ export default function Home() {
 
     const fetchOrders = async () => {
       try {
-        setLoading(true);
-        console.log("Fetching orders for customer ID:", customer.id);
-        const response = await fetch(`/api/getRewards?type=orders&customer_id=${customer.id}`);
-        
-        // Log the response to ensure it's valid
-        console.log("Response:", response);
-        
-        if (!response.ok) throw new Error("Failed to fetch orders");
-    
+        const response = await fetch('/api/getRewards?type=orders&customer_id=123&n=5'); // Updated API path with query parameters
         const data = await response.json();
-        console.log("Fetched orders:", data); // Log the data to check its structure
+    
+        console.log("Orders:", data);
+    
+        // Check if the data is an array and handle it
+        if (!Array.isArray(data)) {
+          console.log('crying');
+          return;
+        }
+    
+        // Set orders
         setOrders(data);
-      } catch (err) {
-        console.error("Error fetching orders:", err);
-        setError("Unable to fetch orders.");
-      } finally {
-        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching orders:', error);
       }
-    };    
-
-    fetchPoints();
-    console.log("points");
-    fetchOrdersThisMonth();
-    console.log("monthly orders");
+    };
+    
+  
     fetchOrders();
-    console.log("reg orders");
+    fetchPoints();
+    fetchOrdersThisMonth();
   }, [customer]); // Depend on `customer`, so this runs when it's set
-
-  if (loading) {
-    return <div>Loading...</div>; // You can show a loading spinner or message here
-  }
 
   if (error) {
     return <p className="alert alert-danger">{error}</p>;
@@ -140,14 +136,36 @@ export default function Home() {
               </tr>
             </thead>
             <tbody>
-              {orders?.map((order) => (
-                <tr key={order.id}>
-                  <td>{order.id}</td>
-                  <td>{order.items}</td>
-                  <td>${order.total}</td>
-                  <td>{order.points}</td>
+              {Array.isArray(orders) && orders.length > 0 ? (
+                orders.map((order) => (
+                  <tr key={order.order_id}>
+                    <td>{order.order_id}</td>
+                    <td>
+                      <ul>
+                        {order.item_size_details?.map((item, index) => (
+                          <li key={`item-size-${index}`}>
+                            {item.item_name} ({item.item_size}) - ${item.price.toFixed(2)}
+                          </li>
+                        ))}
+                        {order.meal_item_details?.map((meal, index) => (
+                          <li key={`meal-item-${index}`}>
+                            {meal.item_name}
+                            {meal.side_name && ` with ${meal.side_name}`}
+                            {meal.entree_names && ` - Entrees: ${meal.entree_names}`}
+                            - ${meal.price.toFixed(2)}
+                          </li>
+                        ))}
+                      </ul>
+                    </td>
+                    <td>${order.order_total.toFixed(2)}</td>
+                    <td>{/* Placeholder for Points */}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4">No orders found.</td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
