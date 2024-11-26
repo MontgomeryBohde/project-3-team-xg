@@ -1,6 +1,5 @@
 // src/app/employee/cashier/order/confirmation/page.js
 'use client';
-import 'bootstrap/dist/css/bootstrap.css';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import DiscountPopUp from '@/components/ui/employee/cashier/order/confirmation/DiscountPopUp';

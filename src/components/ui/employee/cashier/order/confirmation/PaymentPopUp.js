@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import 'bootstrap/dist/css/bootstrap.css';
 import CreditCardPopUp from './CreditCardPopUp'; // Adjust the import path as necessary
 
 const PaymentPopUp = ({ onClose }) => {

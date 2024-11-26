@@ -1,39 +1,49 @@
-"use client"
+// src/app/employee/manager/employeeinfo/page.js
+"use client";
 
-import React from "react";
-import EmployeeCard from "./EmployeeCard"; 
-import "./EmployeeInfo.css";
-
-
-import EmployeeLogInHeader from "@/components/ui/employee/header/EmployeeLogInHeader";
+import React, { useState } from "react";
+import EmployeeLogInHeader from '@/components/ui/employee/header/EmployeeLogInHeader';
+import EmployeeDetails from "@/components/ui/employee/manager/employee/EmployeeDetails";
+import EmployeePay from "@/components/ui/employee/manager/employee/EmployeePay";
 
 const EmployeeInfo = () => {
-    const employees = [
-        { id: "1", name: "Alisa Lu", clockedIn: true, position: "Manager" },
-        { id: "2", name: "Monte Bode", clockedIn: false, position: "Server" },
-        { id: "3", name: "Rebecca Chen", clockedIn: true, position: "Server" },
-        { id: "4", name: "Risha Thimmancherla", clockedIn: true, position: "Server" },
-        { id: "5", name: "Tee Li", clockedIn: false, position: "Cashier" },
-    ];
+    const [activeTab, setActiveTab] = useState("details");
+
+    const renderTabContent = () => {
+        if (activeTab === "details") {
+            return <EmployeeDetails />;
+        } else if (activeTab === "pay") {
+            return <EmployeePay />;
+        }
+    };
 
     return (
-        <div>
-            <EmployeeLogInHeader />
-            <div className="employee-info-container">
-                <h1 className="title">Employee Information</h1>
-                <div className="employee-cards-container">
-                    {employees.map((employee) => (
-                        <EmployeeCard
-                            key={employee.id}
-                            employeeId={employee.id}
-                            name={employee.name}
-                            clockedIn={employee.clockedIn}
-                            position={employee.position}
-                        />
-                    ))}
-                </div>
+        <>
+        <EmployeeLogInHeader />
+        <div className="container mt-4">
+            <div className="d-flex justify-content-center my-3">
+                <button
+                    className={`btn me-2 ${
+                        activeTab === "details" ? "btn-primary" : "btn-outline-primary"
+                    }`}
+                    onClick={() => setActiveTab("details")}
+                >
+                    <i className="fas fa-info-circle me-2"></i>
+                    Employee Details
+                </button>
+                <button
+                    className={`btn ${
+                        activeTab === "pay" ? "btn-primary" : "btn-outline-primary"
+                    }`}
+                    onClick={() => setActiveTab("pay")}
+                >
+                    <i className="fas fa-dollar-sign me-2"></i>
+                    Pay Information
+                </button>
             </div>
-        </div>  
+            <div className="tab-content p-4 border rounded shadow">{renderTabContent()}</div>
+        </div>
+        </>
     );
 };
 

@@ -26,6 +26,10 @@ export async function GET(request) {
 
     await client.end();
 
+    if (itemSizes.length === 0) {
+      return NextResponse.json({ error: 'No item sizes found for this item_id' }, { status: 404 });
+    }
+
     return NextResponse.json(itemSizes);
   } catch (error) {
     console.error('Database query error:', error);

@@ -1,4 +1,3 @@
-// src/app/employee/manager/orders/page.js
 "use client";
 import React, { useEffect, useState } from 'react';
 import './OrderInfo.css';
@@ -8,66 +7,142 @@ import EmployeeLogInHeader from '@/components/ui/employee/header/EmployeeLogInHe
 const OrderInfo = () => {
     const [orders, setOrders] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const ordersPerPage = 5; 
+    const [searchQuery, setSearchQuery] = useState('');
+    const [loadedOrdersCount, setLoadedOrdersCount] = useState(0); 
+    const numPerPage = 3;
+    const ordersPerLoad = 100;
 
-    //will get info form the database in the future when in works 
-    const getOrders = async () => {
-        const sampleData = [
-            { id: 1, time: '2024-10-31 14:30', type: 'Plate', contents: ['Steamed Rice', 'Broccoli Beef', 'Orange Chicken'], total: 12.99 },
-            { id: 2, time: '2024-10-31 15:00', type: 'Bigger Plate', contents: ['Steamed Rice', 'Terriyaki Chicken', 'Spring Rolls'], total: 15.99 },
-            { id: 3, time: '2024-10-31 15:15', type: 'Bowl', contents: ['Super Greens', 'Orange Chicken', 'Apple Pie Roll'], total: 10.49 },
-            { id: 4, time: '2024-10-31 17:15', type: 'Bowl', contents: ['Chow Mein', 'Honey Walnut Shrimp'], total: 10.49 },
-            { id: 5, time: '2024-10-31 17:15', type: 'Plate', contents: ['Chow Mein', 'Broccoli Beef', 'Beijing Beef', 'Dr. Pepper'], total: 10.49 },
-            { id: 6, time: '2024-10-31 17:30', type: 'Plate', contents: ['Fried Rice', 'Kung Pao Chicken', 'Spring Rolls'], total: 11.99 },
-            { id: 7, time: '2024-10-31 18:00', type: 'Bowl', contents: ['Brown Rice', 'Honey Walnut Shrimp'], total: 10.49 },
-            { id: 8, time: '2024-10-31 18:15', type: 'Bigger Plate', contents: ['White Rice', 'Orange Chicken', 'Kung Pao Chicken', 'Chow Mein'], total: 16.49 },
-            { id: 9, time: '2024-10-31 18:30', type: 'Plate', contents: ['Super Greens', 'Beijing Beef', 'Spring Rolls'], total: 13.49 },
-            { id: 10, time: '2024-10-31 18:45', type: 'Plate', contents: ['Fried Rice', 'Broccoli Beef', 'Honey Walnut Shrimp'], total: 12.99 }
-        ];
-        setOrders(sampleData);
+    const getOrders = async (offset = 0) => {
+        try {
+            const response = await fetch(`/api/getOrders?offset=${offset}&limit=${ordersPerLoad}`);
+            if (!response.ok) {
+                throw new Error(`Error: ${response.status}`);
+            }
+            const data = await response.json();
+            setOrders((prevOrders) => [...prevOrders, ...data]); 
+            setLoadedOrdersCount(loadedOrdersCount + data.length);
+        } catch (error) {
+            console.error("Failed to fetch orders:", error);
+        }
     };
 
     useEffect(() => {
-        getOrders();
+        getOrders(); 
     }, []);
 
-    //index range of the current orders on the page 
-    const indexOfLastOrder = currentPage * ordersPerPage;
-    const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
-    const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
+    const deleteOrder = async (orderId) => {
+        try {
+            const response = await fetch(`/api/deleteOrder?id=${orderId}`, {
+                method: 'DELETE',
+            });
 
-    //go to next page
+            if (response.ok) {
+                setOrders(orders.filter(order => order.id !== orderId));
+            } else {
+                const data = await response.json();
+                console.error(data.message);
+            }
+        } catch (error) {
+            console.error("Error deleting order:", error);
+        }
+    };
+
+    const filteredOrders = searchQuery.trim() === ''
+    ? orders
+    : [...new Map(orders.filter(order => order.id.toString() === searchQuery)
+        .map(order => [order.id, order])).values()];
+
+
+    const indexOfLastOrder = currentPage * numPerPage;
+    const indexOfFirstOrder = indexOfLastOrder - numPerPage;
+    const currentOrders = filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder);
+
     const nextPage = () => {
-        if (currentPage < Math.ceil(orders.length / ordersPerPage)) {
+        if (currentPage < Math.ceil(filteredOrders.length / numPerPage)) {
             setCurrentPage(currentPage + 1);
         }
     };
 
-    //go to prev page
     const prevPage = () => {
         if (currentPage > 1) {
             setCurrentPage(currentPage - 1);
         }
     };
 
+    const handleSearchChange = (e) => {
+        setSearchQuery(e.target.value);
+        setCurrentPage(1);
+    };
+
+    const loadMoreOrders = () => {
+        getOrders(loadedOrdersCount); //need to load the next 100 orders
+    };
+
     return (
-        <div className="order-info-container">
+        <>
             <EmployeeLogInHeader />
-            <h1 className="title">Order Information</h1>
-            <div className="order-cards-container">
-                {currentOrders.map(order => (
-                    <OrderCard key={order.id} order={order}/>
-                ))}
+            <div className="order-info-container">
+                <h1 className="title">Order Information</h1>
+
+                {/* Search */}
+                <div className="search-container">
+                    <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Search by Order ID"
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                    />
+                </div>
+
+                {/* Order Cards */}
+                <div className="order-cards-container">
+                    {currentOrders.length > 0 ? (
+                        currentOrders.map(order => (
+                            <OrderCard
+                                key={order.id}
+                                order={order}
+                                onDelete={deleteOrder}
+                            />
+                        ))
+                    ) : (
+                        <p>No orders found matching the search criteria.</p>
+                    )}
+                </div>
+
+                {/* Page Buttons */}
+                <div className="page-buttons d-flex justify-content-between">
+                    <button
+                        onClick={prevPage}
+                        disabled={currentPage === 1}
+                        className="btn btn-info"
+                    >
+                        Previous Page
+                    </button>
+                    <button
+                        onClick={nextPage}
+                        disabled={currentPage >= Math.ceil(filteredOrders.length / numPerPage)}
+                        className="btn btn-info"
+                    >
+                        Next Page
+                    </button>
+                </div>
+
+                {/* Button to Load More */}
+                <div className="load-more-container text-center mt-3">
+                    <button onClick={loadMoreOrders} className="btn btn-primary">
+                        Load More Orders
+                    </button>
+                </div>
+
+                {/* Info */}
+                <div className="page-info mt-3 text-center">
+                    <p className="mb-0 fs-5 fw-bold">
+                        Page {currentPage} of {Math.ceil(filteredOrders.length / numPerPage)}
+                    </p>
+                </div>
             </div>
-            <div className="page-buttons">
-                <button onClick={prevPage} disabled={currentPage === 1}> 
-                    Previous Page
-                </button>
-                <button onClick={nextPage} disabled={currentPage === Math.ceil(orders.length / ordersPerPage)}>
-                    Next Page
-                </button>
-            </div>
-        </div>
+        </>
     );
 };
 

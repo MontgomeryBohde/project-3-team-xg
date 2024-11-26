@@ -1,219 +1,290 @@
-'use client'
+// src/app/employee/manager/inventory/page.js
+'use client';
 
-import { useState } from 'react';
-import './inventory.css';
+import { useState, useEffect, useRef } from 'react';
 import EmployeeLogInHeader from '@/components/ui/employee/header/EmployeeLogInHeader';
+import InventoryPopUp from '@/components/ui/employee/manager/inventory/InventoryPopUp';
+import { FaAppleAlt, FaDrumstickBite, FaCarrot, FaCocktail, FaToolbox, FaUtensils } from 'react-icons/fa';
+import './inventory.css';
 
-export default function Menu() {
-    // Placeholders for now
-    const [appetizers, setAppetizers] = useState(["Appetizer1", "Appetizer2", "Appetizer3"]);
-    const [meats, setMeats] = useState(["Meat1", "Meat2", "Meat3"]);
-    const [vegetables, setVegetables] = useState(["Veg1", "Veg2", "Veg3"]);
-    const [assorted, setAssorted] = useState(["Assorted1", "Assorted2", "Assorted3"]);
-    const [drinks, setDrinks] = useState(["Drink1", "Drink2", "Drink3"]);
+const Inventory = () => {
+    const [inventoryItems, setInventoryItems] = useState({
+        Appetizer: [],
+        Meats: [],
+        Vegetables: [],
+        Assorted: [],
+        Drinks: [],
+        Utensils: [],
+    });
 
     const [selectedCategory, setSelectedCategory] = useState("Appetizer");
-    const [selectedItem, setSelectedItem] = useState(null);
+    const [selectedItem, setSelectedItem] = useState(false);
+    const [itemId, setItemId] = useState(null);
     const [itemName, setItemName] = useState('');
-    const [itemSize, setItemSize] = useState('Medium');
-    const [itemCategory, setItemCategory] = useState('Entree');
-    const [inventoryIds, setInventoryIds] = useState('{}');
-    const [itemPrice, setItemPrice] = useState(3.00);
+    const [itemCategory, setItemCategory] = useState("Appetizer");
+    const [itemPrice, setItemPrice] = useState(0.50);
+    const [currentStock, setCurrentStock] = useState(0);
+    const [restockDate, setRestockDate] = useState('');
+    const [isAllergen, setIsAllergen] = useState(false);
+    const [isVegan, setIsVegan] = useState(false);
 
-    const handlePopup = (name, category) => {
-        setItemName(name);
-        setItemCategory(category);
-        setSelectedItem(category);
+    const categoryRefs = {
+        Appetizer: useRef(null),
+        Meats: useRef(null),
+        Vegetables: useRef(null),
+        Assorted: useRef(null),
+        Drinks: useRef(null),
+        Utensils: useRef(null),
     };
 
-    const addItem = () => {
-        // Add the new item to the correct array based on the selected category
-        switch (itemCategory) {
-            case 'Appetizer':
-                setAppetizers((prev) => [...prev, itemName]);
-                break;
-            case 'Meat':
-                setMeats((prev) => [...prev, itemName]);
-                break;
-            case 'Vegetable':
-                setVegetables((prev) => [...prev, itemName]);
-                break;
-            case 'Assorted':
-                setAssorted((prev) => [...prev, itemName]);
-                break;
-            case 'Drink':
-                setDrinks((prev) => [...prev, itemName]);
-                break;
-            default:
-                break;
-        }
-        
-        // Close the popup and reset the input fields
-        setSelectedItem(null);
-        setItemName('');
-        setItemSize('Medium');
-        setItemCategory('Entree');
-        setInventoryIds('{}');
-        setItemPrice(3.00);
+    const categoryIcons = {
+        Appetizer: <FaAppleAlt />,
+        Meats: <FaDrumstickBite />,
+        Vegetables: <FaCarrot />,
+        Assorted: <FaToolbox />,
+        Drinks: <FaCocktail />,
+        Utensils: <FaUtensils />,
     };
 
+    // Fetch inventory items
+    const fetchInventoryItems = async () => {
+        try {
+            const response = await fetch('/api/getInventory?type=inventory');
+            if (!response.ok) throw new Error('Failed to fetch inventory items');
 
-    const removeItem = () => {
-        switch (itemCategory) {
-            case 'Appetizer':
-                setAppetizers((prev) => prev.filter(item => item !== itemName));
-                break;
-            case 'Meat':
-                setMeats((prev) => prev.filter(item => item !== itemName));
-                break;
-            case 'Vegetable':
-                setVegetables((prev) => prev.filter(item => item !== itemName));
-                break;
-            case 'Assorted':
-                setAssorted((prev) => prev.filter(item => item !== itemName));
-                break;
-            case 'Drink':
-                setDrinks((prev) => prev.filter(item => item !== itemName));
-                break;
-            default:
-                break;
+            const data = await response.json();
+            const categorizedItems = data.reduce((acc, item) => {
+                acc[item.category] = acc[item.category] || [];
+                acc[item.category].push(item);
+                return acc;
+            }, {});
+
+            setInventoryItems((prev) => ({
+                ...prev,
+                ...categorizedItems,
+            }));
+        } catch (error) {
+            console.error('Error fetching inventory items:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchInventoryItems();
+    }, []);
+
+    const handleNavigation = (category) => {
+        const ref = categoryRefs[category];
+        if (ref && ref.current) {
+            ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    };
+
+    const handlePopup = (item) => {
+        if (item) {
+            setItemId(item.id || null);
+            setItemName(item.item_name || '');
+            setItemCategory(item.category || 'Appetizer');
+            setItemPrice(item.unit_price || 0.50);
+            setCurrentStock(item.current_stock || 0);
+            setRestockDate(item.restock_date?.split('T')[0] || '');
+            setIsAllergen(item.is_allergen || false);
+            setIsVegan(item.is_vegan || false);
+            setSelectedItem(item);
+        } else {
+            resetFields();
+            setSelectedItem(true);
+        }
+    };
+
+    const addItem = async () => {
+        if (!itemName.trim() || !itemCategory || isNaN(itemPrice) || isNaN(currentStock) || !restockDate) {
+            alert('All fields are required and must have valid values!');
+            return;
         }
 
-        setSelectedItem(null);
-        resetFields();
+        try {
+            const response = await fetch('/api/getInventory?type=addInventoryItem', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    item_name: itemName.trim(),
+                    category: itemCategory.trim(),
+                    current_stock: parseInt(currentStock, 10),
+                    restock_date: restockDate,
+                    unit_price: parseFloat(itemPrice),
+                    is_allergen: isAllergen,
+                    is_vegan: isVegan,
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to add inventory item');
+            }
+            await fetchInventoryItems();
+        } catch (error) {
+            console.error('Error adding item:', error);
+            alert(`Error adding item: ${error.message}`);
+        } finally {
+            resetFields();
+        }
+    };
+
+    const editItem = async () => {
+        if (!itemId || !itemName.trim() || !itemCategory || isNaN(itemPrice) || isNaN(currentStock) || !restockDate) {
+            alert('All fields are required and must have valid values!');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/getInventory?type=editInventoryItem', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: itemId,
+                    item_name: itemName.trim(),
+                    category: itemCategory.trim(),
+                    current_stock: parseInt(currentStock, 10),
+                    restock_date: restockDate,
+                    unit_price: parseFloat(itemPrice),
+                    is_allergen: isAllergen,
+                    is_vegan: isVegan,
+                }),
+            });
+
+            if (response.status === 404) {
+                alert('Item not found. Please refresh and try again.');
+                return;
+            }
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to edit inventory item');
+            }
+
+            await new Promise((resolve) => setTimeout(resolve, 500));
+            await fetchInventoryItems();
+        } catch (error) {
+            console.error('Error editing item:', error);
+            alert(`Error editing item: ${error.message}`);
+        } finally {
+            resetFields();
+        }
+    };
+
+    const removeItem = async () => {
+        if (!selectedItem?.id) {
+            alert('Item ID is required!');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/getInventory?type=removeInventoryItem', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: selectedItem.id }),
+            });
+
+            if (!response.ok && response.status !== 404) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to remove inventory item');
+            }
+            await fetchInventoryItems();
+        } catch (error) {
+            console.error('Error removing item:', error);
+            alert(`Error removing item: ${error.message}`);
+        } finally {
+            resetFields();
+        }
     };
 
     const resetFields = () => {
+        setItemId(null);
         setItemName('');
-        setItemSize('Medium');
-        setItemCategory('Entree');
-        setInventoryIds('{}');
-        setItemPrice(3.00);
+        setItemCategory("Appetizer");
+        setItemPrice(0.50);
+        setCurrentStock(0);
+        setRestockDate('');
+        setIsAllergen(false);
+        setIsVegan(false);
+        setSelectedItem(false);
     };
 
-    const renderItems = () => {
-        switch (selectedCategory) {
-            case 'Appetizer': return appetizers;
-            case 'Meat': return meats;
-            case 'Vegetable': return vegetables;
-            case 'Assorted': return assorted;
-            case 'Drink': return drinks;
-            default: return [];
-        }
-    };
+    const renderItems = () => inventoryItems[selectedCategory] || [];
 
     return (
         <div>
+            {/* Header */}
             <div className="header-container">
                 <EmployeeLogInHeader />
             </div>
-            <div className="inventory-container">
-                <h1>Inventory</h1>
-                <div className="inventory-layout">
-                    <nav className="category-menu">
-                        {["Appetizer", "Meat", "Vegetable", "Assorted", "Drink"].map((category) => (
-                            <button 
-                                key={category} 
-                                className={`category-button ${selectedCategory === category ? 'active' : ''}`} 
+    
+            {/* Main Content */}
+            <div className="main-content d-flex">
+                {/* Sidebar */}
+                <div className="sidebar">
+                    <nav className="list-group">
+                        {Object.keys(inventoryItems).map((category) => (
+                            <button
+                                key={category}
+                                className={`list-group-item list-group-item-action d-flex align-items-center ${selectedCategory === category ? "active" : ""}`}
                                 onClick={() => setSelectedCategory(category)}
                             >
-                                {category}
+                                <span className="me-3 fs-4">{categoryIcons[category]}</span>
+                                <span className="fs-5">{category}</span>
                             </button>
                         ))}
                     </nav>
-
-                    <div className="items-display">
-                        <h2>{selectedCategory}</h2>
-                        <div className="button-grid">
-                            {renderItems().map((item, index) => (
-                                <button key={index} className="item-button" onClick={() => handlePopup(item, selectedCategory)}>
-                                    {item}
-                                </button>
-                            ))}
-                        </div>
-                        <button className="item-button" onClick={() => handlePopup("", selectedCategory)}>Add New Item</button>
-                    </div>
                 </div>
-
-                {selectedItem && (
-                    <div className="popup">
-                        <h3>Add New Item</h3>
-                        <label>
-                            Name: 
-                            <input type="text" value={itemName} onChange={(e) => setItemName(e.target.value)} />
-                        </label>
-                        <label>
-                            Size: 
-                            <input type="text" value={itemSize} onChange={(e) => setItemSize(e.target.value)} />
-                        </label>
-                        <label>
-                            Category:
-                            <select value={itemCategory} onChange={(e) => setItemCategory(e.target.value)}>
-                                <option value="Appetizer">Appetizer</option>
-                                <option value="Meat">Meat</option>
-                                <option value="Vegetable">Vegetable</option>
-                                <option value="Assorted">Assorted</option>
-                                <option value="Drink">Drink</option>
-                            </select>
-                        </label>
-                        <label>
-                            Inventory Item IDs:
-                            <input type="text" value={inventoryIds} onChange={(e) => setInventoryIds(e.target.value)} />
-                        </label>
-                        <label>
-                            Price:
-                            <input type="number" value={itemPrice} onChange={(e) => setItemPrice(e.target.value)} />
-                        </label>
-                        <button onClick={addItem}>Add</button>
-                        <button onClick={removeItem}>Remove</button>
-                        <button onClick={() => setSelectedItem(null)}>Cancel</button>
+    
+                {/* Items for Selected Category */}
+                <div className="content-container container">
+                    <h1 className="text-center mb-4">Inventory Management</h1>
+                    <h2 className="text-center mb-4">{selectedCategory}</h2>
+                    <div className="row g-4">
+                        {renderItems().map((item, index) => (
+                            <div key={index} className="col-md-4 col-sm-6">
+                                <button
+                                    className="btn btn-outline-primary btn-lg w-100"
+                                    onClick={() => item && handlePopup(item)}
+                                >
+                                    {item?.item_name || 'Unnamed Item'}
+                                </button>
+                            </div>
+                        ))}
                     </div>
-                )}
-
-
-                <style jsx>{`
-                    .popup {
-                        position: fixed;
-                        top: 50%;
-                        left: 50%;
-                        transform: translate(-50%, -50%);
-                        background-color: white;
-                        padding: 20px;
-                        border: 1px solid #ccc;
-                        border-radius: 5px;
-                        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-                        z-index: 1000;
-                    }
-
-                    .popup label {
-                        display: block;
-                        margin: 10px 0;
-                    }
-
-                    .popup button {
-                        margin-top: 10px;
-                        margin-right: 5px;
-                    }
-
-                    .popup input, .popup select {
-                        margin-left: 10px;
-                    }
-
-                    /* Overlay to darken the background when popup is active */
-                    .overlay {
-                        position: fixed;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        background-color: rgba(0, 0, 0, 0.5);
-                        z-index: 999;
-                    }
-                `}</style>
-                
-                {selectedItem && <div className="overlay" onClick={() => setSelectedItem(null)} />}
+                    <button className="btn btn-success btn-lg w-100 mt-4" onClick={() => handlePopup(null)}>
+                        Add New {selectedCategory} Item
+                    </button>
+                </div>
             </div>
+    
+            {/* Inventory Popup */}
+            {selectedItem && (
+                <InventoryPopUp
+                    itemId={itemId}
+                    itemName={itemName}
+                    itemCategory={itemCategory}
+                    itemPrice={itemPrice}
+                    currentStock={currentStock}
+                    restockDate={restockDate}
+                    isAllergen={isAllergen}
+                    isVegan={isVegan}
+                    setItemName={setItemName}
+                    setItemCategory={setItemCategory}
+                    setItemPrice={setItemPrice}
+                    setCurrentStock={setCurrentStock}
+                    setRestockDate={setRestockDate}
+                    setIsAllergen={setIsAllergen}
+                    setIsVegan={setIsVegan}
+                    addItem={addItem}
+                    removeItem={removeItem}
+                    editItem={editItem}
+                    resetFields={resetFields}
+                />
+            )}
         </div>
-        
-    );
-}
+    );    
+};
+
+export default Inventory;

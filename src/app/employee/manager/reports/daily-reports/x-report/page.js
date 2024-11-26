@@ -28,11 +28,20 @@ const XReport = () => {
 
     const fetchReportForHour = async (hour) => {
         try {
-            const response = await fetch(`/api/getXReport?hour=${hour}`);
-            const data = await response.json();
-            setHourlyData(data);
+            const response = await fetch(`/api/getReports?type=xReport&hour=${hour}`);
+            const text = await response.text(); // Get raw response text
+            console.log('Raw response:', text);
+            const data = JSON.parse(text); // Manually parse the text to JSON
+            console.log('Parsed data:', data);
+            if (data.success && Array.isArray(data.data)) {
+                setHourlyData(data.data);
+            } else {
+                console.error('Unexpected data format:', data);
+                setHourlyData([]);
+            }
         } catch (error) {
             console.error('Error fetching X report data:', error);
+            setHourlyData([]);
         }
     };
 
@@ -41,7 +50,16 @@ const XReport = () => {
     }, [selectedHour]);
 
     const formatCurrency = (value) => {
-        return value !== null && value !== undefined ? `$${value.toFixed(2)}` : '$0.00';
+        // Convert the value to a number and check if it's a valid number
+        const numericValue = Number(value);
+        
+        // Check if the numeric value is a valid number
+        if (isNaN(numericValue)) {
+            return '$0.00'; // Return default value if invalid
+        }
+    
+        // Format the number as a currency string
+        return `$${numericValue.toFixed(2)}`;
     };
 
     // Open hours from 10 AM to 9 PM
@@ -91,7 +109,7 @@ const XReport = () => {
                 </div>
 
                 {/* Table to display the hourly report */}
-                {hourlyData ? (
+                {hourlyData && hourlyData.length > 0 ? (
                     <table className="table">
                         <thead>
                             <tr>
@@ -105,7 +123,7 @@ const XReport = () => {
                         <tbody>
                             {hourlyData.map((row, idx) => (
                                 <tr key={idx}>
-                                    <td>{row.hour === 10 ? '10:00 AM' : `${row.hour}:00`}</td>
+                                    <td>{row.order_hour === 10 ? '10:00 AM' : `${row.order_hour}:00`}</td>
                                     <td>{formatCurrency(row.total_sales)}</td>
                                     <td>{row.transaction_count}</td>
                                     <td>{formatCurrency(row.cash_collected)}</td>
@@ -115,7 +133,7 @@ const XReport = () => {
                         </tbody>
                     </table>
                 ) : (
-                    <p>Loading report...</p>
+                    <p>No data available for the selected hour.</p>
                 )}
             </div>
         </>

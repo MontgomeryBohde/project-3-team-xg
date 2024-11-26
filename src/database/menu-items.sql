@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS menu_items (
 
 INSERT INTO menu_items (item_name, category, inventory_item_ids, descr, image_url)
 VALUES
-    ('Hot Ones Blazing Bourbon Chicken', 'Entree', '{}', 'Crispy boneless chicken bites and fresh veggies all wok-tossed in a spicy and sweet bourbon sauce', 'https://olo-images-live.imgix.net/50/503be498564c415eb59e4e37120117b0.png?auto=format%2Ccompress&q=60&cs=tinysrgb&w=810&h=540&fit=crop&fm=png32&s=91acd3adc699123bb269b094fb843769'),
+    ('Hot Ones Blazing Bourbon Chicken', 'Entree', '{5, 32, 24}', 'Crispy boneless chicken bites and fresh veggies all wok-tossed in a spicy and sweet bourbon sauce', 'https://olo-images-live.imgix.net/50/503be498564c415eb59e4e37120117b0.png?auto=format%2Ccompress&q=60&cs=tinysrgb&w=810&h=540&fit=crop&fm=png32&s=91acd3adc699123bb269b094fb843769'),
     ('The Original Orange Chicken', 'Entree', '{5, 32, 24}', 'Tender chicken wok-tossed in a sweet and tangy sauce', 'https://olo-images-live.imgix.net/78/783b6c093c4c44428516139005a621f1.png?auto=format%2Ccompress&q=60&cs=tinysrgb&w=810&h=540&fit=crop&fm=png32&s=e8191ba402e81280158b4793829b83e0'),
     ('Black Pepper Sirloin Steak', 'Entree', '{8, 32, 16}', 'Sirloin steak, bell peppers, and onions wok-tossed in a savory black pepper sauce', 'https://olo-images-live.imgix.net/fd/fd7ab3840a8f476db096435bfef01322.png?auto=format%2Ccompress&q=60&cs=tinysrgb&w=810&h=540&fit=crop&fm=png32&s=db6bb16a3f93d09d28b09f7e3df02679'),
     ('Honey Walnut Shrimp', 'Entree', '{9, 29}', 'Crispy shrimp with honey sauce and glazed walnuts', 'https://olo-images-live.imgix.net/e0/e065708712fb4fa2b43d3b6a34e7993d.png?auto=format%2Ccompress&q=60&cs=tinysrgb&w=810&h=540&fit=crop&fm=png32&s=a195a7d0bfcdab2002821f262b3fb624'),

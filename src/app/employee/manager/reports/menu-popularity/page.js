@@ -12,16 +12,23 @@ const MenuPopularity = () => {
     useEffect(() => {
         async function fetchPopularItems() {
             try {
-                const response = await fetch(`/api/getPopularity?n=${n}`);
-                const data = await response.json();
+                const response = await fetch(`/api/getReports?type=popularity&n=${n}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch popular items');
+                }
+                const { success, data } = await response.json();
+                if (!success || !Array.isArray(data)) {
+                    throw new Error('Invalid API response format');
+                }
                 setPopularItems(data);
             } catch (error) {
                 console.error('Error fetching popular items:', error);
+                setPopularItems([]); // Fallback to an empty array
             }
         }
-
+    
         fetchPopularItems();
-    }, [n]); // Fetch popular items whenever `n` changes
+    }, [n]); // Refetch when `n` changes    
 
     const handleNChange = (event) => {
         const newN = parseInt(event.target.value, 10);
@@ -59,7 +66,6 @@ const MenuPopularity = () => {
                         <tr>
                             <th>Rank</th>
                             <th>Menu Item</th>
-                            <th>Type</th>
                             <th>Category</th>
                             <th>Times Ordered</th>
                         </tr>
@@ -67,17 +73,16 @@ const MenuPopularity = () => {
                     <tbody>
                         {popularItems.length > 0 ? (
                             popularItems.map((item, index) => (
-                                <tr key={item.menu_item_id || index}>
+                                <tr key={item.food_name || index}>
                                     <td>{index + 1}</td>
                                     <td>{item.food_name}</td>
-                                    <td>{item.item_size}</td>
                                     <td>{item.menu_category}</td>
                                     <td>{item.times_ordered}</td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="5">Loading...</td> {/* Currently always loading because food_name undefined (name for menu_items table) */}
+                                <td colSpan="4">Loading...</td>
                             </tr>
                         )}
                     </tbody>

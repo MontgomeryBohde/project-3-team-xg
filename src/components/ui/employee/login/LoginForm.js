@@ -3,7 +3,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from "next/navigation";
-import 'bootstrap/dist/css/bootstrap.css';
 
 const LoginForm = () => {
   const [userId, setUserId] = useState('');
@@ -16,9 +15,9 @@ const LoginForm = () => {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await fetch('/api/employees');
+        const response = await fetch('/api/getEmployees');
         if (!response.ok) {
-            throw new Error('Failed to fetch employees');
+          throw new Error('Failed to fetch employees');
         }
         const data = await response.json();
         setEmployees(data);
@@ -32,7 +31,6 @@ const LoginForm = () => {
 
   // Handle form submission
   const handleSubmit = async (event) => {
-    console.log("handle submit button");
     event.preventDefault();
 
     // Reset error state
@@ -43,27 +41,21 @@ const LoginForm = () => {
 
     // Check if the employee exists
     if (!employee) {
-		setError("User ID not found");
-		return;
+      setError("User ID not found");
+      return;
     }
-    else // store this employee in local storage
-    {
-        localStorage.setItem('loggedInEmployee', JSON.stringify(employee));
-    }
+
+    // Store this employee in local storage for session persistence
+    localStorage.setItem('loggedInEmployee', JSON.stringify(employee));
 
     // Validate password
     if (password !== "1234") {
-		setError("Incorrect password");
-		return;
+      setError("Incorrect password");
+      return;
     }
 
-    // Check if the employee is a manager
-    if (employee.is_manager) {
-        router.push('/employee/manager');
-    } else {
-	    router.push('/employee/cashier/order');
-    }
-
+    // Redirect to the home page for employees
+    router.push('/employee/home');
   };
 
   return (

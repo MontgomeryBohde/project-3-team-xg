@@ -1,9 +1,9 @@
+// src/app/customer/kiosk/meal/meal.js
 "use client";
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import EmployeeHeader from "@/components/ui/employee/header/EmployeeHeader";
-import "bootstrap/dist/css/bootstrap.css"; // Bootstrap is already included
 import "./meal-select.css";
 
 const CustomerMealSelect = () => {
@@ -12,23 +12,32 @@ const CustomerMealSelect = () => {
 
 	// Fetch entrees and sides from the database using the API endpoint
 	useEffect(() => {
-		const fetchMenuItems = async () => {
-			try {
-				const response = await fetch('/api/menu_items');
-				if (!response.ok) throw new Error('Failed to fetch menu items');
-				const data = await response.json();
+        const fetchMenuItems = async () => {
+            try {
+                const response = await fetch("/api/getProducts?type=menu");
+                if (!response.ok) throw new Error("Failed to fetch menu items");
 
-				// Filter and set entrees and sides
-				setEntrees(data.menuItems.filter(item => item.category.toLowerCase() === 'entree').map(item => item.name));
-				setSides(data.menuItems.filter(item => item.category.toLowerCase() === 'side').map(item => item.name));
-			} catch (error) {
-				console.error('Error fetching menu items:', error);
-				alert('Error fetching menu items. Please try again later.');
-			}
-		};
+                const data = await response.json();
+                console.log("API Response:", data);
 
+                if (!Array.isArray(data)) {
+                    throw new Error("Invalid data format from API");
+                }
+
+				console.log(data);
+
+                // Filter and set entrees and sides
+                setEntrees(data.filter((item) => item.category.toLowerCase() === "entree"));
+                setSides(data.filter((item) => item.category.toLowerCase() === "side"));
+            } catch (err) {
+                console.error("Error fetching menu items:", err);
+                setError("Failed to fetch menu items. Please try again later.");
+            }
+        };
+	
 		fetchMenuItems();
-	}, []);
+	}, []);	
+	
 
 	const mealTypes = [
 		{ name: "Bowl", sides: 1, entrees: 1, price: 8.30 },
@@ -74,6 +83,8 @@ const CustomerMealSelect = () => {
 
 	// Handle item button press
 	const handlePressed = (item, type) => {
+		console.log(`Pressed: ${item} | Type: ${type}`);  // Log to check if the handler is triggered
+	
 		if (type === "Side") {
 			setSelectedSides((prevSelectedSides) => {
 				if (prevSelectedSides.includes(item)) {
@@ -91,7 +102,7 @@ const CustomerMealSelect = () => {
 				}
 			});
 		}
-	};
+	};	
 
 	// Handle quantity change for selected entrees
 	const handleQuantityChange = (item, increment) => {
@@ -127,7 +138,7 @@ const CustomerMealSelect = () => {
 
 	// Handle cancel action
 	const handleCancel = () => {
-		router.push("/customer/menuselection"); // TODO: Navigate to the menu page
+		router.push("/customer/kiosk/menuselection"); // TODO: Navigate to the menu page
 	};
 
 	const handleConfirm = () => {
@@ -170,29 +181,27 @@ const CustomerMealSelect = () => {
 			<EmployeeHeader />
 			<div className="main-content">
 				<h1>Meal: {meal}</h1>
-				<section className="section">
+					<section className="section">
 					<h2>Sides</h2>
 					<h4>Select 1</h4>
-					<div className="row row-cols-3 g-3"> {/* Bootstrap grid layout with gaps */}
+					<div className="row row-cols-3 g-3">
 						{sides.map((item, index) => {
-							const isSelected = selectedSides.includes(item);
+							const isSelected = selectedSides.includes(item.name); // Compare using the name
 							return (
 								<div key={index} className="col">
 									<button
 										className={`btn btn-outline-secondary w-100 h-100 ${isSelected ? "btn-selected" : ""}`}
 										onClick={() => {
 											if (!isSelected) {
-												// Only allow selection if no side is selected yet
 												if (selectedSides.length < 1) {
-													handlePressed(item, "Side");
+													handlePressed(item.name, "Side"); // Use item.name
 												}
 											} else {
-												// Unselect the side if it's already selected
-												handlePressed(item, "Side");
+												handlePressed(item.name, "Side"); // Use item.name
 											}
 										}}
 									>
-										{item}
+										{item.name} {/* Display the name */}
 									</button>
 								</div>
 							);
@@ -205,35 +214,34 @@ const CustomerMealSelect = () => {
 					<h4>Select {numEntrees}</h4>
 					<div className="row row-cols-3 g-3">
 						{entrees.map((item, index) => {
-							const isSelected = selectedEntrees.includes(item);
+							const isSelected = selectedEntrees.includes(item.name); // Compare using the name
 							return (
 								<div key={index} className="col">
 									<button
 										className={`btn btn-outline-secondary w-100 ${isSelected ? "btn-selected" : ""}`}
 										onClick={() => {
 											if (!isSelected && selectedEntrees.length < numEntrees) {
-												handlePressed(item, "Entree");
+												handlePressed(item.name, "Entree"); // Use item.name
 											} else if (isSelected) {
-												handlePressed(item, "Entree");
+												handlePressed(item.name, "Entree"); // Use item.name
 											}
 										}}
 									>
-										{item}
+										{item.name} {/* Display the name */}
 									</button>
 
-									{/* Show quantity slider only when selected */}
 									{isSelected && numEntrees > 1 && (
 										<div className="quantity-slider">
 											<button
 												className="btn btn-outline-secondary"
-												onClick={() => handleQuantityChange(item, -1)}
+												onClick={() => handleQuantityChange(item.name, -1)} // Use item.name
 											>
 												-
 											</button>
-											<span>{selectedEntrees.filter(entree => entree === item).length}</span>
+											<span>{selectedEntrees.filter(entree => entree === item.name).length}</span> {/* Filter by name */}
 											<button
 												className="btn btn-outline-secondary"
-												onClick={() => selectedEntrees.length < numEntrees && handleQuantityChange(item, 1)}
+												onClick={() => selectedEntrees.length < numEntrees && handleQuantityChange(item.name, 1)} // Use item.name
 											>
 												+
 											</button>
@@ -243,8 +251,8 @@ const CustomerMealSelect = () => {
 							);
 						})}
 					</div>
-
 				</section>
+
 
 
 				{/* Display selected meal items */}

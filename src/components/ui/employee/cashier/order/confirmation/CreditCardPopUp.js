@@ -2,7 +2,6 @@
 // src/components/ui/employee/cashier/order/confirmation/CreditCardPopUp.js
 import React, { useState } from 'react';
 import { useRouter } from "next/navigation";
-import 'bootstrap/dist/css/bootstrap.css';
 
 const CreditCardPopUp = ({ onClose }) => {
     const router = useRouter();

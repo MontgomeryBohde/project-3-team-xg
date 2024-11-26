@@ -16,8 +16,14 @@ const CustomerPage = () => {
         router.push("/customer/kiosk"); // Navigate to the Kiosk Order page
     };
 
+    /*
     const navigateToMobileOrder = () => {
         router.push("/customer/mobile"); // Navigate to the Mobile Order page
+    };
+    */
+
+    const navigateToLoyaltyPage = () => {
+        router.push("/customer/loyalty/login"); // Navigate to the Mobile Order page
     };
 
     const navigateToMainPage = () => {
@@ -45,8 +51,8 @@ const CustomerPage = () => {
                     <button className="btn btn-outline-light btn-lg px-5 py-3 customer-button" onClick={navigateToKioskOrder}>
                         Kiosk Order
                     </button>
-                    <button className="btn btn-outline-light btn-lg px-5 py-3 customer-button" onClick={navigateToMobileOrder}>
-                        Mobile Order
+                    <button className="btn btn-outline-light btn-lg px-5 py-3 customer-button" onClick={navigateToLoyaltyPage}>
+                        Customer Loyalty Page
                     </button>
                 </div>
 
