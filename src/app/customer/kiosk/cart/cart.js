@@ -515,7 +515,7 @@ const CartPage = () => {
                 </div>
                 
                 <div className="d-flex justify-content-between">
-                    <Link href="/customer/kiosk/menuselection" className="btn btn-primary m-3">Back to Menu</Link>
+                    <Link href="/customer/kiosk/menu-selection" className="btn btn-primary m-3">Back to Menu</Link>
                     <button onClick={handleClearCart} className="btn btn-danger m-3">Clear Order</button>
                     <button onClick={handleCheckout} className="btn btn-success m-3">Check Out</button>
                 </div>
