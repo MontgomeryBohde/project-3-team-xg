@@ -1,5 +1,5 @@
+// src/components/ui/customer/menu-selection/MealModal.js
 import React, { useState, useEffect } from "react";
-import "./MealModal.css";
 
 const MealModal = ({ mealType, onClose, onConfirm }) => {
     const [sides, setSides] = useState([]);
