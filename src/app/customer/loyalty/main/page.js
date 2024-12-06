@@ -63,17 +63,17 @@ export default function Home() {
         setError("Unable to fetch orders this month.");
       }
     };
-
-    const fetchOrders = async () => {
+    
+    const fetchOrders = async () => { // FIXME: this still doesn't work fully!
       try {
-        const response = await fetch('/api/getRewards?type=orders&customer_id=123&n=5'); // Updated API path with query parameters
+        const response = await fetch(`/api/getRewards?type=orders&customer_id=${customer.id}&n=5`);
         const data = await response.json();
     
         console.log("Orders:", data);
     
         // Check if the data is an array and handle it
         if (!Array.isArray(data)) {
-          console.log('crying');
+          console.log('not an array :(');
           return;
         }
     
@@ -105,6 +105,12 @@ export default function Home() {
   // 10% Discount calculations
   const pointsRemainingDiscount = points !== null ? 120 - points : 0;
   const pointsPercentageDiscount = points !== null ? (points / 120) * 100 : 0;
+
+
+  // Claim Reward
+  const claimReward = async (reward) => {
+    
+  }
 
   return (
     <div>
@@ -144,7 +150,7 @@ export default function Home() {
                       <ul>
                         {order.item_size_details?.map((item, index) => (
                           <li key={`item-size-${index}`}>
-                            {item.item_name} ({item.item_size}) - ${item.price.toFixed(2)}
+                            {item.item_name} ({item.item_size}) - ${item.price}
                           </li>
                         ))}
                         {order.meal_item_details?.map((meal, index) => (
@@ -152,12 +158,12 @@ export default function Home() {
                             {meal.item_name}
                             {meal.side_name && ` with ${meal.side_name}`}
                             {meal.entree_names && ` - Entrees: ${meal.entree_names}`}
-                            - ${meal.price.toFixed(2)}
+                            - ${meal.price}
                           </li>
                         ))}
                       </ul>
                     </td>
-                    <td>${order.order_total.toFixed(2)}</td>
+                    <td>${order.order_total}</td>
                     <td>{/* Placeholder for Points */}</td>
                   </tr>
                 ))
@@ -193,6 +199,14 @@ export default function Home() {
                 {pointsPercentageBowl.toFixed(0)}%
               </div>
             </div>
+            {points >= 100 && (
+              <button
+                className="btn btn-success mt-2"
+                onClick={() => alert("Free Bowl claimed!")}
+              >
+                Claim Free Bowl
+              </button>
+            )}
           </div>
             
           {/* 10% Discount */}

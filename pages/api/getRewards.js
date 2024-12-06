@@ -23,19 +23,23 @@ export default async function handler(req, res) {
                             o.placed_time,
                             ARRAY(
                                 SELECT 
-                                    mi.item_name, 
-                                    isize.item_size, 
-                                    isize.price
+                                    json_build_object(
+                                        'item_name', mi.item_name, 
+                                        'item_size', isize.item_size, 
+                                        'price', isize.price
+                                    )
                                 FROM item_sizes isize
                                 JOIN menu_items mi ON mi.id = isize.item_id
                                 WHERE isize.id = ANY(o.item_size_ids)
                             ) AS item_size_details,
                             ARRAY(
                                 SELECT 
-                                    mi.item_name, 
-                                    side.item_name AS side_name, 
-                                    STRING_AGG(entree.item_name, ', ') AS entree_names, 
-                                    m.price
+                                    json_build_object(
+                                        'item_name', mi.item_name, 
+                                        'side_name', side.item_name, 
+                                        'entree_names', STRING_AGG(entree.item_name, ', '), 
+                                        'price', m.price
+                                    )
                                 FROM meal_items m
                                 JOIN menu_items mi ON mi.id = m.id
                                 LEFT JOIN menu_items side ON side.id = m.side_id
@@ -46,7 +50,7 @@ export default async function handler(req, res) {
                         FROM orders o
                         WHERE o.customer_id = $1
                         ORDER BY o.placed_time DESC
-                        LIMIT $2;
+                        LIMIT $2;                
                     `;
 
                     result = await query(queryText, [customer_id, limit]);
