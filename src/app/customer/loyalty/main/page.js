@@ -6,6 +6,12 @@ import CustomerHeader from "@/components/ui/customer/header/CustomerHeader";
 export default function Home() {
   const router = useRouter();
 
+  useEffect(() => {
+    // Clear sessionStorage items after component mounts (in the browser)
+    sessionStorage.removeItem("rewards");
+    console.log("help");
+  }, []);
+
   const [customer, setCustomer] = useState(null);
   const [points, setPoints] = useState(null);
   const [numOrders, setNumOrders] = useState(null);
@@ -17,10 +23,10 @@ export default function Home() {
   const [hasClaimedFreeBowl, setHasClaimedFreeBowl] = useState(false);
   const [hasClaimedDiscount, setHasClaimedDiscount] = useState(false);
 
-  // Fetch customer from localStorage
+  // Fetch customer from sessionStorage
   useEffect(() => {
     const fetchCustomer = async () => {
-      const storedCustomer = localStorage.getItem("loyaltyCustomer");
+      const storedCustomer = sessionStorage.getItem("loyaltyCustomer");
       console.log("stored customer:", storedCustomer);
       if (storedCustomer) {
         try {
@@ -114,11 +120,11 @@ export default function Home() {
   const pointsPercentageDiscount = points !== null ? (points / 120) * 100 : 0;
 
 
-  // Initialize rewards array in localStorage if not already present
+  // Initialize rewards array in sessionStorage if not already present
   const initializeRewards = () => {
-    if (!localStorage.getItem('rewards')) {
-      localStorage.setItem('rewards', JSON.stringify([])); // Store an empty array
-      console.log('Rewards array initialized in localStorage');
+    if (!sessionStorage.getItem('rewards')) {
+      sessionStorage.setItem('rewards', JSON.stringify([])); // Store an empty array
+      console.log('Rewards array initialized in sessionStorage');
     }
   };
 
@@ -128,19 +134,22 @@ export default function Home() {
       // Ensure rewards array is initialized
       initializeRewards();
 
-      // Retrieve existing rewards from localStorage
-      let rewards = JSON.parse(localStorage.getItem('rewards'));
+      // Retrieve existing rewards from sessionStorage
+      let rewards = JSON.parse(sessionStorage.getItem('rewards'));
 
-      // Add the new reward to the array
-      rewards.push(reward);
+      // create new reward
+      let newReward = {name: reward, image: "/images/10per.jpg", sizeType: "special"}
 
-      // Save the updated array back to localStorage
-      localStorage.setItem('rewards', JSON.stringify(rewards));
+      // Save the updated array back to sessionStorage
+      sessionStorage.setItem('rewards', JSON.stringify(rewards));
 
       // Update for display
       if(reward == "Free Bowl") {
         // remove points
         setPoints((prevPoints) => prevPoints - 100);
+
+        // set correct image value
+        newReward.image = "/images/10per.jpg";
 
         // set state variable
         setHasClaimedFreeBowl(true);
@@ -149,11 +158,17 @@ export default function Home() {
         // remove points
         setPoints((prevPoints) => prevPoints - 120);
 
+        // set correct image value
+        newReward.image = "/images/freebowl.png";
+
         // set state variable
         setHadClaimedDiscount(true);
       }
 
-      console.log('Reward claimed successfully:', reward);
+      // Add the new reward to the array
+      rewards.push(newReward);
+
+      console.log('Reward claimed successfully:', rewards);
     } catch (error) {
       console.error('Error claiming reward:', error);
     }

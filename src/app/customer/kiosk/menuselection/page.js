@@ -54,6 +54,14 @@ const MealSelectionPage = () => {
         { name: "50 percent off", image: "/images/50per.jpg", sizeType: "special" }
     ];
 
+    const [rewards, setRewards] = useState();
+    useEffect(() => {
+        const storedRewards = JSON.parse(sessionStorage.getItem('rewards'));
+        if(storedRewards){
+            setRewards(storedRewards);
+        }
+    }, []); 
+
     const catering = [
         { name: "Party Size Side", image: "/images/party_size_side.jpg", sizeType: "special" },
         { name: "12-16 Person Party Bundle", image: "/images/12_16_person_party_bundle.jpg", sizeType: "special" },
@@ -63,6 +71,14 @@ const MealSelectionPage = () => {
 
     const [cart, setCart] = useState([]);
     const [selectedSize, setSelectedSize] = useState({});
+
+    const [custLoggedIn, setCustLoggedIn] = useState(false);
+    useEffect(() => {
+        const loggedInCustomer = JSON.parse(sessionStorage.getItem('loggedInCustomer'));
+        if(loggedInCustomer){
+            setCustLoggedIn(true);
+        }
+    }, []);
 
     useEffect(() => {
         const savedCart = JSON.parse(sessionStorage.getItem("cart")) || [];
@@ -227,6 +243,12 @@ const MealSelectionPage = () => {
                                     </a>
                                 </li>
                                 <li className="nav-item">
+                                    <a className="nav-link" onClick={() => handleScrollToSection('rewards')} style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
+                                        <FaGift className="me-2" style={{ fontSize: '2rem' }} />
+                                        <span>Rewards</span>
+                                    </a>
+                                </li>
+                                <li className="nav-item">
                                     <a className="nav-link" onClick={() => handleScrollToSection('catering')} style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
                                         <FaTruck className="me-2" style={{ fontSize: '2rem' }} />
                                         <span>Catering</span>
@@ -306,6 +328,12 @@ const MealSelectionPage = () => {
                             <h2>Deals</h2>
                             <div className="row">
                                 {renderItems(deals)}
+                            </div>
+                        </div>
+                        <div className="py-3" id="rewards">
+                            <h2>Rewards</h2>
+                            <div className="row">
+                                {renderItems(rewards)}
                             </div>
                         </div>
                         <div className="py-3" id="catering">

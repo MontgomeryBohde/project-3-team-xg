@@ -9,8 +9,6 @@ const CustomerLoginPage = () => {
         // Clear localStorage items after component mounts (in the browser)
         sessionStorage.removeItem("loggedInCustomer");
         sessionStorage.removeItem("loggedInCustomerName");
-
-        console.log("help");
     }, []);
 
     return (
