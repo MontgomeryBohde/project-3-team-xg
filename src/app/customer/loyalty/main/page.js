@@ -1,14 +1,21 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import CustomerHeader from "@/components/ui/customer/header/CustomerHeader";
 
 export default function Home() {
+  const router = useRouter();
+
   const [customer, setCustomer] = useState(null);
   const [points, setPoints] = useState(null);
   const [numOrders, setNumOrders] = useState(null);
   const [orders, setOrders] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // state variables for free bowl + discount
+  const [hasClaimedFreeBowl, setHasClaimedFreeBowl] = useState(false);
+  const [hasClaimedDiscount, setHasClaimedDiscount] = useState(false);
 
   // Fetch customer from localStorage
   useEffect(() => {
@@ -107,10 +114,58 @@ export default function Home() {
   const pointsPercentageDiscount = points !== null ? (points / 120) * 100 : 0;
 
 
+  // Initialize rewards array in localStorage if not already present
+  const initializeRewards = () => {
+    if (!localStorage.getItem('rewards')) {
+      localStorage.setItem('rewards', JSON.stringify([])); // Store an empty array
+      console.log('Rewards array initialized in localStorage');
+    }
+  };
+
   // Claim Reward
   const claimReward = async (reward) => {
-    
+    try {
+      // Ensure rewards array is initialized
+      initializeRewards();
+
+      // Retrieve existing rewards from localStorage
+      let rewards = JSON.parse(localStorage.getItem('rewards'));
+
+      // Add the new reward to the array
+      rewards.push(reward);
+
+      // Save the updated array back to localStorage
+      localStorage.setItem('rewards', JSON.stringify(rewards));
+
+      // Update for display
+      if(reward == "Free Bowl") {
+        // remove points
+        setPoints((prevPoints) => prevPoints - 100);
+
+        // set state variable
+        setHasClaimedFreeBowl(true);
+      }
+      else if(reward == "Discount") {
+        // remove points
+        setPoints((prevPoints) => prevPoints - 120);
+
+        // set state variable
+        setHadClaimedDiscount(true);
+      }
+
+      console.log('Reward claimed successfully:', reward);
+    } catch (error) {
+      console.error('Error claiming reward:', error);
+    }
+  };
+
+  initializeRewards(); // Initialize rewards array on app load
+
+  const placeOrderNav = () => {
+    router.push("/customer/kiosk"); // Navigate to the Kiosk Order page
   }
+
+
 
   return (
     <div>
@@ -164,7 +219,7 @@ export default function Home() {
                       </ul>
                     </td>
                     <td>${order.order_total}</td>
-                    <td>{/* Placeholder for Points */}</td>
+                    <td>{10}</td>
                   </tr>
                 ))
               ) : (
@@ -183,52 +238,79 @@ export default function Home() {
           {/* Free Bowl */}
           <div className="mb-4">
             <h4>Free Bowl</h4>
-            <h6> You can earn a free bowl after 10 orders (100 points). </h6>
-            <p>
-              {points} points earned. {pointsRemainingBowl} points to reach goal.
-            </p>
-            <div className="progress">
-              <div
-                className="progress-bar"
-                role="progressbar"
-                style={{ width: `${pointsPercentageBowl}%` }}
-                aria-valuenow={points}
-                aria-valuemin="0"
-                aria-valuemax={100}
-              >
-                {pointsPercentageBowl.toFixed(0)}%
-              </div>
-            </div>
-            {points >= 100 && (
-              <button
-                className="btn btn-success mt-2"
-                onClick={() => alert("Free Bowl claimed!")}
-              >
-                Claim Free Bowl
-              </button>
+            {hasClaimedFreeBowl ? (
+              <>
+                <h6>Free Bowl Claimed!</h6>
+                <button className="btn btn-primary mt-2" onClick={placeOrderNav}>Place Order</button>
+              </>
+            ) : (
+              <>
+                <h6>You can earn a free bowl after 10 orders (100 points).</h6>
+                <p>
+                  {points} points earned. {100 - points} points to reach goal.
+                </p>
+                <div className="progress">
+                  <div
+                    className="progress-bar"
+                    role="progressbar"
+                    style={{ width: `${(points / 100) * 100}%` }}
+                    aria-valuenow={points}
+                    aria-valuemin="0"
+                    aria-valuemax={100}
+                  >
+                    {((points / 100) * 100).toFixed(0)}%
+                  </div>
+                </div>
+                {points >= 100 && (
+                  <button
+                    className="btn btn-success mt-2"
+                    onClick={() => claimReward("Free Bowl")}
+                  >
+                    Claim Free Bowl
+                  </button>
+                )}
+              </>
             )}
           </div>
-            
+
           {/* 10% Discount */}
           <div className="mb-4">
             <h4>10% Discount</h4>
-            <h6> You can earn a 10% discount on the rest of orders this month after 12 orders (120 points). </h6>
-            <p>
-              {points} points earned. {pointsRemainingDiscount} points to reach goal.
-            </p>
-            <div className="progress">
-              <div
-                className="progress-bar"
-                role="progressbar"
-                style={{ width: `${pointsPercentageDiscount}%` }}
-                aria-valuenow={points}
-                aria-valuemin="0"
-                aria-valuemax={120}
-              >
-                {pointsPercentageDiscount.toFixed(0)}%
-              </div>
-            </div>
+            {hasClaimedDiscount ? (
+              <>
+                <h6>10% Discount Claimed!</h6>
+                <button className="btn btn-primary mt-2" onClick={placeOrderNav}>Place Order</button>
+              </>
+            ) : (
+              <>
+                <h6>You can earn a 10% discount on the rest of orders this month after 12 orders (120 points).</h6>
+                <p>
+                  {points} points earned. {120 - points} points to reach goal.
+                </p>
+                <div className="progress">
+                  <div
+                    className="progress-bar"
+                    role="progressbar"
+                    style={{ width: `${(points / 120) * 100}%` }}
+                    aria-valuenow={points}
+                    aria-valuemin="0"
+                    aria-valuemax={120}
+                  >
+                    {((points / 120) * 100).toFixed(0)}%
+                  </div>
+                </div>
+                {points >= 120 && (
+                  <button
+                    className="btn btn-success mt-2"
+                    onClick={() => claimReward("Discount")}
+                  >
+                    Claim Discount
+                  </button>
+                )}
+              </>
+            )}
           </div>
+
         </div>
       </div>
     </div>
