@@ -1,0 +1,190 @@
+/* Trevor Mode: Container */
+.trevor-mode .container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 15px;
+    background: linear-gradient(135deg, #ff4500, #ff1493, #32cd32);
+    border-radius: 15px;
+    box-shadow: 0 0 20px #ff5733, 0 0 40px #ff4500 inset;
+    overflow: hidden;
+    font-family: "Comic Sans MS", cursive !important;
+    color: #fff;
+    animation: neon-flicker 1.5s infinite;
+}
+
+/* Trevor Mode: Header */
+.trevor-mode h1 {
+    font-size: 3rem;
+    font-weight: bold;
+    text-align: center;
+    color: #ffff00;
+    text-shadow: 3px 3px 10px rgba(255, 255, 0, 0.9), 0 0 15px #ff1493;
+    animation: bounce 2s infinite;
+    margin-bottom: 20px;
+}
+
+/* Trevor Mode: List Group Items */
+.trevor-mode .list-group-item {
+    background: linear-gradient(90deg, #ff5733, #ff4500);
+    color: #fff;
+    border: 2px solid #ff1493;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    animation: wiggle 1.5s infinite ease-in-out;
+}
+
+.trevor-mode .list-group-item:hover {
+    transform: scale(1.1) rotate(-5deg);
+    background: radial-gradient(circle, #32cd32, #ff4500);
+    box-shadow: 0 0 20px #ff5733, 0 0 40px #ff1493 inset;
+    transition: all 0.3s ease;
+}
+
+/* Trevor Mode: Quantity Controls */
+.trevor-mode .quantity-controls button {
+    background: #ff1493;
+    color: #fff;
+    font-size: 1.2rem;
+    border-radius: 5px;
+    border: 2px solid #ff5733;
+    box-shadow: 0 0 10px #ff4500, 0 0 20px #ff1493;
+    transition: all 0.3s ease-in-out;
+}
+
+.trevor-mode .quantity-controls button:hover {
+    transform: translateY(-3px) scale(1.1);
+    background: #ffff00;
+    color: #000;
+    box-shadow: 0 0 20px #ff1493, 0 0 40px #32cd32 inset;
+}
+
+/* Trevor Mode: Total Box */
+.trevor-mode .total-box {
+    background: radial-gradient(circle, #32cd32, #ff4500);
+    border: 5px dashed #ff1493;
+    border-radius: 20px;
+    padding: 30px;
+    color: #fff;
+    text-align: center;
+    animation: pulse 2s infinite;
+    margin-top: 30px;
+}
+
+.trevor-mode .total-box p {
+    font-size: 1.2rem;
+    color: #ffff00;
+    text-shadow: 1px 1px 5px #ff5733;
+}
+
+.trevor-mode .total-box h2 {
+    font-size: 3rem;
+    font-weight: bold;
+    text-shadow: 3px 3px 10px #ff1493;
+}
+
+/* Trevor Mode: Buttons */
+.trevor-mode .button-group .btn {
+    font-size: 1.5rem;
+    font-weight: bold;
+    background: linear-gradient(45deg, #ff4500, #32cd32);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 0 10px #ff1493, 0 0 20px #ff4500;
+    transition: all 0.3s ease-in-out;
+    animation: bounce 2s infinite;
+}
+
+.trevor-mode .button-group .btn:hover {
+    transform: scale(1.2) rotate(5deg);
+    background: linear-gradient(90deg, #32cd32, #ffff00);
+    box-shadow: 0 0 20px #ff5733, 0 0 40px #ff1493 inset;
+}
+
+/* Promo Code Input */
+.trevor-mode .promo-input {
+    border: 2px dashed #ff1493;
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 1.2rem;
+    color: #ff4500;
+    background: #fff;
+    text-align: center;
+    animation: neon-glow 1.5s infinite alternate ease-in-out;
+}
+
+.trevor-mode .promo-input:focus {
+    outline: none;
+    border-color: #32cd32;
+    box-shadow: 0 0 15px #ff4500;
+}
+
+/* Keyframes for Animations */
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes neon-flicker {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+        opacity: 1;
+    }
+    20%, 24%, 55% {
+        opacity: 0.5;
+    }
+}
+
+@keyframes wiggle {
+    0%, 100% {
+        transform: rotate(-5deg);
+    }
+    50% {
+        transform: rotate(5deg);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 15px #32cd32, 0 0 30px #ff4500;
+    }
+    50% {
+        box-shadow: 0 0 30px #ff1493, 0 0 60px #ffff00;
+    }
+}
+
+@keyframes neon-glow {
+    0% {
+        box-shadow: 0 0 10px #ff4500;
+    }
+    100% {
+        box-shadow: 0 0 20px #ff1493;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .trevor-mode .container {
+        width: 95%;
+        margin: 10px auto;
+        padding: 10px;
+    }
+
+    .trevor-mode .button-group {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .trevor-mode .list-group-item {
+        flex-direction: column;
+        text-align: center;
+    }
+}
