@@ -2,32 +2,38 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
-import { FaShoppingCart } from "react-icons/fa";
 import CustomerHeader from '@/components/ui/customer/header/CustomerHeader';
-
+import './cart.css'; // Add this CSS file for Trevor Mode styles
 
 const CartPage = () => {
-    const [cart, setCart] = useState(() => { // retrive initially from sessionstorage
-    const storedCart = sessionStorage.getItem('cart');
-    return storedCart ? JSON.parse(storedCart) : [];
+    const [cart, setCart] = useState(() => {
+        const storedCart = sessionStorage.getItem('cart');
+        return storedCart ? JSON.parse(storedCart) : [];
     });
+    const [isTrevorModeActive, setIsTrevorModeActive] = useState(false);
     const [prices, setPrices] = useState({});
     const [loading, setLoading] = useState(true);
     const [promoCode, setPromoCode] = useState("");
     const [discount, setDiscount] = useState(0);
     const [taxRate] = useState(0.08); 
-
-
     const [customerId, setCustomerId] = useState(null);
     const [guestName, setGuestName] = useState(null);
     const [orderId, setOrderId] = useState(null);
+
+    // Load Trevor Mode state and cart on mount
+    useEffect(() => {
+        const trevorModeState = sessionStorage.getItem('trevorModeActive');
+        if (trevorModeState === "true") {
+            setIsTrevorModeActive(true);
+            import ('./cart-trevor.css');
+        }
+    }, []);
+
 
     useEffect(() => {
         async function initializeCustomerId() {
             const loggedInCustomer = JSON.parse(localStorage.getItem('loggedInCustomer'));
             const loggedInCustomerName = localStorage.getItem('loggedInCustomerName');
-
-            console.log("Fetched loggedInCustomerName from localStorage:", loggedInCustomerName);
 
             // Logged in customer
             if (loggedInCustomer && loggedInCustomer.id) {
@@ -52,7 +58,6 @@ const CartPage = () => {
 
         if (response.ok) {
             const data = await response.json();
-            console.log('Next Customer ID:', data.next_id);
             setCustomerId(data.next_id);
         } else {
             console.error('Failed to fetch next customer ID. Status:', response.status);
@@ -226,7 +231,6 @@ const CartPage = () => {
         const mealItemIds = [];
         for(const item of cart)
         {
-            console.log(item.quantity);
             for(let i = 0; i < item.quantity; i++)
             {
                 let entreeIds = [];
@@ -264,7 +268,6 @@ const CartPage = () => {
                         }
 
                         // after pushing into db, add that order to mealItemIds array
-                        console.log(item);
                         try {
                             const mealItemResponse = await fetch('/api/meal_items', {
                                 method: 'POST',
@@ -331,7 +334,7 @@ const CartPage = () => {
         };
 
         console.log(requestBody);
-    
+
         try {
             const response = await fetch('/api/orders', {
                 method: 'POST',
@@ -352,7 +355,6 @@ const CartPage = () => {
             } else {
                 alert(`Failed to create order: ${data.error}`);
             }
-
             setOrderId(response);
         } catch (error) {
             console.error("Error during checkout:", error);
@@ -361,7 +363,6 @@ const CartPage = () => {
 
         // update customer db with data
         handleCustomerData();
-
 
         // clear cart
         handleClearCart();
@@ -420,9 +421,8 @@ const CartPage = () => {
         }
     }
     
-
     return (
-        <div>
+        <div className={isTrevorModeActive ? "trevor-mode" : ""}>
             <CustomerHeader></CustomerHeader>
             <div className="container">
                 <h1 className="text-center my-4">Your Cart</h1>

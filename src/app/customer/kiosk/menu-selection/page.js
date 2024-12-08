@@ -3,11 +3,13 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Head from "next/head";
 import { FaUtensils, FaShoppingCart, FaDrumstickBite, FaCarrot, FaConciergeBell, FaGlassCheers, FaGift } from "react-icons/fa";
+import { FiAlertTriangle } from "react-icons/fi";
 import CustomerHeader from "@/components/ui/customer/header/CustomerHeader";
 import RenderMenu from "@/components/ui/customer/menu-selection/RenderMenu";
 import ItemModal from "@/components/ui/customer/menu-selection/ItemModal";
 import MealModal from "@/components/ui/customer/menu-selection/MealModal";
 import './menu-selection.css';
+import './menu-selection-trevor.css';
 
 const MealSelectionPage = () => {
     const [menuItems, setMenuItems] = useState([]);
@@ -17,6 +19,7 @@ const MealSelectionPage = () => {
     const [selectedSize, setSelectedSize] = useState("Small");
     const [selectedMeal, setSelectedMeal] = useState(null);
     const [cart, setCart] = useState([]);
+    const [isTrevorModeActive, setIsTrevorModeActive] = useState(false);
 
     const deals = [
         { name: "50 percent off", image: "/images/50per.jpg", sizeType: "special" }
@@ -81,8 +84,62 @@ const MealSelectionPage = () => {
         }
     };
 
+    // Trevor Mode
+
+    const showTrevorToast = () => {
+        const toast = document.createElement("div");
+        toast.innerText = isTrevorModeActive ? "Trevor Mode Deactivated 🚫" : "Trevor Mode Activated 🕶️";
+        toast.style.position = "fixed";
+        toast.style.bottom = "20px";
+        toast.style.right = "20px";
+        toast.style.backgroundColor = "#ff4500";
+        toast.style.color = "#fff";
+        toast.style.padding = "10px 20px";
+        toast.style.borderRadius = "5px";
+        toast.style.zIndex = "1000";
+        toast.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.3)";
+        toast.style.fontFamily = "Comic Sans MS, cursive";
+        toast.style.animation = "fade-out 3s forwards";
+    
+        document.body.appendChild(toast);
+    
+        setTimeout(() => {
+            document.body.removeChild(toast);
+        }, 3000);
+    };
+
+    const playHoverSound = () => {
+        const boomSound = new Audio("/sounds/vine-boom.mp3");
+        boomSound.volume = 0.3;
+    
+        try {
+            boomSound.play();
+        } catch (error) {
+            console.error("Audio playback failed:", error);
+        }
+    };
+    
+    const toggleTrevorMode = () => {
+        const newState = !isTrevorModeActive;
+        setIsTrevorModeActive(newState);
+        sessionStorage.setItem("trevorModeActive", newState ? "true" : "false");
+    
+        // Play sound effect on toggle (user interaction guarantees playback)
+        const sound = new Audio('/sounds/OOF.mp3');
+        sound.volume = 0.2;
+    
+        try {
+            sound.play();
+        } catch (error) {
+            console.error("Audio playback failed:", error);
+        }
+    
+        // Show toast notification
+        showTrevorToast();
+    };
+    
     return (
-        <>
+        <div className={`container-fluid ${isTrevorModeActive ? "trevor-mode" : ""}`}>
             <Head>
                 <title>Customer Menu Selection</title>
             </Head>
@@ -102,38 +159,52 @@ const MealSelectionPage = () => {
                                     { id: "deal", label: "Deals", icon: <FaGift className="icon me-3" /> },
                                 ].map((section, index) => (
                                     <li key={index} className="nav-item mb-3">
-                                        <a
-                                            className="nav-link d-flex align-items-center px-4 py-3 rounded shadow-sm fs-5"
-                                            onClick={() => handleScrollToSection(section.id)}
-                                            style={{
-                                                cursor: "pointer",
-                                                transition: "background-color 0.3s ease, color 0.3s ease",
-                                            }}
-                                        >
-                                            {section.icon}
-                                            <span>{section.label}</span>
-                                        </a>
+                                            <a
+                                                className="nav-link d-flex align-items-center px-4 py-3 rounded shadow-sm fs-5"
+                                                onMouseEnter={isTrevorModeActive ? playHoverSound : undefined}
+                                                onClick={() => handleScrollToSection(section.id)}
+                                                style={{
+                                                    cursor: "pointer",
+                                                    transition: "background-color 0.3s ease, color 0.3s ease",
+                                                }}
+                                            >
+                                                {section.icon}
+                                                <span>{section.label}</span>
+                                            </a>
+                                        </li>
+                                    ))}
+                                    {/* View Cart */}
+                                    <li className="nav-item mt-4">
+                                        <Link href="/customer/kiosk/cart">
+                                            <span
+                                                className="nav-link text-danger d-flex align-items-center px-4 py-3 rounded shadow-sm fs-5"
+                                                style={{
+                                                    backgroundColor: "#fff5f5",
+                                                    transition: "background-color 0.3s ease, color 0.3s ease",
+                                                }}
+                                            >
+                                                <FaShoppingCart className="icon me-3" />
+                                                View Cart {cart.length > 0 && `(${cart.length})`}
+                                            </span>
+                                        </Link>
                                     </li>
-                                ))}
-                                <li className="nav-item mt-4">
-                                    <Link href="/customer/kiosk/cart">
-                                        <span
-                                            className="nav-link text-danger d-flex align-items-center px-4 py-3 rounded shadow-sm fs-5"
+
+                                    {/* Trevor Mode Toggle */}
+                                    <li className="nav-item mt-4">
+                                        <button
+                                            className={`btn ${isTrevorModeActive ? "btn-danger" : "btn-warning"} d-flex align-items-center px-4 py-3 rounded shadow-sm fs-5`}
+                                            onClick={toggleTrevorMode}
                                             style={{
-                                                backgroundColor: "#fff5f5",
-                                                transition: "background-color 0.3s ease, color 0.3s ease",
+                                                backgroundColor: isTrevorModeActive ? "#ff4d4d" : "#ffd54f",
+                                                transition: "transform 0.2s ease, background-color 0.3s ease",
                                             }}
                                         >
-                                            <FaShoppingCart className="icon me-3" />
-                                            View Cart {cart.length > 0 && `(${cart.length})`}
-                                        </span>
-                                    </Link>
-                                </li>
+                                            <FiAlertTriangle className="icon me-3"/> {isTrevorModeActive ? "Deactivate" : "Activate Trevor Mode"}
+                                        </button>
+                                    </li>
                             </ul>
                         </div>
                     </nav>
-
-
 
                     {/* Main Content */}
                     <main className="col-md-10 ms-sm-auto col-lg-10 px-md-4">
@@ -161,7 +232,6 @@ const MealSelectionPage = () => {
                                 mealType={selectedMeal}
                                 onClose={() => setSelectedMeal(null)}
                                 onConfirm={(mealData) => {
-                                    console.log("Meal Data Received:", mealData); // Debugging
                                     const updatedCart = [...cart, mealData];
                                     setCart(updatedCart); // Update the cart state
                                     sessionStorage.setItem("cart", JSON.stringify(updatedCart)); // Save to sessionStorage
@@ -217,6 +287,7 @@ const MealSelectionPage = () => {
                                 ))}
                             </div>
                         </section>
+                        
                     </main>
                 </div>
             </div>
@@ -232,7 +303,7 @@ const MealSelectionPage = () => {
                     onAdd={handleAddToCart}
                 />
             )}
-        </>
+        </div>
     );
 };
 

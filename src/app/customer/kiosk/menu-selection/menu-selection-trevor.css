@@ -1,0 +1,125 @@
+/* Trevor Mode: General Styles */
+.trevor-mode {
+    font-family: "Comic Sans MS", cursive, sans-serif;
+    color: #ff4500;
+}
+
+/* Responsive Sidebar Adjustments */
+@media (max-width: 768px) {
+    .trevor-mode .sidebar {
+        width: 100%;
+        padding: 0.5rem;
+        overflow-y: auto;
+    }
+
+    .trevor-mode .nav-link {
+        font-size: 1.3rem;
+        padding: 0.8rem 1rem;
+        margin-bottom: 0.8rem;
+        text-align: center; /* Center align items for smaller screens */
+    }
+}
+
+/* Nav Link Hover Effects */
+.trevor-mode .nav-link:hover {
+    color: #000 !important;
+    transform: rotate(-5deg) scale(1.15);
+    animation: pop-glow 0.3s ease-in-out;
+    animation: gradient-shift 3s ease infinite;
+}
+
+/* Icon Effects */
+.trevor-mode .icon {
+    animation: neon-glow 1.5s infinite alternate ease-in-out, wiggle 1s infinite;
+    filter: drop-shadow(0 0 12px #ff4500);
+}
+
+/* Gradient Shift Animation */
+@keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Wiggle Animation */
+@keyframes wiggle {
+    0%, 100% { transform: rotate(-8deg); }
+    50% { transform: rotate(8deg); }
+}
+
+/* Pop Glow Animation */
+@keyframes pop-glow {
+    0% { box-shadow: 0 0 10px #ff4500; }
+    50% { box-shadow: 0 0 20px #ff1493; }
+    100% { box-shadow: 0 0 10px #32cd32; }
+}
+
+/* Neon Glow Effect */
+@keyframes neon-glow {
+    0% { filter: drop-shadow(0 0 8px #ff4500); }
+    100% { filter: drop-shadow(0 0 25px #ff1493); }
+}
+
+/* Trevor Mode: Meal Buttons */
+.trevor-mode .meal-button {
+    font-family: "Comic Sans MS", cursive;
+    font-size: 1.2rem; /* Reduce font size */
+    color: white;
+    border: none;
+    border-radius: 6px; /* Slightly smaller border radius */
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2); /* Adjust shadow for a subtler look */
+    transition: all 0.3s ease;
+    display: block;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto; /* Center align the buttons */
+    background: linear-gradient(45deg, #ff4500, #ff1493, #32cd32);
+    background-size: 200% 200%;
+    animation: gradient-shift 3s ease infinite;
+}
+
+/* Hover Effect */
+.trevor-mode .meal-button:hover {
+    color: #fff;
+    transform: scale(1.05); /* Slight zoom-in effect */
+    box-shadow: 0 5px 8px rgba(0, 0, 0, 0.3); /* Enhance hover shadow */
+}
+
+/* Pulse Animation */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* Active Nav Link */
+.trevor-mode .nav-link.active {
+    background: linear-gradient(90deg, #ffe600, #ff4500);
+    color: #fff !important;
+    border: 3px solid #ff1493;
+    animation: pulse 1.5s infinite;
+}
+
+/* Responsive Sidebar for Smaller Screens */
+@media (max-width: 768px) {
+    .trevor-mode .sidebar {
+        width: 100% !important;
+        height: auto !important;
+        position: relative !important;
+        box-shadow: none;
+    }
+
+    .trevor-mode .nav-link {
+        justify-content: center !important;
+    }
+
+    .trevor-mode .icon {
+        margin-right: 0 !important;
+    }
+}
+
+/* Toast Notification Fade-Out Animation */
+@keyframes fade-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
