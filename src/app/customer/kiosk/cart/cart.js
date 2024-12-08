@@ -24,22 +24,22 @@ const CartPage = () => {
 
     useEffect(() => {
         async function initializeCustomerId() {
-            const loggedInCustomer = JSON.parse(localStorage.getItem('loggedInCustomer'));
-            const loggedInCustomerName = localStorage.getItem('loggedInCustomerName');
-
-            console.log("Fetched loggedInCustomerName from localStorage:", loggedInCustomerName);
-
+            const loggedInCustomer = JSON.parse(sessionStorage.getItem('loggedInCustomer'));
+            const loggedInCustomerName = sessionStorage.getItem('loggedInCustomerName');
+        
+            console.log("Fetched loggedInCustomerName from sessionStorage:", loggedInCustomerName);
+        
             // Logged in customer
             if (loggedInCustomer && loggedInCustomer.id) {
                 setCustomerId(loggedInCustomer.id);
-            }
+            } 
             // Guest
             else {
-                // Set guest name from localStorage
+                // Set guest name from sessionStorage
                 setGuestName(loggedInCustomerName);
                 await fetchNextCustomerId();
-              }
-        }
+            }
+        }        
 
         initializeCustomerId();
     }, []);
@@ -369,7 +369,7 @@ const CartPage = () => {
     
     // +10 this customer's points
     const handleCustomerData = async () => {
-        const loggedInCustomer = JSON.parse(localStorage.getItem('loggedInCustomer'));
+        const loggedInCustomer = JSON.parse(sessionStorage.getItem('loggedInCustomer'));
 
         // Logged in customer
         if (loggedInCustomer && loggedInCustomer.id) {
@@ -379,7 +379,7 @@ const CartPage = () => {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ customer_id: loggedInCustomer.id }),
+                    body: JSON.stringify({ customer_id: customerId }),
                 });
 
                 if (response.ok) {

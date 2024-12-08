@@ -7,8 +7,10 @@ import CustomerLoginForm from "@/components/ui/customer/login/CustomerLoginForm"
 const CustomerLoginPage = () => {
     useEffect(() => {
         // Clear localStorage items after component mounts (in the browser)
-        localStorage.removeItem("loggedInCustomer");
-        localStorage.removeItem("loggedInCustomerName");
+        sessionStorage.removeItem("loggedInCustomer");
+        sessionStorage.removeItem("loggedInCustomerName");
+
+        console.log("help");
     }, []);
 
     return (

@@ -105,7 +105,7 @@ const CustomerHeader = () => {
           style={{ cursor: "pointer" }}
         />
         <h4 className="mb-0">
-          {customer ? `Welcome, ${customer.first_name}` : "Welcome to Panda Express"}
+          {customer ? `Welcome, ${customer.name}` : "Welcome to Panda Express"}
         </h4>
       </div>
       <div className="d-flex align-items-center">
