@@ -401,8 +401,6 @@ const CartPage = () => {
                 pointsToAdd = -110;
             }
 
-            console.log("Calculated pnts: ", pointsToAdd);
-
             try {
                 const response = await fetch('/api/customers', {
                     method: 'PUT',

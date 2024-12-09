@@ -15,8 +15,6 @@ export async function PUT(request) {
     // Check and see if pointsAdj is valid
     const pointsToAdd = pointsAdj || 10;
 
-    console.log("pointsToAdd to db: ", pointsToAdd);
-
     // Fetch the current rewards points for the customer
     const getPointsResult = await client.query(
       'SELECT rewards_points FROM customers WHERE id = $1',
@@ -32,7 +30,6 @@ export async function PUT(request) {
 
     // Update the rewards points to add pointsToAdd
     const newPoints = currentPoints + pointsToAdd;
-    console.log("New points in db: ", newPoints);
     const updateResult = await client.query(
       'UPDATE customers SET rewards_points = $1 WHERE id = $2 RETURNING *',
       [newPoints, customer_id]
