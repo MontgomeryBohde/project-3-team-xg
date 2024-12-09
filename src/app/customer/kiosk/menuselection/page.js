@@ -59,6 +59,7 @@ const MealSelectionPage = () => {
         const storedRewards = JSON.parse(sessionStorage.getItem('rewards'));
         if(storedRewards){
             setRewards(storedRewards);
+            console.log("stuffs: " , storedRewards);
         }
     }, []); 
 
@@ -130,6 +131,11 @@ const MealSelectionPage = () => {
         // Store the selected meal type in localStorage
         localStorage.setItem('selectedMeal', mealType);
     };
+
+    if(!rewards)
+    {
+        return <div>Loading customer data...</div>;
+    }
 
     const renderItems = (items) => (
         items.map((item, index) => (

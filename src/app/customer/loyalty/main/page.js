@@ -6,12 +6,6 @@ import CustomerHeader from "@/components/ui/customer/header/CustomerHeader";
 export default function Home() {
   const router = useRouter();
 
-  useEffect(() => {
-    // Clear sessionStorage items after component mounts (in the browser)
-    sessionStorage.removeItem("rewards");
-    console.log("help");
-  }, []);
-
   const [customer, setCustomer] = useState(null);
   const [points, setPoints] = useState(null);
   const [numOrders, setNumOrders] = useState(null);
@@ -140,16 +134,13 @@ export default function Home() {
       // create new reward
       let newReward = {name: reward, image: "/images/10per.jpg", sizeType: "special"}
 
-      // Save the updated array back to sessionStorage
-      sessionStorage.setItem('rewards', JSON.stringify(rewards));
-
       // Update for display
       if(reward == "Free Bowl") {
         // remove points
         setPoints((prevPoints) => prevPoints - 100);
 
         // set correct image value
-        newReward.image = "/images/10per.jpg";
+        newReward.image = "/images/freebowl.png";
 
         // set state variable
         setHasClaimedFreeBowl(true);
@@ -159,7 +150,7 @@ export default function Home() {
         setPoints((prevPoints) => prevPoints - 120);
 
         // set correct image value
-        newReward.image = "/images/freebowl.png";
+        newReward.image = "/images/10per.jpg";
 
         // set state variable
         setHadClaimedDiscount(true);
@@ -167,8 +158,9 @@ export default function Home() {
 
       // Add the new reward to the array
       rewards.push(newReward);
-
-      console.log('Reward claimed successfully:', rewards);
+      console.log(rewards);
+      // Save the updated array back to sessionStorage
+      sessionStorage.setItem('rewards', JSON.stringify(rewards));
     } catch (error) {
       console.error('Error claiming reward:', error);
     }

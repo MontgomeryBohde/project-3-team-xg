@@ -82,6 +82,7 @@ const CartPage = () => {
 
     //Catering prices (hardcoded)
     const specialDealPrices = {
+        "Free Bowl": -8.30,
         "Party Size Side": 16.00,
         "12-16 Person Party Bundle": 108.00,
         "18-22 Person Party Bundle": 154.00,
@@ -90,6 +91,12 @@ const CartPage = () => {
 
    //50% off deal
    const isFiftyPercentOff = cart.some(item => item.name && item.name.toLowerCase().includes("50 percent off"));
+
+   //10% discount reward
+   const isTenPercentOff = cart.some(item => item.name && item.name.toLowerCase().includes("Discount"));
+
+   //Free Bowl
+   const hasFreeBowl = cart.some(item => item.name && item.name.toLowerCase().includes("Free Bowl"));
 
 
     useEffect(() => {
@@ -181,7 +188,13 @@ const CartPage = () => {
         }
     };
 
-    const automaticDiscount = isFiftyPercentOff ? subtotal * 0.5 : 0;
+    // const automaticDiscount = isFiftyPercentOff ? subtotal * 0.5 : 0;
+
+    const automaticDiscount = isFiftyPercentOff
+        ? subtotal * 0.5
+        : isTenPercentOff
+        ? subtotal * 0.1
+        : 0;
 
     //taxes and total calculation
     const tax = subtotal * taxRate;

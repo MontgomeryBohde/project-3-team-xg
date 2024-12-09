@@ -55,8 +55,8 @@ const LoyaltyLoginForm = () => {
                 console.log("customerData: ", customerData);
 
                 // Store customer data in local storage and navigate
-                localStorage.setItem("loyaltyCustomer", JSON.stringify(customerData));
-                localStorage.setItem("loggedInCustomerName", customerData.first_name);
+                sessionStorage.setItem("loyaltyCustomer", JSON.stringify(customerData));
+                sessionStorage.setItem("loggedInCustomerName", customerData.first_name);
 
                 // Navigate to the meal selection page
                 router.push("/customer/loyalty/main");
