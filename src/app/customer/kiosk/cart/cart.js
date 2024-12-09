@@ -24,22 +24,22 @@ const CartPage = () => {
 
     useEffect(() => {
         async function initializeCustomerId() {
-            const loggedInCustomer = JSON.parse(localStorage.getItem('loggedInCustomer'));
-            const loggedInCustomerName = localStorage.getItem('loggedInCustomerName');
-
-            console.log("Fetched loggedInCustomerName from localStorage:", loggedInCustomerName);
-
+            const loggedInCustomer = JSON.parse(sessionStorage.getItem('loggedInCustomer'));
+            const loggedInCustomerName = sessionStorage.getItem('loggedInCustomerName');
+        
+            console.log("Fetched loggedInCustomerName from sessionStorage:", loggedInCustomerName);
+        
             // Logged in customer
             if (loggedInCustomer && loggedInCustomer.id) {
                 setCustomerId(loggedInCustomer.id);
-            }
+            } 
             // Guest
             else {
-                // Set guest name from localStorage
+                // Set guest name from sessionStorage
                 setGuestName(loggedInCustomerName);
                 await fetchNextCustomerId();
-              }
-        }
+            }
+        }        
 
         initializeCustomerId();
     }, []);
@@ -82,6 +82,7 @@ const CartPage = () => {
 
     //Catering prices (hardcoded)
     const specialDealPrices = {
+        "Free Bowl": -8.30,
         "Party Size Side": 16.00,
         "12-16 Person Party Bundle": 108.00,
         "18-22 Person Party Bundle": 154.00,
@@ -91,10 +92,15 @@ const CartPage = () => {
    //50% off deal
    const isFiftyPercentOff = cart.some(item => item.name && item.name.toLowerCase().includes("50 percent off"));
 
+   //10% discount reward
+   const isTenPercentOff = cart.some(item => item.name && item.name.includes("Discount"));
+    
+   //Free Bowl
+   const hasFreeBowl = cart.some(item => item.name && item.name.includes("Free Bowl"));
 
     useEffect(() => {
         const savedCart = JSON.parse(sessionStorage.getItem("cart")) || [];
-        setCart(savedCart); // This will trigger a re-render after the cart is updated.
+        setCart(savedCart); // This will trigger a re-render after the cart is updated
     }, []); // This only runs once when the component mounts.
     
       // This effect processes the cart items after the cart state has been updated.
@@ -181,7 +187,13 @@ const CartPage = () => {
         }
     };
 
-    const automaticDiscount = isFiftyPercentOff ? subtotal * 0.5 : 0;
+    // const automaticDiscount = isFiftyPercentOff ? subtotal * 0.5 : 0;
+
+    const automaticDiscount = isFiftyPercentOff
+        ? subtotal * 0.5
+        : isTenPercentOff
+        ? subtotal * 0.1
+        : 0;
 
     //taxes and total calculation
     const tax = subtotal * taxRate;
@@ -292,30 +304,35 @@ const CartPage = () => {
                     }
                 }
                 else {
-                    try {
-                        // fetch the menu item ID using the item name
-                        const menuItemResponse = await fetch(`/api/getMenuItemId?name=${encodeURIComponent(item.name)}`);
-                        const menuItemData = await menuItemResponse.json();
-                
-                        if (menuItemData && menuItemData.id) {
-                            const menuItemId = menuItemData.id;
-                
-                            // fetch the item size ID using the menu item ID and size
-                            const itemSizeResponse = await fetch(`/api/item_sizes?item_id=${menuItemId}&size=${encodeURIComponent(item.size)}`);
-                            const itemSizeData = await itemSizeResponse.json();
-
-                            for(const sizeItems of itemSizeData)
-                            {
-                                if(sizeItems.item_size == item.size)
+                    if(specialDealPrices[item.name]) {
+                        //
+                    }
+                    else {
+                        try {
+                            // fetch the menu item ID using the item name
+                            const menuItemResponse = await fetch(`/api/getMenuItemId?name=${encodeURIComponent(item.name)}`);
+                            const menuItemData = await menuItemResponse.json();
+                    
+                            if (menuItemData && menuItemData.id) {
+                                const menuItemId = menuItemData.id;
+                    
+                                // fetch the item size ID using the menu item ID and size
+                                const itemSizeResponse = await fetch(`/api/item_sizes?item_id=${menuItemId}&size=${encodeURIComponent(item.size)}`);
+                                const itemSizeData = await itemSizeResponse.json();
+    
+                                for(const sizeItems of itemSizeData)
                                 {
-                                    itemSizeIds.push(sizeItems.id);
-                                    break;
+                                    if(sizeItems.item_size == item.size)
+                                    {
+                                        itemSizeIds.push(sizeItems.id);
+                                        break;
+                                    }
                                 }
                             }
+                        } catch (error) {
+                            console.error("Error fetching item size ID:", error);
                         }
-                    } catch (error) {
-                        console.error("Error fetching item size ID:", error);
-                    }
+                    }     
                 }
             }
         }
@@ -365,21 +382,34 @@ const CartPage = () => {
 
         // clear cart
         handleClearCart();
+
+        // remove discounts
+        sessionStorage.removeItem('rewards');
     };
     
     // +10 this customer's points
     const handleCustomerData = async () => {
-        const loggedInCustomer = JSON.parse(localStorage.getItem('loggedInCustomer'));
+        const loggedInCustomer = JSON.parse(sessionStorage.getItem('loggedInCustomer'));
 
         // Logged in customer
         if (loggedInCustomer && loggedInCustomer.id) {
+            let pointsToAdd = 10;
+            if(hasFreeBowl) {
+                pointsToAdd = -90;
+            }
+            if(isTenPercentOff) {
+                pointsToAdd = -110;
+            }
+
             try {
                 const response = await fetch('/api/customers', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ customer_id: loggedInCustomer.id }),
+                    body: JSON.stringify({ 
+                        customer_id: customerId, 
+                        pointsAdj: pointsToAdd}),
                 });
 
                 if (response.ok) {
