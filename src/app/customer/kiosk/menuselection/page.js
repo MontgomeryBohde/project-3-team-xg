@@ -132,11 +132,6 @@ const MealSelectionPage = () => {
         localStorage.setItem('selectedMeal', mealType);
     };
 
-    if(!rewards)
-    {
-        return <div>Loading customer data...</div>;
-    }
-
     const renderItems = (items) => (
         items.map((item, index) => (
             <div key={index} className="col-6 col-md-4 col-lg-3 mb-3">
@@ -248,12 +243,14 @@ const MealSelectionPage = () => {
                                         <span>Deals</span>
                                     </a>
                                 </li>
-                                <li className="nav-item">
-                                    <a className="nav-link" onClick={() => handleScrollToSection('rewards')} style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
-                                        <FaGift className="me-2" style={{ fontSize: '2rem' }} />
-                                        <span>Rewards</span>
-                                    </a>
-                                </li>
+                                {custLoggedIn && (
+                                     <li className="nav-item">
+                                     <a className="nav-link" onClick={() => handleScrollToSection('rewards')} style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
+                                         <FaGift className="me-2" style={{ fontSize: '2rem' }} />
+                                         <span>Rewards</span>
+                                     </a>
+                                 </li>
+                                )}
                                 <li className="nav-item">
                                     <a className="nav-link" onClick={() => handleScrollToSection('catering')} style={{ display: 'flex', alignItems: 'center', padding: '1.5rem' }}>
                                         <FaTruck className="me-2" style={{ fontSize: '2rem' }} />
@@ -336,12 +333,21 @@ const MealSelectionPage = () => {
                                 {renderItems(deals)}
                             </div>
                         </div>
-                        <div className="py-3" id="rewards">
-                            <h2>Rewards</h2>
-                            <div className="row">
-                                {renderItems(rewards)}
-                            </div>
-                        </div>
+                        {custLoggedIn && (
+                            rewards && rewards.length > 0 ? (
+                                <div className="py-3" id="rewards">
+                                    <h2>Rewards</h2>
+                                    <div className="row">
+                                        {renderItems(rewards)}
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="py-3" id="rewards">
+                                    <h2>Rewards</h2>
+                                    <p>You have not claimed any rewards yet!</p>
+                                </div>   
+                            )
+                        )}
                         <div className="py-3" id="catering">
                             <h2>Catering</h2>
                             <div className="row">

@@ -153,7 +153,7 @@ export default function Home() {
         newReward.image = "/images/10per.jpg";
 
         // set state variable
-        setHadClaimedDiscount(true);
+        setHasClaimedDiscount(true);
       }
 
       // Add the new reward to the array
