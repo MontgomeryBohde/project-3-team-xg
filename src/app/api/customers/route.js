@@ -10,7 +10,10 @@ export async function PUT(request) {
     await client.connect();
 
     // Parse the JSON body to get customer_id
-    const { customer_id } = await request.json();
+    const { customer_id, pointsAdj } = await request.json();
+
+    // Check and see if pointsAdj is valid
+    const pointsToAdd = pointsAdj || 10;
 
     // Fetch the current rewards points for the customer
     const getPointsResult = await client.query(
@@ -25,8 +28,8 @@ export async function PUT(request) {
 
     const currentPoints = getPointsResult.rows[0].rewards_points;
 
-    // Update the rewards points to add 10
-    const newPoints = currentPoints + 10;
+    // Update the rewards points to add pointsToAdd
+    const newPoints = currentPoints + pointsToAdd;
     const updateResult = await client.query(
       'UPDATE customers SET rewards_points = $1 WHERE id = $2 RETURNING *',
       [newPoints, customer_id]

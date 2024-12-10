@@ -5,9 +5,9 @@ import LoyaltyLoginForm from "@/components/ui/customer/loyalty/LoyaltyLoginForm"
 
 const LoyaltyLoginPage = () => {
     useEffect(() => {
-        // Delete items from localStorage on page load
-        localStorage.removeItem('loyaltyCustomer');
-        localStorage.removeItem('loggedInCustomerName');
+        // Delete items from session on page load
+        sessionStorage.removeItem('loyaltyCustomer');
+        sessionStorage.removeItem('loggedInCustomerName');
     }, []);
 
     return (
