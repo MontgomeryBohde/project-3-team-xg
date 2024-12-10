@@ -184,175 +184,178 @@ const MealSelectionPage = () => {
     };
     
     return (
-        <div className={`container-fluid ${isTrevorModeActive ? "trevor-mode" : ""}`}>
-            <Head>
-                <title>Customer Menu Selection</title>
-            </Head>
+        <div>
             <CustomerHeader />
-            <div className="container-fluid">
-                <div className="row">
-                    {/* Sidebar */}
-                    <nav className="col-md-3 d-none d-md-block bg-light sidebar">
-                        <div className="position-fixed sidebar-container p-4">
-                            <ul className="nav flex-column">
-                                {[
-                                    { id: "meals", label: "Meals", icon: <FaUtensils className="icon me-3" /> },
-                                    { id: "entree", label: "Entrées", icon: <FaDrumstickBite className="icon me-3" /> },
-                                    { id: "side", label: "Sides", icon: <FaCarrot className="icon me-3" /> },
-                                    { id: "appetizer", label: "Appetizers", icon: <FaConciergeBell className="icon me-3" /> },
-                                    { id: "drink", label: "Drinks", icon: <FaGlassCheers className="icon me-3" /> },
-                                    { id: "deal", label: "Deals", icon: <FaGift className="icon me-3" /> },
-                                ].map((section, index) => (
-                                    <li key={index} className="nav-item mb-3">
-                                            <a
-                                                className="nav-link d-flex align-items-center px-4 py-3 rounded shadow-sm fs-5"
-                                                onMouseEnter={isTrevorModeActive ? playHoverSound : undefined}
-                                                onClick={() => handleScrollToSection(section.id)}
-                                                style={{
-                                                    cursor: "pointer",
-                                                    transition: "background-color 0.3s ease, color 0.3s ease",
-                                                }}
-                                            >
-                                                {section.icon}
-                                                <span>{section.label}</span>
-                                            </a>
+            <div className={`container-fluid ${isTrevorModeActive ? "trevor-mode" : ""}`}>
+                <Head>
+                    <title>Customer Menu Selection</title>
+                </Head>
+                
+                <div className="container-fluid">
+                    <div className="row">
+                        {/* Sidebar */}
+                        <nav className="col-md-3 d-none d-md-block bg-light sidebar">
+                            <div className="position-fixed sidebar-container p-4">
+                                <ul className="nav flex-column">
+                                    {[
+                                        { id: "meals", label: "Meals", icon: <FaUtensils className="icon me-3" /> },
+                                        { id: "entree", label: "Entrées", icon: <FaDrumstickBite className="icon me-3" /> },
+                                        { id: "side", label: "Sides", icon: <FaCarrot className="icon me-3" /> },
+                                        { id: "appetizer", label: "Appetizers", icon: <FaConciergeBell className="icon me-3" /> },
+                                        { id: "drink", label: "Drinks", icon: <FaGlassCheers className="icon me-3" /> },
+                                        { id: "deal", label: "Deals", icon: <FaGift className="icon me-3" /> },
+                                    ].map((section, index) => (
+                                        <li key={index} className="nav-item mb-3">
+                                                <a
+                                                    className="nav-link d-flex align-items-center px-4 py-3 rounded shadow-sm fs-5"
+                                                    onMouseEnter={isTrevorModeActive ? playHoverSound : undefined}
+                                                    onClick={() => handleScrollToSection(section.id)}
+                                                    style={{
+                                                        cursor: "pointer",
+                                                        transition: "background-color 0.3s ease, color 0.3s ease",
+                                                    }}
+                                                >
+                                                    {section.icon}
+                                                    <span>{section.label}</span>
+                                                </a>
+                                            </li>
+                                        ))}
+                                        {/* View Cart */}
+                                        <li className="nav-item mt-4">
+                                            <Link href="/customer/kiosk/cart">
+                                                <span
+                                                    className="nav-link text-danger d-flex align-items-center px-4 py-3 rounded shadow-sm fs-5"
+                                                    style={{
+                                                        backgroundColor: "#fff5f5",
+                                                        transition: "background-color 0.3s ease, color 0.3s ease",
+                                                    }}
+                                                >
+                                                    <FaShoppingCart className="icon me-3" />
+                                                    View Cart {cart.length > 0 && `(${cart.length})`}
+                                                </span>
+                                            </Link>
                                         </li>
-                                    ))}
-                                    {/* View Cart */}
-                                    <li className="nav-item mt-4">
-                                        <Link href="/customer/kiosk/cart">
-                                            <span
-                                                className="nav-link text-danger d-flex align-items-center px-4 py-3 rounded shadow-sm fs-5"
+
+                                        {/* Trevor Mode Toggle */}
+                                        <li className="nav-item mt-4">
+                                            <button
+                                                className={`btn ${isTrevorModeActive ? "btn-danger" : "btn-warning"} d-flex align-items-center px-4 py-3 rounded shadow-sm fs-5`}
+                                                onClick={toggleTrevorMode}
                                                 style={{
-                                                    backgroundColor: "#fff5f5",
-                                                    transition: "background-color 0.3s ease, color 0.3s ease",
+                                                    backgroundColor: isTrevorModeActive ? "#ff4d4d" : "#ffd54f",
+                                                    transition: "transform 0.2s ease, background-color 0.3s ease",
                                                 }}
                                             >
-                                                <FaShoppingCart className="icon me-3" />
-                                                View Cart {cart.length > 0 && `(${cart.length})`}
-                                            </span>
-                                        </Link>
-                                    </li>
-
-                                    {/* Trevor Mode Toggle */}
-                                    <li className="nav-item mt-4">
-                                        <button
-                                            className={`btn ${isTrevorModeActive ? "btn-danger" : "btn-warning"} d-flex align-items-center px-4 py-3 rounded shadow-sm fs-5`}
-                                            onClick={toggleTrevorMode}
-                                            style={{
-                                                backgroundColor: isTrevorModeActive ? "#ff4d4d" : "#ffd54f",
-                                                transition: "transform 0.2s ease, background-color 0.3s ease",
-                                            }}
-                                        >
-                                            <FiAlertTriangle className="icon me-3"/> {isTrevorModeActive ? "Deactivate" : "Activate Trevor Mode"}
-                                        </button>
-                                    </li>
-                            </ul>
-                        </div>
-                    </nav>
-
-                    {/* Main Content */}
-                    <main className="col-md-10 ms-sm-auto col-lg-10 px-md-4">
-
-                        {/* Meals Section */}
-                        <section id="meals" className="py-3">
-                            <h2>Meals</h2>
-                            <div className="row g-3">
-                                {["Bowl", "Plate", "Bigger Plate", "Cub Meal", "Family Meal"].map((meal, index) => (
-                                    <div key={index} className="col-6 col-md-4">
-                                        <button
-                                            className="btn btn-outline-dark w-100 meal-button py-3"
-                                            onClick={() => setSelectedMeal(meal)}
-                                        >
-                                            {meal}
-                                        </button>
-                                    </div>
-                                ))}
+                                                <FiAlertTriangle className="icon me-3"/> {isTrevorModeActive ? "Deactivate" : "Activate Trevor Mode"}
+                                            </button>
+                                        </li>
+                                </ul>
                             </div>
-                        </section>
+                        </nav>
 
-                        {/* Subway Surfer Section */}
-                        <div id="trevor-video" className={`trevor-video ${isTrevorModeActive ? "active" : ""}`}>
-                            <div id="trevor-video-iframe"></div>
-                        </div>
+                        {/* Main Content */}
+                        <main className="col-md-10 ms-sm-auto col-lg-10 px-md-4">
 
-                        {/* Meal Modal */}
-                        {selectedMeal && (
-                            <MealModal
-                                mealType={selectedMeal}
-                                onClose={() => setSelectedMeal(null)}
-                                onConfirm={(mealData) => {
-                                    const updatedCart = [...cart, mealData];
-                                    setCart(updatedCart); // Update the cart state
-                                    sessionStorage.setItem("cart", JSON.stringify(updatedCart)); // Save to sessionStorage
-                                    setSelectedMeal(null); // Close the modal
-                                }}
-                            />
-                        )}
-
-                        {/* RenderMenu grouped by category */}
-                        {Object.entries(
-                            menuItems.reduce((groups, item) => {
-                                if (!groups[item.category]) {
-                                    groups[item.category] = [];
-                                }
-                                groups[item.category].push(item);
-                                return groups;
-                            }, {})
-                        ).map(([category, items], index) => (
-                            <section
-                                key={index}
-                                id={category.toLowerCase().replace(/\s+/g, "-")}
-                                className="py-3"
-                            >
-                                <h2>{category}</h2>
-                                <div className="row">
-                                    <RenderMenu
-                                        menuItems={items} // Pass only items in this category
-                                        itemSizes={itemSizes}
-                                        inventoryData={inventoryData}
-                                        setSelectedItem={setSelectedItem}
-                                    />
+                            {/* Meals Section */}
+                            <section id="meals" className="py-3">
+                                <h2>Meals</h2>
+                                <div className="row g-3">
+                                    {["Bowl", "Plate", "Bigger Plate", "Cub Meal", "Family Meal"].map((meal, index) => (
+                                        <div key={index} className="col-6 col-md-4">
+                                            <button
+                                                className="btn btn-outline-dark w-100 meal-button py-3"
+                                                onClick={() => setSelectedMeal(meal)}
+                                            >
+                                                {meal}
+                                            </button>
+                                        </div>
+                                    ))}
                                 </div>
                             </section>
-                        ))}
 
-                        {/* Deals Section */}
-                        <section id="deal" className="py-3">
-                            <h2>Deals</h2>
-                            <div className="row">
-                                {deals.map((deal, index) => (
-                                    <div key={index} className="col-6 col-md-4 col-lg-3 mb-3">
-                                        <div className="card">
-                                            <img
-                                                src={deal.image}
-                                                className="card-img-top img-fluid"
-                                                alt={deal.name}
-                                            />
-                                            <div className="card-body text-center">
-                                                <p className="card-text">{deal.name}</p>
+                            {/* Subway Surfer Section */}
+                            <div id="trevor-video" className={`trevor-video ${isTrevorModeActive ? "active" : ""}`}>
+                                <div id="trevor-video-iframe"></div>
+                            </div>
+
+                            {/* Meal Modal */}
+                            {selectedMeal && (
+                                <MealModal
+                                    mealType={selectedMeal}
+                                    onClose={() => setSelectedMeal(null)}
+                                    onConfirm={(mealData) => {
+                                        const updatedCart = [...cart, mealData];
+                                        setCart(updatedCart); // Update the cart state
+                                        sessionStorage.setItem("cart", JSON.stringify(updatedCart)); // Save to sessionStorage
+                                        setSelectedMeal(null); // Close the modal
+                                    }}
+                                />
+                            )}
+
+                            {/* RenderMenu grouped by category */}
+                            {Object.entries(
+                                menuItems.reduce((groups, item) => {
+                                    if (!groups[item.category]) {
+                                        groups[item.category] = [];
+                                    }
+                                    groups[item.category].push(item);
+                                    return groups;
+                                }, {})
+                            ).map(([category, items], index) => (
+                                <section
+                                    key={index}
+                                    id={category.toLowerCase().replace(/\s+/g, "-")}
+                                    className="py-3"
+                                >
+                                    <h2>{category}</h2>
+                                    <div className="row">
+                                        <RenderMenu
+                                            menuItems={items} // Pass only items in this category
+                                            itemSizes={itemSizes}
+                                            inventoryData={inventoryData}
+                                            setSelectedItem={setSelectedItem}
+                                        />
+                                    </div>
+                                </section>
+                            ))}
+
+                            {/* Deals Section */}
+                            <section id="deal" className="py-3">
+                                <h2>Deals</h2>
+                                <div className="row">
+                                    {deals.map((deal, index) => (
+                                        <div key={index} className="col-6 col-md-4 col-lg-3 mb-3">
+                                            <div className="card">
+                                                <img
+                                                    src={deal.image}
+                                                    className="card-img-top img-fluid"
+                                                    alt={deal.name}
+                                                />
+                                                <div className="card-body text-center">
+                                                    <p className="card-text">{deal.name}</p>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-                        
-                    </main>
+                                    ))}
+                                </div>
+                            </section>
+                            
+                        </main>
+                    </div>
                 </div>
-            </div>
 
-            {/* Item Modal */}
-            {selectedItem && (
-                <ItemModal
-                    item={selectedItem}
-                    sizes={itemSizes[selectedItem.id] || []}
-                    selectedSize={selectedSize}
-                    setSelectedSize={setSelectedSize}
-                    onClose={() => setSelectedItem(null)}
-                    onAdd={handleAddToCart}
-                />
-            )}
+                {/* Item Modal */}
+                {selectedItem && (
+                    <ItemModal
+                        item={selectedItem}
+                        sizes={itemSizes[selectedItem.id] || []}
+                        selectedSize={selectedSize}
+                        setSelectedSize={setSelectedSize}
+                        onClose={() => setSelectedItem(null)}
+                        onAdd={handleAddToCart}
+                    />
+                )}
+            </div>
         </div>
     );
 };
