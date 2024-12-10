@@ -1,6 +1,6 @@
 // pages/employee.js
 import { useSession } from "next-auth/react";
-import EmployeeLoginButton from '../components/EmployeeLoginButton';
+import EmployeeLoginButton from '@/components/ui/employee/auth/EmployeeLoginButton';
 
 const EmployeePage = () => {
   const { data: session, status } = useSession();
