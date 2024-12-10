@@ -195,7 +195,7 @@ const MealSelectionPage = () => {
                     <div className="row">
                         {/* Sidebar */}
                         <nav className="col-md-3 d-none d-md-block bg-light sidebar">
-                            <div className="position-fixed sidebar-container p-4">
+                            <div className="position-fixed sidebar-container pt-4">
                                 <ul className="nav flex-column">
                                     {[
                                         { id: "meals", label: "Meals", icon: <FaUtensils className="icon me-3" /> },
@@ -246,7 +246,7 @@ const MealSelectionPage = () => {
                                                     transition: "transform 0.2s ease, background-color 0.3s ease",
                                                 }}
                                             >
-                                                <FiAlertTriangle className="icon me-3"/> {isTrevorModeActive ? "Deactivate" : "Activate Trevor Mode"}
+                                                <FiAlertTriangle className="icon me-3"/> {isTrevorModeActive ? "Deactivate" : "Trevor Mode"}
                                             </button>
                                         </li>
                                 </ul>
