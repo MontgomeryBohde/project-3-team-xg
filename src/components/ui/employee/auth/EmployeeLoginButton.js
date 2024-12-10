@@ -1,7 +1,7 @@
-// src/components/EmployeeLoginButton.js
+// src/components/ui/employee/auth/EmployeeLoginButton.js
 "use client";
 
-import { signIn } from "next-auth/react";
+import { signIn } from "next-auth/react"; 
 import { useRouter } from "next/navigation";
 
 const EmployeeLoginButton = () => {

@@ -40,9 +40,6 @@ const Page = () => {
           </button>
           <EmployeeLoginButton />
         </div>
-
-        {/* Show the employee login button on employee route */}
-        {pathname === '/employee' && <EmployeeLoginButton />}
       </div>
     </div>
   );
