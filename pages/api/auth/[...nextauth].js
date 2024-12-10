@@ -16,7 +16,7 @@ export const authOptions = {
       return url.startsWith(baseUrl) ? url : baseUrl;
     },
   },  
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: "b4f82be5950266447902258491326789a6585803",
 };
 
 export default NextAuth(authOptions);
