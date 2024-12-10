@@ -10,9 +10,6 @@ const Page = () => {
     const navigateToSales = () => {
         router.push("/employee/manager/reports/sales");
     };
-    const navigateToDailyReports = () => {
-        router.push("/employee/manager/reports/daily-reports");
-    };
     const navigateToMenuPopularity = () => {
         router.push("/employee/manager/reports/menu-popularity");
     };
@@ -31,9 +28,6 @@ const Page = () => {
                 <div className="d-grid gap-2 col-6 mx-auto">
                     <button className="btn btn-primary btn-lg m-3" onClick={navigateToSales}>
                         Sales Report
-                    </button>
-                    <button className="btn btn-primary btn-lg m-3" onClick={navigateToDailyReports}>
-                        Daily Reports
                     </button>
                     <button className="btn btn-primary btn-lg m-3" onClick={navigateToMenuPopularity}>
                         Menu Items Popularity
