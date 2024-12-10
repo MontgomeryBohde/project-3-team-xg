@@ -1,0 +1,88 @@
+/* Trevor Mode: Confirmation Content */
+.confirm-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    background: linear-gradient(135deg, #ff4500, #ff1493, #32cd32);
+    background-size: 300% 300%;
+    animation: bg-gradient-shift 5s infinite linear;
+    flex-direction: column;
+    padding: 20px;
+    text-align: center;
+    min-height: 300px; /* Ensure the container has a minimum height */
+    transition: opacity 0.5s ease;
+    color: #ffffff; /* Text color contrasts with background */
+    border: 5px solid #ff5733;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  }
+  
+  /* Heading Styles */
+  .confirm-content h1 {
+    margin: 10px 0;
+    text-align: center;
+    font-size: 3.5rem;
+    color: #fffacd;
+    text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.7);
+  }
+  
+  .confirm-content h2,
+  .confirm-content h3 {
+    margin: 10px 0;
+    text-align: center;
+    font-size: 1.3rem;
+    color: #fff8dc;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7);
+  }
+  
+  .confirm-content h4 {
+    text-align: center;
+    padding-top: 30px;
+    color: #f0e68c;
+    font-size: 1.2rem;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
+  }
+  
+  /* Image Styling */
+  .confirm-content img {
+    margin-top: 20px;
+    align-items: center;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    filter: drop-shadow(0 0 15px #ff4500);
+    animation: rotate-pulse 3s infinite;
+  }
+  
+  /* Background Animation */
+  @keyframes bg-gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  /* Image Rotation and Pulse Animation */
+  @keyframes rotate-pulse {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.1) rotate(5deg); }
+  }
+  
+  /* Button Hover Effects (if needed later) */
+  .confirm-content button {
+    font-family: "Comic Sans MS", cursive;
+    background-color: #ff4500;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  }
+  
+  .confirm-content button:hover {
+    background-color: #ff1493;
+    transform: scale(1.1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+  }
+  
