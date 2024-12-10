@@ -19,6 +19,7 @@ const MealSelectionPage = () => {
     const [selectedSize, setSelectedSize] = useState("Small");
     const [selectedMeal, setSelectedMeal] = useState(null);
     const [cart, setCart] = useState([]);
+    const [player, setPlayer] = useState(null);
     const [isTrevorModeActive, setIsTrevorModeActive] = useState(false);
 
     const deals = [
@@ -58,6 +59,42 @@ const MealSelectionPage = () => {
         setCart(savedCart);
     }, []);    
 
+    // YouTube API
+    useEffect(() => {
+        // Load YouTube Iframe API
+        const script = document.createElement("script");
+        script.src = "https://www.youtube.com/iframe_api";
+        script.async = true;
+        document.body.appendChild(script);
+
+        // Initialize YouTube Player API
+        window.onYouTubeIframeAPIReady = () => {
+            const playerInstance = new window.YT.Player("trevor-video-iframe", {
+                videoId: "ObhmrE6FyNs",
+                playerVars: {
+                    autoplay: 0, // Do not autoplay initially
+                    loop: 1,
+                    playlist: "ObhmrE6FyNs",
+                    start: 9, // Start at 10 seconds
+                },
+                events: {
+                    onReady: () => {
+                        // Set volume to 30% when ready
+                        if (playerInstance) {
+                            playerInstance.setVolume(50);
+                        }
+                    },
+                },
+            });
+
+            setPlayer(playerInstance); // Set the player instance in state
+        };
+
+        return () => {
+            delete window.onYouTubeIframeAPIReady;
+        };
+    }, []);
+
     const handleAddToCart = (item, size) => {
         const selectedSize = size || "Small";
         const existingItem = cart.find(cartItem => cartItem.name === item.item_name && cartItem.size === selectedSize);
@@ -85,7 +122,6 @@ const MealSelectionPage = () => {
     };
 
     // Trevor Mode
-
     const showTrevorToast = () => {
         const toast = document.createElement("div");
         toast.innerText = isTrevorModeActive ? "Trevor Mode Deactivated 🚫" : "Trevor Mode Activated 🕶️";
@@ -110,7 +146,7 @@ const MealSelectionPage = () => {
 
     const playHoverSound = () => {
         const boomSound = new Audio("/sounds/vine-boom.mp3");
-        boomSound.volume = 0.3;
+        boomSound.volume = 0.2;
     
         try {
             boomSound.play();
@@ -136,6 +172,15 @@ const MealSelectionPage = () => {
     
         // Show toast notification
         showTrevorToast();
+
+        // Update the video iframe source
+        if (player) {
+            if (newState) {
+                player.playVideo(); // Play the video when Trevor Mode is active
+            } else {
+                player.stopVideo(); // Stop the video when Trevor Mode is inactive
+            }
+        }
     };
     
     return (
@@ -225,6 +270,11 @@ const MealSelectionPage = () => {
                                 ))}
                             </div>
                         </section>
+
+                        {/* Subway Surfer Section */}
+                        <div id="trevor-video" className={`trevor-video ${isTrevorModeActive ? "active" : ""}`}>
+                            <div id="trevor-video-iframe"></div>
+                        </div>
 
                         {/* Meal Modal */}
                         {selectedMeal && (

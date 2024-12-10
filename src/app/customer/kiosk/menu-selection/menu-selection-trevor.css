@@ -123,3 +123,33 @@
     from { opacity: 1; }
     to { opacity: 0; }
 }
+
+/* Trevor Mode Video */
+.trevor-video {
+    position: fixed; /* Keep the video in a fixed position */
+    bottom: 20px; /* 20px from the bottom of the viewport */
+    left: 20px; /* 20px from the left of the viewport */
+    width: 300px; /* Define the video container width */
+    height: 169px; /* Maintain 16:9 aspect ratio */
+    border-radius: 10px; /* Optional: rounded corners */
+    overflow: hidden; /* Ensure no content spills out */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Optional: shadow for better visibility */
+    z-index: 1000; /* Ensure the video is above most other content */
+    opacity: 0; /* Default hidden */
+    transform: translateX(-100%); /* Move offscreen initially */
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; /* Smooth transitions */
+}
+
+/* Show the video when Trevor Mode is active */
+.trevor-video.active {
+    opacity: 1; /* Make visible */
+    transform: translateX(0); /* Bring onscreen */
+}
+
+/* Ensure the iframe scales correctly */
+.trevor-video iframe {
+    width: 100%; /* Full width of the container */
+    height: 100%; /* Full height of the container */
+    border: none; /* Remove default iframe border */
+    display: block; /* Prevent unwanted spacing */
+}
