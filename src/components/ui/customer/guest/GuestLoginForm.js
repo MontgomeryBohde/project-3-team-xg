@@ -47,7 +47,7 @@ const GuestLoginForm = () => {
       }
 
       // Navigate to the menu selection page
-      router.push("/customer/kiosk/menuselection");
+      router.push("/customer/kiosk/menu-selection");
     } catch (error) {
       console.error("Error during API call:", error);
       setError("Failed to log in as a guest. Please try again.");
