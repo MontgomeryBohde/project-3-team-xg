@@ -27,7 +27,7 @@ const CustomerLoginForm = () => {
                 window.sessionStorage.setItem("loggedInCustomerName", customer.name);
 
                 // Navigate to menu selection
-                router.push("/customer/kiosk/menuselection/");
+                router.push("/customer/kiosk/menu-selection/");
             } else {
                 // Invalid code
                 setError("No login found for code. Please enter a valid code.");
