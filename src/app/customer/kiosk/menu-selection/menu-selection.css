@@ -1,0 +1,57 @@
+/* Sidebar Styles */
+.sidebar {
+    height: 100vh;
+    font-size: 1.25rem;
+    background-color: #f8f9fa; /* Matches Bootstrap bg-light */
+    position: fixed; /* Ensure the sidebar remains fixed during scroll */
+    width: 240px; /* Define a consistent width */
+    overflow-y: auto; /* Add vertical scrolling if content overflows */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for separation */
+}
+
+.sidebar .nav-link {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem; /* Slightly larger clickable area */
+    color: #000;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.sidebar .nav-link:hover {
+    background-color: #e9ecef; /* Matches hover with a lighter gray */
+    color: #007bff; /* Primary color on hover */
+}
+
+.sidebar .nav-link.active {
+    background-color: #ced4da; /* Slightly darker gray for active links */
+    color: #495057; /* Darker text color */
+}
+
+.sidebar .nav-item {
+    margin-bottom: 0.5rem; /* Space between items */
+}
+
+.icon {
+    font-size: 1.5rem; /* Consistent icon size */
+    margin-right: 0.5rem; /* Space between icon and text */
+}
+
+/* Ensure sidebar responsiveness */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%; /* Expand to full width for smaller screens */
+        height: auto; /* Adjust height to fit content */
+        position: relative; /* Ensure it does not overlap */
+    }
+
+    .sidebar .nav-link {
+        justify-content: center; /* Center-align links for better mobile display */
+    }
+
+    .icon {
+        margin-right: 0; /* Remove extra spacing for compact layout */
+    }
+}
+
