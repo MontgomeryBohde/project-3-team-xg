@@ -8,7 +8,6 @@ export const authOptions = {
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
     }),
   ],
-  secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     async redirect({ url, baseUrl }) {
       // If the callback URL is a relative path, prepend the base URL
@@ -17,6 +16,7 @@ export const authOptions = {
       return url.startsWith(baseUrl) ? url : baseUrl;
     },
   },  
+  secret: process.env.NEXTAUTH_SECRET,
 };
 
 export default NextAuth(authOptions);
