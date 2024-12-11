@@ -118,10 +118,10 @@ const CustomerHeader = () => {
       <GoogleTranslate />
       <div>
         <button className="btn btn-light me-2" onClick={increaseFontSize}>
-          <i className="bi bi-zoom-in"></i>
+          +
         </button>
         <button className="btn btn-light" onClick={decreaseFontSize}>
-          <i className="bi bi-zoom-out"></i>
+          -
         </button>
       </div>
     </header>
