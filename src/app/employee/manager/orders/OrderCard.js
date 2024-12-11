@@ -2,6 +2,16 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useState } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 
+/**
+ * 
+ * Sets up the order card component.
+ *
+ * @param {Object} props - The component's props.
+ * @param {Object} props.order - The order data.
+ * @param {Function} props.onDelete - Function to handle deletion.
+ *
+ * @returns {JSX.Element} The finished rendered order card component.
+ */
 const OrderCard = ({ order, onDelete }) => {
     console.log(order);
     const [showPopup, setShowPopup] = useState(false);
