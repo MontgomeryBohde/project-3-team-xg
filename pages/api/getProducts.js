@@ -40,7 +40,30 @@ export default async function handler(req, res) {
                     result = await query(queryText, [limitValue]);
                     break;
                 }
+                case 'price': {
+                    const { foodNames } = req.body || {};
 
+                   
+                    if (!foodNames || !Array.isArray(foodNames) || foodNames.length === 0) {
+                        return res.status(400).json({ error: 'Invalid or empty foodNames array' });
+                    }
+
+                    console.log("Food names:", foodNames);
+
+                    
+                    const queryText = `
+                        SELECT menu_items.item_name, item_sizes.item_size, item_sizes.price
+                        FROM menu_items
+                        JOIN item_sizes ON item_sizes.item_id = menu_items.id
+                        WHERE menu_items.item_name = ANY($1);
+                    `;
+                    const queryParams = [foodNames];
+
+                  
+                    result = await query(queryText, queryParams);
+
+                    break;
+                }
                 case 'menu': {
                     console.log("Fetching menu items");
                     const queryText = `
