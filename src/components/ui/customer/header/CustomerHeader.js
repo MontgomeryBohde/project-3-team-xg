@@ -28,10 +28,10 @@ const CustomerHeader = () => {
   };
 
   useEffect(() => {
-    // Retrieve customer data from session storage
-    const storedCustomerJSON = window.sessionStorage.getItem("loggedInCustomer");
+    // Retrieve customer data from local storage
+    const storedCustomerJSON = window.localStorage.getItem("loggedInCustomerName");
     if (storedCustomerJSON) {
-      const customerObject = JSON.parse(storedCustomerJSON);
+      const customerObject = (storedCustomerJSON);
       setCustomer(customerObject);
     }
 
@@ -105,7 +105,7 @@ const CustomerHeader = () => {
           style={{ cursor: "pointer" }}
         />
         <h4 className="mb-0">
-          {customer ? `Welcome, ${customer.first_name}` : "Welcome to Panda Express"}
+          {customer ? `Welcome, ${customer}` : "Welcome to Panda Express"}
         </h4>
       </div>
       <div className="d-flex align-items-center">

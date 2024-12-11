@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Head from "next/head";
-import { FaUtensils, FaShoppingCart, FaDrumstickBite, FaCarrot, FaConciergeBell, FaGlassCheers, FaGift } from "react-icons/fa";
+import { FaUtensils, FaShoppingCart, FaDrumstickBite, FaCarrot, FaConciergeBell, FaGlassCheers, FaGift, FaTrophy } from "react-icons/fa";
 import { FiAlertTriangle } from "react-icons/fi";
 import CustomerHeader from "@/components/ui/customer/header/CustomerHeader";
 import RenderMenu from "@/components/ui/customer/menu-selection/RenderMenu";
@@ -25,6 +25,26 @@ const MealSelectionPage = () => {
     const deals = [
         { name: "50 percent off", image: "/images/50per.jpg", sizeType: "special" }
     ];
+
+    // rewards from sessionStorage
+    const [rewards, setRewards] = useState();
+    useEffect(() => {
+        const storedRewards = JSON.parse(sessionStorage.getItem('rewards'));
+        if(storedRewards){
+            setRewards(storedRewards);
+            console.log("stuffs: " , storedRewards);
+        }
+    }, []); 
+
+    // is customer logged in
+    const [custLoggedIn, setCustLoggedIn] = useState(false);
+    useEffect(() => {
+        const loggedInCustomer = JSON.parse(sessionStorage.getItem('loggedInCustomer'));
+        if(loggedInCustomer){
+            setCustLoggedIn(true);
+        }
+    }, []);
+
 
     useEffect(() => {
         const fetchMenuData = async () => {
@@ -96,22 +116,30 @@ const MealSelectionPage = () => {
     }, []);
 
     const handleAddToCart = (item, size) => {
-        const selectedSize = size || "Small";
-        const existingItem = cart.find(cartItem => cartItem.name === item.item_name && cartItem.size === selectedSize);
-
-        let updatedCart;
-        if (existingItem) {
-            updatedCart = cart.map(cartItem =>
-                cartItem.name === item.item_name && cartItem.size === selectedSize
-                    ? { ...cartItem, quantity: cartItem.quantity + 1 }
-                    : cartItem
-            );
-        } else {
-            updatedCart = [...cart, { name: item.item_name, size: selectedSize, quantity: 1 }];
+        if (size == "special") { // free bowls & other rewards
+            let updatedCart;
+            updatedCart = [...cart, { name: item.name, size: size, quantity: 1 }];
+            setCart(updatedCart);
+            sessionStorage.setItem("cart", JSON.stringify(updatedCart));
         }
+        else {
+            const selectedSize = size || "Small";
+            const existingItem = cart.find(cartItem => cartItem.name === item.item_name && cartItem.size === selectedSize);
 
-        setCart(updatedCart);
-        sessionStorage.setItem("cart", JSON.stringify(updatedCart));
+            let updatedCart;
+            if (existingItem) {
+                updatedCart = cart.map(cartItem =>
+                    cartItem.name === item.item_name && cartItem.size === selectedSize
+                        ? { ...cartItem, quantity: cartItem.quantity + 1 }
+                        : cartItem
+                );
+            } else {
+                updatedCart = [...cart, { name: item.item_name, size: selectedSize, quantity: 1 }];
+            }
+
+            setCart(updatedCart);
+            sessionStorage.setItem("cart", JSON.stringify(updatedCart));
+        }  
     };
 
     const handleScrollToSection = (sectionId) => {
@@ -204,6 +232,7 @@ const MealSelectionPage = () => {
                                         { id: "appetizer", label: "Appetizers", icon: <FaConciergeBell className="icon me-3" /> },
                                         { id: "drink", label: "Drinks", icon: <FaGlassCheers className="icon me-3" /> },
                                         { id: "deal", label: "Deals", icon: <FaGift className="icon me-3" /> },
+                                        { id: "rewards", label: "Rewards", icon: <FaTrophy className="icon me-3" /> },
                                     ].map((section, index) => (
                                         <li key={index} className="nav-item mb-3">
                                                 <a
@@ -339,7 +368,49 @@ const MealSelectionPage = () => {
                                     ))}
                                 </div>
                             </section>
-                            
+
+                            {/* Rewards Section */}
+                            <section id="deal" className="py-3">
+                                <h2>Rewards</h2>
+                                {custLoggedIn ? (
+                                    rewards && rewards.length > 0 ? (
+                                        <div className="py-3" id="rewards">
+                                            <div className="row">
+                                                {rewards.map((reward, index) => (
+                                                    <div key={index} className="col-6 col-md-4 col-lg-3 mb-3">
+                                                        <div className="card">
+                                                            <img
+                                                                src={reward.image}
+                                                                className="card-img-top img-fluid"
+                                                                alt={reward.name}
+                                                            />
+                                                            <div className="card-body text-center">
+                                                                <p className="card-text">{reward.name}</p>
+                                                                <button
+                                                                    className="btn btn-danger"
+                                                                    onClick={() => handleAddToCart(reward, "special")}
+                                                                >
+                                                                    Add to Cart
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="py-3" id="rewards">
+                                            <p>You have not claimed any rewards yet!</p>
+                                        </div>
+                                    )
+                                ) : (
+                                    <div className="py-3" id="rewards">
+                                        <p>You are logged in as a guest and thus do not have any rewards.</p>
+                                    </div>
+                                )}
+
+                            </section>
+
                         </main>
                     </div>
                 </div>
