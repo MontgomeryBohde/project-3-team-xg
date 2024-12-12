@@ -3,6 +3,10 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+/**
+ * Form that takes customers' phone numbers, and if valid, redirects to the Loyalty Page
+ * @returns Loyalty Login Form which redirects to the Loyalty Page
+ */
 const LoyaltyLoginForm = () => {
     const [num, setNum] = useState('');
     const [error, setError] = useState(null);
@@ -10,7 +14,10 @@ const LoyaltyLoginForm = () => {
     const [customer, setCustomer] = useState(null);
     const router = useRouter();
 
-    // Fetch customer data
+    /**
+     * Returns customer data from the database
+     * @returns customer data from database
+     */
     const fetchCustomerData = async () => {
         try {
             setLoading(true);
@@ -32,7 +39,11 @@ const LoyaltyLoginForm = () => {
         }
     };
 
-    // Handle form submission
+    /**
+     * Handles functionality when login button is pressed - redirects to loyalty page if entered phone number is correct
+     * @param {*} event when the login button is pressed
+     * @returns redirects to loyalty page if entered phone number is correct
+     */
     const handleLogin = async (event) => {
         event.preventDefault();
 
@@ -70,6 +81,9 @@ const LoyaltyLoginForm = () => {
         }
     };
 
+    /**
+     * Navigates to Kiosk page
+     */
     const navigateToKioskPage = () => {
         router.push("/customer/kiosk"); // Navigate back to the Kiosk Page
     };

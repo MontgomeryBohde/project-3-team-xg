@@ -1,12 +1,28 @@
-// src/app/employee/cashier/order/confirmation/page.js
+/**
+ * @file page.js
+ * @description Confirmation page for reviewing and finalizing orders in the cashier interface. 
+ * Handles cart display, discount application, tax calculations, and order confirmation.
+ * @module employee/cashier/order/confirmation/page
+ * @requires React
+ * @requires Link
+ * @requires DiscountPopUp
+ * @requires PaymentPopUp
+ * @requires EmployeeLogInHeader
+ */
+
 'use client';
-import 'bootstrap/dist/css/bootstrap.css';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import DiscountPopUp from '@/components/ui/employee/cashier/order/confirmation/DiscountPopUp';
 import PaymentPopUp from '@/components/ui/employee/cashier/order/confirmation/PaymentPopUp';
 import EmployeeLogInHeader from "@/components/ui/employee/header/EmployeeLogInHeader";
 
+/**
+ * The main component for the order confirmation page.
+ * Manages cart items, discounts, and tax settings for the cashier interface.
+ * 
+ * @component
+ */
 const ConfirmationPage = () => {
     const [cartItems, setCartItems] = useState([]);
     const [discount, setDiscount] = useState(0);
@@ -15,29 +31,41 @@ const ConfirmationPage = () => {
     const [showDiscountPopUp, setShowDiscountPopUp] = useState(false);
 
     useEffect(() => {
+        /**
+         * Initializes cart items and discount details from query parameters or local storage.
+         */
         const queryCart = new URLSearchParams(window.location.search).get('cart');
-        const storedCart = queryCart 
-            ? JSON.parse(queryCart) 
-            : JSON.parse(sessionStorage.getItem('cart')) || [];
+        const storedCart = queryCart ? JSON.parse(queryCart) : JSON.parse(localStorage.getItem('cart')) || [];
         setCartItems(storedCart);
-    
-        // Retrieve discount details from localStorage
+
         const storedDiscount = localStorage.getItem('selectedDiscount');
         const storedTaxExempt = localStorage.getItem('isTaxExempt');
-    
+
         if (storedDiscount) setDiscount(Number(storedDiscount));
         if (storedTaxExempt) setTaxExempt(storedTaxExempt === 'true');
-    }, []);    
+    }, []);
 
+    /**
+     * Calculates the subtotal of the cart items.
+     * @returns {number} The subtotal of all items in the cart.
+     */
     const calculateSubtotal = () => {
         return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
     };
 
+    /**
+     * Calculates the discount amount based on the applied discount percentage.
+     * @returns {number} The discount amount.
+     */
     const calculateDiscountAmount = () => {
         const subtotal = calculateSubtotal();
         return (subtotal * discount) / 100;
     };
 
+    /**
+     * Calculates the total amount, including tax and discounts.
+     * @returns {number} The total amount after applying tax and discounts.
+     */
     const calculateTotal = () => {
         const subtotal = calculateSubtotal();
         const discountAmount = calculateDiscountAmount();
@@ -45,36 +73,58 @@ const ConfirmationPage = () => {
         return (subtotal - discountAmount + tax).toFixed(2);
     };
 
+    /**
+     * Saves the cart items to local storage before returning to the previous page.
+     */
     const handleReturn = () => {
-        // Save the cart items to sessionStorage before returning
-        sessionStorage.setItem('cart', JSON.stringify(cartItems));
+        localStorage.setItem('cart', JSON.stringify(cartItems));
     };
 
+    /**
+     * Updates the quantity of a specific item in the cart.
+     * @param {number} index - The index of the item in the cart.
+     * @param {number} quantity - The new quantity for the item.
+     */
     const handleQuantityChange = (index, quantity) => {
         const updatedCartItems = [...cartItems];
         updatedCartItems[index].quantity = quantity || 1;
         setCartItems(updatedCartItems);
     };
 
+    /**
+     * Removes a specific item from the cart.
+     * @param {number} index - The index of the item to remove.
+     */
     const handleRemoveItem = (index) => {
         const updatedCartItems = cartItems.filter((_, i) => i !== index);
         setCartItems(updatedCartItems);
     };
 
+    /**
+     * Renders sub-items for a composite item in the cart.
+     * @param {Array<object>} subItems - List of sub-items to render.
+     * @returns {JSX.Element} The rendered sub-item list.
+     */
     const renderSubItems = (subItems) => (
         <ul className="list-group list-group-flush mt-2">
             {subItems.map((subItem, subIndex) => (
                 <li key={subIndex} className="list-group-item ps-4">
-                    <small className="text-muted">{subItem.item_name}</small>
+                    <small className="text-muted">{subItem.name}</small>
                 </li>
             ))}
         </ul>
     );
 
+    /**
+     * Renders an individual cart item with controls for updating quantity and removing the item.
+     * @param {object} item - The cart item to render.
+     * @param {number} index - The index of the item in the cart.
+     * @returns {JSX.Element} The rendered cart item.
+     */
     const renderCartItem = (item, index) => (
         <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
             <div className="d-flex flex-column">
-                <strong>{item.item_name}</strong>
+                <strong>{item.name}</strong>
                 {item.size && (
                     <span className="text-muted">Size: {item.size}</span>
                 )}
