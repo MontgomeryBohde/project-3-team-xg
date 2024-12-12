@@ -4,6 +4,13 @@ import './OrderInfo.css';
 import OrderCard from './OrderCard';
 import EmployeeLogInHeader from '@/components/ui/employee/header/EmployeeLogInHeader';
 
+/**
+ * Fetches the orders from the server.
+ *
+ * @param {number} offset - The offset for calculating page number.
+ * @async
+ * @returns {Promise<void>}
+ */
 const OrderInfo = () => {
     const [orders, setOrders] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -30,6 +37,13 @@ const OrderInfo = () => {
         getOrders(); 
     }, []);
 
+/**
+ * Deletes an order from the view and database.
+ *
+ * @param {string} orderId - The ID of the order to delete.
+ * @async
+ * @returns {Promise<void>}
+ */
     const deleteOrder = async (orderId) => {
         try {
             const response = await fetch(`/api/deleteOrder?id=${orderId}`, {
@@ -56,24 +70,38 @@ const OrderInfo = () => {
     const indexOfLastOrder = currentPage * numPerPage;
     const indexOfFirstOrder = indexOfLastOrder - numPerPage;
     const currentOrders = filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder);
-
+    
+ /**
+ * Moves the view to the next page of orders.
+ */
     const nextPage = () => {
         if (currentPage < Math.ceil(filteredOrders.length / numPerPage)) {
             setCurrentPage(currentPage + 1);
         }
     };
 
+    /**
+     * Moves the view to previous page of orders.
+     */
     const prevPage = () => {
         if (currentPage > 1) {
             setCurrentPage(currentPage - 1);
         }
     };
 
+    /**
+     * Updates the search query, based on searchbar and changes the page.
+     *
+     * @param {Event} e - The event object.
+     */
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
         setCurrentPage(1);
     };
 
+    /**
+     * Loads the next 100 orders from the server.
+     */
     const loadMoreOrders = () => {
         getOrders(loadedOrdersCount); //need to load the next 100 orders
     };
