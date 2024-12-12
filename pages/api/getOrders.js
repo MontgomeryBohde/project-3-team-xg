@@ -8,6 +8,12 @@ const pool = new Pool({
     port: 5432,
 });
 
+/**
+ * Handles the API requests for fetching a list of orders with information on the meal type, price, items, etc.
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @returns {void}
+ */
 export default async function handler(req, res) {
     if (req.method === 'GET') {
         try {
@@ -65,7 +71,11 @@ const offset = parseInt(req.query.offset) || 0;  //offset starts at 0
 
 const { rows } = await pool.query(query, [limit, offset]);
 
-
+/**
+ * Transforms the raw order data into a structured array of order.
+ * @param {Array} rows - An array of objects representing raw order data.
+ * @returns {Array} - An array of order objects with aggregated information.
+ */
 const orders = rows.reduce((acc, row) => {
     const existingOrder = acc.find(order => order.id === row.order_id);
     

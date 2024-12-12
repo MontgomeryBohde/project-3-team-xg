@@ -1,5 +1,11 @@
 import { query } from '@lib/db';
 
+/**
+ * Handles the API requests for various data fetching operations that have to do with menu/product items.
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @returns {void}
+ */
 export default async function handler(req, res) {
     const { type, limit } = req.query;
     const limitValue = limit ? parseInt(limit, 10) : 10;
