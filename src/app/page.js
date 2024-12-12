@@ -38,7 +38,9 @@ const Page = () => {
           <button className="btn btn-outline-light btn-lg px-5 py-3 home-button" onClick={navigateToCustomer}>
             Customer
           </button>
-          <EmployeeLoginButton />
+          <button className="btn btn-outline-light btn-lg px-5 py-3 home-button" onClick={navigateToEmployee}>
+            Employee
+          </button>
         </div>
       </div>
     </div>
