@@ -1,7 +1,24 @@
-// pages/api/getInventory.js
+/**
+ * @file getInventory.js
+ * @description API handler for managing inventory items. Supports retrieving, adding, editing, and removing inventory items from the database.
+ * @module api/getInventory
+ * @requires @lib/db
+ */
+
 import { query } from '@lib/db';
 
+/**
+ * API handler function for inventory operations.
+ * Handles different types of requests like retrieving, adding, editing, and removing inventory items.
+ * 
+ * @param {object} req - The HTTP request object.
+ * @param {object} res - The HTTP response object.
+ */
 export default async function handler(req, res) {
+    /**
+     * Extracts the `type` query parameter to determine the operation type.
+     * @type {string} type
+     */
     const { type } = req.query;
 
     if (req.method === 'GET' || req.method === 'POST') {
@@ -9,11 +26,27 @@ export default async function handler(req, res) {
             let result;
 
             switch (type) {
+
+                /**
+                 * Retrieve all inventory items.
+                 * @route GET /api/getInventory?type=inventory
+                 */
                 case 'inventory': {
                     result = await query('SELECT * FROM inventory_items;');
                     return res.status(200).json(result || []);
                 }
 
+                /**
+                 * Add a new inventory item to the database.
+                 * @route POST /api/getInventory?type=addInventoryItem
+                 * @param {string} item_name - Name of the item.
+                 * @param {string} category - Category of the item.
+                 * @param {number} current_stock - Initial stock quantity.
+                 * @param {string} restock_date - Date to restock the item.
+                 * @param {number} unit_price - Price per unit.
+                 * @param {boolean} is_allergen - Whether the item contains allergens.
+                 * @param {boolean} is_vegan - Whether the item is vegan.
+                 */
                 case 'addInventoryItem': {
                     const {
                         item_name,
@@ -62,6 +95,18 @@ export default async function handler(req, res) {
                     break;
                 }
 
+                /**
+                 * Edit an existing inventory item in the database.
+                 * @route POST /api/getInventory?type=editInventoryItem
+                 * @param {number} id - ID of the inventory item.
+                 * @param {string} item_name - Updated name of the item.
+                 * @param {string} category - Updated category.
+                 * @param {number} current_stock - Updated stock quantity.
+                 * @param {string} restock_date - Updated restock date.
+                 * @param {number} unit_price - Updated price per unit.
+                 * @param {boolean} is_allergen - Whether the item contains allergens.
+                 * @param {boolean} is_vegan - Whether the item is vegan.
+                 */
                 case 'editInventoryItem': {
                     const {
                         id,
