@@ -1,8 +1,19 @@
 'use client';
 
+/**
+ * @file page.js
+ * @description Contains the Menu component which displays menu items.
+ * @requires React
+ * @requires EmployeeLogInHeader
+ */
+
 import React, { useEffect, useState } from "react";
 import EmployeeLogInHeader from '@/components/ui/employee/header/EmployeeLogInHeader';
 
+/**
+ * Menu component that fetches and displays menu items.
+ * @returns {JSX.Element} The rendered Menu component.
+ */
 const Menu = () => {
     const [entrees, setEntrees] = useState([]);
 	const [sides, setSides] = useState([]);
@@ -11,6 +22,12 @@ const Menu = () => {
     const [seasonal, setSeasonal] = useState([]);
     const [inventoryItems, setInventoryItems] = useState([]);
 
+    /**
+     * Fetches inventory items from the API.
+     * @async
+     * @function
+     * @returns {Promise<void>}
+     */
 const fetchInventoryItems = async () => {
     try {
         const response = await fetch("/api/inventory-items");
@@ -27,6 +44,12 @@ useEffect(() => {
     fetchInventoryItems(); 
 }, []);
 
+    /**
+     * Fetches menu items from the API and groups them by item ID.
+     * @async
+     * @function
+     * @returns {Promise<void>}
+     */
     const fetchMenuItems = async () => {
         try {
             const response = await fetch("/api/getProducts?type=menu-with-sizes");
@@ -136,7 +159,12 @@ useEffect(() => {
     const [availableInventoryItems, setAvailableInventoryItems] = useState([]);
    
 
-    
+    /**
+     * Fetches available inventory items from the API.
+     * @async
+     * @function
+     * @returns {Promise<void>}
+     */
     const fetchAvailableInventoryItems = async () => {
         try {
             const response = await fetch("/api/inventory-items");
@@ -156,7 +184,12 @@ useEffect(() => {
         fetchAvailableInventoryItems();
     }, []);
 
-
+    /**
+     * Adds a new menu item to the database.
+     * @async
+     * @function
+     * @returns {Promise<void>}
+    */
     const addItem = async () => {
         const itemData = {
             item_name: itemName,
@@ -195,7 +228,12 @@ useEffect(() => {
     };
     
     
-  
+    /**
+     * Removes a menu item from the database.
+     * @async
+     * @function
+     * @returns {Promise<void>}
+     */
     const removeItem = async () => {
         if (!selectedItem || !selectedItem.item_id) {
             console.error("No item selected for removal.");
@@ -225,6 +263,13 @@ useEffect(() => {
         }
     };
   
+    /**
+     * Adds an inventory item to a menu item.
+     * @async
+     * @function
+     * @param {string} selectedInventoryItemName - The name of the inventory item to add.
+     * @returns {Promise<void>}
+     */
     const handleAddInventoryItem = async (selectedInventoryItemName) => {
         try {
            
@@ -269,6 +314,14 @@ useEffect(() => {
             console.error("Error:", error);
         }
     };
+
+    /**
+     * Removes an inventory item from a menu item.
+     * @async
+     * @function
+     * @param {string} selectedInventoryItemName - The name of the inventory item to remove.
+     * @returns {Promise<void>}
+     */
     const handleRemoveInventoryItem = async (selectedInventoryItemName) => {
         try {
             console.log("Selected ITEM:", selectedItem);
@@ -311,20 +364,6 @@ useEffect(() => {
         }
     };
     
-    
-    
-
-  
-    
-    
-  
-    
-    
-
-    
-
-
-
     const renderMenuItems = (items, category) => (
         items.length > 0 ? (
             items.map((item, index) => (

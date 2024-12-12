@@ -1,11 +1,24 @@
 // src/components/ui/employee/login/LoginForm.js
 "use client";
 
+/**
+ * @fileoverview LoginForm component for employee login.
+ * @requires react
+ * @requires next/navigation
+ * @requires next-auth/react
+ * @requires react-icons/fa
+ */
+
 import React, { useState, useEffect } from 'react';
 import { useRouter } from "next/navigation";
 import { signIn } from 'next-auth/react';
 import { FaGithub } from 'react-icons/fa'; // Import GitHub icon
 
+/**
+ * LoginForm component for employee login.
+ * @component
+ * @returns {JSX.Element} The rendered component.
+ */
 const LoginForm = () => {
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
@@ -13,7 +26,12 @@ const LoginForm = () => {
   const [employees, setEmployees] = useState([]);
   const router = useRouter();
 
-  // Fetch employee data
+  /**
+   * Fetch employee data from the API.
+   * @async
+   * @function fetchEmployees
+   * @returns {Promise<void>}
+   */
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
@@ -31,7 +49,13 @@ const LoginForm = () => {
     fetchEmployees();
   }, []);
 
-  // Handle form submission
+  /**
+   * Handle form submission.
+   * @async
+   * @function handleSubmit
+   * @param {Event} event - The form submission event.
+   * @returns {Promise<void>}
+   */
   const handleSubmit = async (event) => {
     event.preventDefault();
 

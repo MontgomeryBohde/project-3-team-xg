@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: src/app/customer/loyalty/main/page.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: src/app/customer/loyalty/main/page.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>"use client";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import CustomerHeader from "@/components/ui/customer/header/CustomerHeader";
+
+/**
+ * Assembles the Customer Loyalty Home Page
+ * @returns Loyalty Home Page displaying the current rewards progress and old orders for a selected customer.
+ */
+export default function Home() {
+  const router = useRouter();
+
+  const [customer, setCustomer] = useState(null);
+  const [points, setPoints] = useState(null);
+  const [numOrders, setNumOrders] = useState(null);
+  const [orders, setOrders] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // state variables for free bowl + discount
+  const [hasClaimedFreeBowl, setHasClaimedFreeBowl] = useState(false);
+  const [hasClaimedDiscount, setHasClaimedDiscount] = useState(false);
+
+  // Fetch customer from localStorage
+  useEffect(() => {
+    /**
+     * Gets customer from localStorage and sets storedCustomer to it.  
+     */
+    const fetchCustomer = async () => {
+      const storedCustomer = localStorage.getItem("loyaltyCustomer");
+      console.log("stored customer:", storedCustomer);
+      if (storedCustomer) {
+        try {
+          const parsedCustomer = JSON.parse(storedCustomer);
+          setCustomer(parsedCustomer);
+          console.log("parsed customer:", parsedCustomer);
+        } catch (error) {
+          console.error("Error parsing stored customer data:", error);
+        }
+      }
+    };
+
+    fetchCustomer();
+  }, []);
+
+  // Fetch points, orders, and other data when customer is set
+  useEffect(() => {
+    console.log(customer);
+
+    if (!customer?.id) return; // Make sure we have customer data before fetching
+
+    /**
+     * Fetches the customer's points. 
+     */
+    const fetchPoints = async () => {
+      try {
+        const response = await fetch(`/api/getRewards?type=points&amp;customer_id=${customer.id}`);
+        if (!response.ok) throw new Error("Failed to fetch points");
+        const data = await response.json();
+        setPoints(data[0]?.rewards_points || 0);
+
+        console.log("points:", points);
+      } catch (err) {
+        console.error("Error fetching points:", err);
+        setError("Unable to fetch points.");
+      }
+    };
+
+    /**
+     * Fetches the number of this customer's orders in this month. 
+     */
+    const fetchOrdersThisMonth = async () => {
+      try {
+        const response = await fetch(`/api/getRewards?type=month&amp;customer_id=${customer.id}`);
+        if (!response.ok) throw new Error("Failed to fetch orders this month");
+        const data = await response.json();
+        setNumOrders(data[0]?.orders_this_month || 0);
+
+        console.log("num orders this month:", numOrders);
+      } catch (err) {
+        console.error("Error fetching orders:", err);
+        setError("Unable to fetch orders this month.");
+      }
+    };
+    
+    /**
+     * Fetches the last 5 orders this customer has made. 
+     */
+    const fetchOrders = async () => {
+      try {
+        const response = await fetch(`/api/getRewards?type=orders&amp;customer_id=${customer.id}&amp;n=5`);
+        const data = await response.json();
+    
+        console.log("Orders:", data);
+    
+        // Check if the data is an array and handle it
+        if (!Array.isArray(data)) {
+          console.log('not an array :(');
+          return;
+        }
+    
+        // Set orders
+        setOrders(data);
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+      }
+    };
+    
+  
+    fetchOrders();
+    fetchPoints();
+    fetchOrdersThisMonth();
+  }, [customer]); // Depend on `customer`, so this runs when it's set
+
+  if (error) {
+    return &lt;p className="alert alert-danger">{error}&lt;/p>;
+  }
+
+  if (!customer) {
+    return &lt;div>Loading customer data...&lt;/div>;
+  }
+
+  // Free Bowl calculations
+  const pointsRemainingBowl = points !== null ? 100 - points : 0;
+  const pointsPercentageBowl = points !== null ? (points / 100) * 100 : 0;
+
+  // 10% Discount calculations
+  const pointsRemainingDiscount = points !== null ? 120 - points : 0;
+  const pointsPercentageDiscount = points !== null ? (points / 120) * 100 : 0;
+
+
+  // Initialize rewards array in sessionStorage if not already present
+  const initializeRewards = () => {
+    if (!sessionStorage.getItem('rewards')) {
+      sessionStorage.setItem('rewards', JSON.stringify([])); // Store an empty array
+      console.log('Rewards array initialized in sessionStorage');
+    }
+  };
+
+  /**
+   * "Claims" a reward by creating a reward object and storing it in session storage. 
+   * @param {*} reward is the name of the reward that was passed in to be claimed. 
+   */
+  // Claim Reward
+  const claimReward = async (reward) => {
+    try {
+      // Ensure rewards array is initialized
+      initializeRewards();
+
+      // Retrieve existing rewards from sessionStorage
+      let rewards = JSON.parse(sessionStorage.getItem('rewards'));
+
+      // create new reward
+      let newReward = {name: reward, image: "/images/10per.jpg", sizeType: "special"}
+
+      // Update for display
+      if(reward == "Free Bowl") {
+        // remove points
+        setPoints((prevPoints) => prevPoints - 100);
+
+        // set correct image value
+        newReward.image = "/images/freebowl.png";
+
+        // set state variable
+        setHasClaimedFreeBowl(true);
+      }
+      else if(reward == "Discount") {
+        // remove points
+        setPoints((prevPoints) => prevPoints - 120);
+
+        // set correct image value
+        newReward.image = "/images/10per.jpg";
+
+        // set state variable
+        setHasClaimedDiscount(true);
+      }
+
+      // Add the new reward to the array
+      rewards.push(newReward);
+      console.log(rewards);
+      // Save the updated array back to sessionStorage
+      sessionStorage.setItem('rewards', JSON.stringify(rewards));
+    } catch (error) {
+      console.error('Error claiming reward:', error);
+    }
+  };
+
+  initializeRewards(); // Initialize rewards array on app load
+
+  const placeOrderNav = () => {
+    router.push("/customer/kiosk"); // Navigate to the Kiosk Order page
+  }
+
+  const handleLogout = () => {
+    router.push("/customer/loyalty/login"); 
+  }
+
+  return (
+    &lt;div>
+      &lt;CustomerHeader />
+      &lt;div className="container mt-5">
+        &lt;h1 className="text-center mb-4">Your Rewards&lt;/h1>
+
+        {/* Account Information */}
+        &lt;div className="mb-4">
+          &lt;h2>Account Information&lt;/h2>
+          &lt;p>
+            &lt;strong>Name:&lt;/strong> {customer.first_name} {customer.last_name}
+          &lt;/p>
+          &lt;p>
+            &lt;strong>Email:&lt;/strong> {customer.email}
+          &lt;/p>
+          &lt;button className="btn btn-danger" onClick={handleLogout}> Logout &lt;/button>
+        &lt;/div>
+
+        {/* Past Orders */}
+        &lt;div className="mb-4">
+          &lt;h2>Past 5 Orders&lt;/h2>
+          &lt;table className="table table-striped">
+            &lt;thead>
+              &lt;tr>
+                &lt;th>Order #&lt;/th>
+                &lt;th>Items&lt;/th>
+                &lt;th>Total&lt;/th>
+                &lt;th>Points Earned&lt;/th>
+              &lt;/tr>
+            &lt;/thead>
+            &lt;tbody>
+              {Array.isArray(orders) &amp;&amp; orders.length > 0 ? (
+                orders.map((order) => (
+                  &lt;tr key={order.order_id}>
+                    &lt;td>{order.order_id}&lt;/td>
+                    &lt;td>
+                      &lt;ul>
+                        {order.item_size_details?.map((item, index) => (
+                          &lt;li key={`item-size-${index}`}>
+                            {item.item_name} ({item.item_size}) - ${item.price}
+                          &lt;/li>
+                        ))}
+                        {order.meal_item_details?.map((meal, index) => (
+                          &lt;li key={`meal-item-${index}`}>
+                            {meal.item_name}
+                            {meal.side_name &amp;&amp; ` with ${meal.side_name}`}
+                            {meal.entree_names &amp;&amp; ` - Entrees: ${meal.entree_names}`}
+                            - ${meal.price}
+                          &lt;/li>
+                        ))}
+                      &lt;/ul>
+                    &lt;/td>
+                    &lt;td>${order.order_total}&lt;/td>
+                    &lt;td>{10}&lt;/td>
+                  &lt;/tr>
+                ))
+              ) : (
+                &lt;tr>
+                  &lt;td colSpan="4">No orders found.&lt;/td>
+                &lt;/tr>
+              )}
+            &lt;/tbody>
+          &lt;/table>
+        &lt;/div>
+
+        {/* Rewards Progress */}
+        &lt;div>
+          &lt;h2>Rewards Progress&lt;/h2>
+
+          {/* Free Bowl */}
+          &lt;div className="mb-4">
+            &lt;h4>Free Bowl&lt;/h4>
+            {hasClaimedFreeBowl ? (
+              &lt;>
+                &lt;h6>Free Bowl Claimed!&lt;/h6>
+                &lt;button className="btn btn-primary mt-2" onClick={placeOrderNav}>Place Order&lt;/button>
+              &lt;/>
+            ) : (
+              &lt;>
+                &lt;h6>You can earn a free bowl after 10 orders (100 points).&lt;/h6>
+                &lt;p>
+                  {points} points earned. {100 - points} points to reach goal.
+                &lt;/p>
+                &lt;div className="progress">
+                  &lt;div
+                    className="progress-bar"
+                    role="progressbar"
+                    style={{ width: `${(points / 100) * 100}%` }}
+                    aria-valuenow={points}
+                    aria-valuemin="0"
+                    aria-valuemax={100}
+                  >
+                    {((points / 100) * 100).toFixed(0)}%
+                  &lt;/div>
+                &lt;/div>
+                {points >= 100 &amp;&amp; (
+                  &lt;button
+                    className="btn btn-success mt-2"
+                    onClick={() => claimReward("Free Bowl")}
+                  >
+                    Claim Free Bowl
+                  &lt;/button>
+                )}
+              &lt;/>
+            )}
+          &lt;/div>
+
+          {/* 10% Discount */}
+          &lt;div className="mb-4">
+            &lt;h4>10% Discount&lt;/h4>
+            {hasClaimedDiscount ? (
+              &lt;>
+                &lt;h6>10% Discount Claimed!&lt;/h6>
+                &lt;button className="btn btn-primary mt-2" onClick={placeOrderNav}>Place Order&lt;/button>
+              &lt;/>
+            ) : (
+              &lt;>
+                &lt;h6>You can earn a 10% discount on the rest of orders this month after 12 orders (120 points).&lt;/h6>
+                &lt;p>
+                  {points} points earned. {120 - points} points to reach goal.
+                &lt;/p>
+                &lt;div className="progress">
+                  &lt;div
+                    className="progress-bar"
+                    role="progressbar"
+                    style={{ width: `${(points / 120) * 100}%` }}
+                    aria-valuenow={points}
+                    aria-valuemin="0"
+                    aria-valuemax={120}
+                  >
+                    {((points / 120) * 100).toFixed(0)}%
+                  &lt;/div>
+                &lt;/div>
+                {points >= 120 &amp;&amp; (
+                  &lt;button
+                    className="btn btn-success mt-2"
+                    onClick={() => claimReward("Discount")}
+                  >
+                    Claim Discount
+                  &lt;/button>
+                )}
+              &lt;/>
+            )}
+          &lt;/div>
+
+        &lt;/div>
+      &lt;/div>
+    &lt;/div>
+  );
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-ConfirmationPage.html">ConfirmationPage</a></li><li><a href="module-CreditCardPopUp.html">CreditCardPopUp</a></li><li><a href="module-ManagerHomePage.html">ManagerHomePage</a></li><li><a href="module-OrderPage.html">OrderPage</a></li><li><a href="module-Page.html">Page</a></li><li><a href="module-api_getInventory.html">api/getInventory</a></li><li><a href="module-api_getItemSizes.html">api/getItemSizes</a></li><li><a href="module-api_getMenu.html">api/getMenu</a></li><li><a href="module-api_getProducts.html">api/getProducts</a></li><li><a href="module-api_getReports.html">api/getReports</a></li><li><a href="module-employee_cashier_order_confirmation_page.html">employee/cashier/order/confirmation/page</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Appetizer">Appetizer</a></li><li><a href="global.html#BootstrapClient">BootstrapClient</a></li><li><a href="global.html#CACHE_DURATION">CACHE_DURATION</a></li><li><a href="global.html#Cart">Cart</a></li><li><a href="global.html#CartPage">CartPage</a></li><li><a href="global.html#CartPageWrapper">CartPageWrapper</a></li><li><a href="global.html#CashConfirmation">CashConfirmation</a></li><li><a href="global.html#Chat">Chat</a></li><li><a href="global.html#ChatBot">ChatBot</a></li><li><a href="global.html#ClockPage">ClockPage</a></li><li><a href="global.html#ContactForm">ContactForm</a></li><li><a href="global.html#ContactPage">ContactPage</a></li><li><a href="global.html#CustomerHeader">CustomerHeader</a></li><li><a href="global.html#CustomerLoginForm">CustomerLoginForm</a></li><li><a href="global.html#CustomerLoginPage">CustomerLoginPage</a></li><li><a href="global.html#CustomerPage">CustomerPage</a></li><li><a href="global.html#DiscountPopUp">DiscountPopUp</a></li><li><a href="global.html#Drink">Drink</a></li><li><a href="global.html#EmployeeCard">EmployeeCard</a></li><li><a href="global.html#EmployeeDetails">EmployeeDetails</a></li><li><a href="global.html#EmployeeHeader">EmployeeHeader</a></li><li><a href="global.html#EmployeeHomePage">EmployeeHomePage</a></li><li><a href="global.html#EmployeeInfo">EmployeeInfo</a></li><li><a href="global.html#EmployeeLogInHeader">EmployeeLogInHeader</a></li><li><a href="global.html#EmployeeLoginButton">EmployeeLoginButton</a></li><li><a href="global.html#EmployeeLoginPage">EmployeeLoginPage</a></li><li><a href="global.html#EmployeePage">EmployeePage</a></li><li><a href="global.html#EmployeePay">EmployeePay</a></li><li><a href="global.html#Entree">Entree</a></li><li><a href="global.html#GET">GET</a></li><li><a href="global.html#GoogleTranslate">GoogleTranslate</a></li><li><a href="global.html#GuestLoginForm">GuestLoginForm</a></li><li><a href="global.html#Inventory">Inventory</a></li><li><a href="global.html#InventoryPopup">InventoryPopup</a></li><li><a href="global.html#ItemModal">ItemModal</a></li><li><a href="global.html#KioskPage">KioskPage</a></li><li><a href="global.html#LoginForm">LoginForm</a></li><li><a href="global.html#LoyaltyLoginForm">LoyaltyLoginForm</a></li><li><a href="global.html#LoyaltyLoginPage">LoyaltyLoginPage</a></li><li><a href="global.html#MealModal">MealModal</a></li><li><a href="global.html#MealSelectionPage">MealSelectionPage</a></li><li><a href="global.html#Menu">Menu</a></li><li><a href="global.html#MenuBoardPage">MenuBoardPage</a></li><li><a href="global.html#MenuPopularity">MenuPopularity</a></li><li><a href="global.html#MobilePage">MobilePage</a></li><li><a href="global.html#OrderCard">OrderCard</a></li><li><a href="global.html#OrderInfo">OrderInfo</a></li><li><a href="global.html#POST">POST</a></li><li><a href="global.html#PUT">PUT</a></li><li><a href="global.html#Page">Page</a></li><li><a href="global.html#PaymentPopUp">PaymentPopUp</a></li><li><a href="global.html#ProductUsageChart">ProductUsageChart</a></li><li><a href="global.html#RenderMenu">RenderMenu</a></li><li><a href="global.html#SalesChart">SalesChart</a></li><li><a href="global.html#SalesReport">SalesReport</a></li><li><a href="global.html#Side">Side</a></li><li><a href="global.html#SizeSelection">SizeSelection</a></li><li><a href="global.html#XReport">XReport</a></li><li><a href="global.html#ZReport">ZReport</a></li><li><a href="global.html#authOptions">authOptions</a></li><li><a href="global.html#cache">cache</a></li><li><a href="global.html#fetchEmployees">fetchEmployees</a></li><li><a href="global.html#fetchPayData">fetchPayData</a></li><li><a href="global.html#fetchPopularItems">fetchPopularItems</a></li><li><a href="global.html#fetchProductUsageData">fetchProductUsageData</a></li><li><a href="global.html#fetchWeather">fetchWeather</a></li><li><a href="global.html#fetchZReport">fetchZReport</a></li><li><a href="global.html#formatCurrency">formatCurrency</a></li><li><a href="global.html#handleNChange">handleNChange</a></li><li><a href="global.html#handleSubmit">handleSubmit</a></li><li><a href="global.html#inter">inter</a></li><li><a href="global.html#metadata">metadata</a></li><li><a href="global.html#pool">pool</a></li><li><a href="global.html#query">query</a></li><li><a href="global.html#weatherMap">weatherMap</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Wed Dec 11 2024 23:17:49 GMT-0600 (Central Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

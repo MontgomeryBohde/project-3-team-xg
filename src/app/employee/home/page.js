@@ -1,10 +1,22 @@
 // src/app/employee/home/page.js
 "use client";
 
+/**
+ * @fileoverview Employee Home Page component.
+ * @requires react
+ * @requires next/navigation
+ * @requires @/components/ui/employee/header/EmployeeLogInHeader
+ */
+
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import EmployeeLogInHeader from "@/components/ui/employee/header/EmployeeLogInHeader";
 
+/**
+ * EmployeeHomePage component.
+ * @component
+ * @returns {JSX.Element} The Employee Home Page component.
+ */
 const EmployeeHomePage = () => {
 	const [employee, setEmployee] = useState(null);
 	const router = useRouter();
@@ -26,6 +38,10 @@ const EmployeeHomePage = () => {
 		return <div>Loading...</div>; // Loading state while fetching employee data
 	}
 
+    /**
+     * Handles navigation to a specified path.
+     * @param {string} path - The path to navigate to.
+     */
 	const handleNavigation = (path) => {
 		router.push(path);
 	};

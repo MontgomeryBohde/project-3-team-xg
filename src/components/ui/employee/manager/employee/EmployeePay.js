@@ -1,11 +1,34 @@
 "use client";
 
+/**
+ * @file EmployeePay.js
+ * @description This file contains the EmployeePay component which fetches and displays employee pay data.
+ * @requires React
+ */
+
 import React, { useEffect, useState } from "react";
 
+/**
+ * EmployeePay component fetches and displays employee pay data.
+ * 
+ * @component
+ * @example
+ * return (
+ *   <EmployeePay />
+ * )
+ * @returns {JSX.Element} The EmployeePay component.
+ */
 const EmployeePay = () => {
     const [employeePayData, setEmployeePayData] = useState([]);
 
     useEffect(() => {
+        /**
+         * Fetches shifts and employees data, processes it to calculate total hours and pay for each employee.
+         * 
+         * @async
+         * @function fetchPayData
+         * @returns {Promise<void>}
+         */
         const fetchPayData = async () => {
             try {
                 // Fetch shifts and employees data
@@ -17,6 +40,17 @@ const EmployeePay = () => {
                     const employees = await employeesResponse.json();
 
                     // Map employees by ID for quick lookup
+                    /**
+                     * Maps employees by their ID.
+                     * 
+                     * @param {Object} acc - Accumulator object.
+                     * @param {Object} employee - Employee object.
+                     * @param {number} employee.id - Employee ID.
+                     * @param {string} employee.first_name - Employee first name.
+                     * @param {string} employee.last_name - Employee last name.
+                     * @param {string} employee.hourly_rate - Employee hourly rate.
+                     * @returns {Object} - Accumulator object with employee data mapped by ID.
+                     */
                     const employeesById = employees.reduce((acc, employee) => {
                         acc[employee.id] = {
                             firstName: employee.first_name,
@@ -26,10 +60,25 @@ const EmployeePay = () => {
                         return acc;
                     }, {});
 
-                    // Filter out shifts with no end_time
+                    /**
+                     * Filters out shifts with no end_time.
+                     * 
+                     * @param {Object} shift - Shift object.
+                     * @param {string} shift.end_time - Shift end time.
+                     * @returns {boolean} - True if shift has an end_time, false otherwise.
+                     */
                     const validShifts = shifts.filter((shift) => shift.end_time !== null);
 
-                    // Process valid shifts data to calculate total hours and pay
+                    /**
+                     * Processes valid shifts data to calculate total hours and pay for each employee.
+                     * 
+                     * @param {Object} acc - Accumulator object.
+                     * @param {Object} shift - Shift object.
+                     * @param {number} shift.employee_id - Employee ID.
+                     * @param {string} shift.start_time - Shift start time.
+                     * @param {string} shift.end_time - Shift end time.
+                     * @returns {Object} - Accumulator object with calculated pay data for each employee.
+                     */
                     const payData = validShifts.reduce((acc, shift) => {
                         const employee = employeesById[shift.employee_id];
                         if (!employee) return acc;

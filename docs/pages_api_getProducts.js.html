@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: pages/api/getProducts.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: pages/api/getProducts.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file getProducts.js
+ * @description API handler for retrieving product information including usage, pricing, and menu details.
+ * @module api/getProducts
+ * @requires @lib/db
+ */
+
+import { query } from '@lib/db';
+
+/**
+ * Handles the API requests for various data fetching operations that have to do with menu/product items.
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @returns {void}
+ */
+export default async function handler(req, res) {
+    /**
+     * Extract query parameters.
+     * @type {string} type - Type of the query (e.g., usage, price, menu).
+     * @type {number} [limit=10] - Maximum number of results (default: 10).
+     */
+    const { type, limit } = req.query;
+    const limitValue = limit ? parseInt(limit, 10) : 10;
+
+    if (req.method === 'GET' || req.method === 'POST') {
+        try {
+            let result;
+
+            switch (type) {
+                /**
+                 * Fetch product usage statistics.
+                 * @route GET /api/getProducts?type=usage
+                 * @param {number} limit - Maximum number of items to return.
+                 */
+                case 'usage': {
+                    console.log("Executing usage query");
+
+                    const queryText = `
+                        WITH combined_meal_items AS (
+                            -- Get entree items from meal_items in orders
+                            SELECT unnest(mi.entree_ids) AS item_id, 'entree' AS item_type, mi.meal_type
+                            FROM orders o
+                            JOIN meal_items mi ON mi.id = ANY(o.meal_item_ids)
+
+                            UNION ALL
+
+                            -- Get side items from meal_items in orders
+                            SELECT mi.side_id AS item_id, 'side' AS item_type, mi.meal_type
+                            FROM orders o
+                            JOIN meal_items mi ON mi.id = ANY(o.meal_item_ids)
+                        )
+                        -- Get the total number of orders for each individual meal item
+                        SELECT 
+                            COALESCE(m.item_name, 'Unknown') AS meal_item_name,  -- Display the actual item name or 'Unknown' if not found
+                            COUNT(*) AS times_ordered
+                        FROM combined_meal_items cm
+                        LEFT JOIN menu_items m ON m.id = cm.item_id   -- Join with menu_items to get the actual name of the item
+                        GROUP BY meal_item_name  -- Group by the meal_item_name which is the alias created above
+                        ORDER BY times_ordered DESC
+                        LIMIT $1;  -- Use the limit parameter
+                    `;
+
+                    result = await query(queryText, [limitValue]);
+                    break;
+                }
+                /**
+                 * Fetch product prices for specific items.
+                 * @route POST /api/getProducts?type=price
+                 * @param {string[]} foodNames - List of food item names to fetch prices for.
+                 */
+                case 'price': {
+                    const { foodNames } = req.body || {};
+
+                   
+                    if (!foodNames || !Array.isArray(foodNames) || foodNames.length === 0) {
+                        return res.status(400).json({ error: 'Invalid or empty foodNames array' });
+                    }
+
+                    console.log("Food names:", foodNames);
+
+                    
+                    const queryText = `
+                        SELECT menu_items.item_name, item_sizes.item_size, item_sizes.price
+                        FROM menu_items
+                        JOIN item_sizes ON item_sizes.item_id = menu_items.id
+                        WHERE menu_items.item_name = ANY($1);
+                    `;
+                    const queryParams = [foodNames];
+
+                  
+                    result = await query(queryText, queryParams);
+
+                    break;
+                }
+                /**
+                 * Fetch a list of menu items.
+                 * @route GET /api/getProducts?type=menu
+                 */
+                case 'menu': {
+                    console.log("Fetching menu items");
+                    const queryText = `
+                        SELECT menu_items.item_name AS name, menu_items.category
+                        FROM menu_items;
+                    `;
+                    result = await query(queryText);
+                    break;
+                }
+
+                /**
+                 * Fetch menu items with sizes and associated data.
+                 * @route GET /api/getProducts?type=menu-with-sizes
+                 */
+                case 'menu-with-sizes': {
+                    console.log("Fetching menu items with sizes, IDs, and calories");
+                    const queryText = `
+                        SELECT 
+                            menu_items.id AS item_id,
+                            menu_items.item_name AS name, 
+                            item_sizes.item_size AS size, 
+                            menu_items.category, 
+                            ARRAY_AGG(inventory_items.item_name) AS inventory_names, 
+                            item_sizes.price,
+                            item_sizes.calories
+                        FROM menu_items
+                        JOIN item_sizes ON menu_items.id = item_sizes.item_id
+                        LEFT JOIN inventory_items ON inventory_items.id = ANY(menu_items.inventory_item_ids)
+                        GROUP BY menu_items.id, item_sizes.item_size, item_sizes.price, item_sizes.calories;
+                    `;
+                    
+                    result = await query(queryText);
+                    break;
+                }
+
+                default:
+                    return res.status(400).json({ error: 'Invalid action' });
+            }
+
+            
+            console.log("Query result:", result);
+
+            // check for null
+            if (!result || result.length === 0) {
+                return res.status(404).json({ error: 'No data found' });
+            }
+
+           
+            res.status(200).json(result);
+
+        } catch (error) {
+           
+            console.error('Error executing query:', error);
+
+            
+            res.status(500).json({ error: 'Failed to execute query', details: error.message });
+        }
+    } else {
+       
+        console.log(`Method ${req.method} not allowed`);
+        res.setHeader('Allow', ['GET', 'POST']);
+        res.status(405).end(`Method ${req.method} Not Allowed`);
+    }
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-ConfirmationPage.html">ConfirmationPage</a></li><li><a href="module-CreditCardPopUp.html">CreditCardPopUp</a></li><li><a href="module-ManagerHomePage.html">ManagerHomePage</a></li><li><a href="module-OrderPage.html">OrderPage</a></li><li><a href="module-Page.html">Page</a></li><li><a href="module-api_getInventory.html">api/getInventory</a></li><li><a href="module-api_getItemSizes.html">api/getItemSizes</a></li><li><a href="module-api_getMenu.html">api/getMenu</a></li><li><a href="module-api_getProducts.html">api/getProducts</a></li><li><a href="module-api_getReports.html">api/getReports</a></li><li><a href="module-employee_cashier_order_confirmation_page.html">employee/cashier/order/confirmation/page</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Appetizer">Appetizer</a></li><li><a href="global.html#BootstrapClient">BootstrapClient</a></li><li><a href="global.html#CACHE_DURATION">CACHE_DURATION</a></li><li><a href="global.html#Cart">Cart</a></li><li><a href="global.html#CartPage">CartPage</a></li><li><a href="global.html#CartPageWrapper">CartPageWrapper</a></li><li><a href="global.html#CashConfirmation">CashConfirmation</a></li><li><a href="global.html#Chat">Chat</a></li><li><a href="global.html#ChatBot">ChatBot</a></li><li><a href="global.html#ClockPage">ClockPage</a></li><li><a href="global.html#ContactForm">ContactForm</a></li><li><a href="global.html#ContactPage">ContactPage</a></li><li><a href="global.html#CustomerHeader">CustomerHeader</a></li><li><a href="global.html#CustomerLoginForm">CustomerLoginForm</a></li><li><a href="global.html#CustomerLoginPage">CustomerLoginPage</a></li><li><a href="global.html#CustomerPage">CustomerPage</a></li><li><a href="global.html#DiscountPopUp">DiscountPopUp</a></li><li><a href="global.html#Drink">Drink</a></li><li><a href="global.html#EmployeeCard">EmployeeCard</a></li><li><a href="global.html#EmployeeDetails">EmployeeDetails</a></li><li><a href="global.html#EmployeeHeader">EmployeeHeader</a></li><li><a href="global.html#EmployeeHomePage">EmployeeHomePage</a></li><li><a href="global.html#EmployeeInfo">EmployeeInfo</a></li><li><a href="global.html#EmployeeLogInHeader">EmployeeLogInHeader</a></li><li><a href="global.html#EmployeeLoginButton">EmployeeLoginButton</a></li><li><a href="global.html#EmployeeLoginPage">EmployeeLoginPage</a></li><li><a href="global.html#EmployeePage">EmployeePage</a></li><li><a href="global.html#EmployeePay">EmployeePay</a></li><li><a href="global.html#Entree">Entree</a></li><li><a href="global.html#GET">GET</a></li><li><a href="global.html#GoogleTranslate">GoogleTranslate</a></li><li><a href="global.html#GuestLoginForm">GuestLoginForm</a></li><li><a href="global.html#Inventory">Inventory</a></li><li><a href="global.html#InventoryPopup">InventoryPopup</a></li><li><a href="global.html#ItemModal">ItemModal</a></li><li><a href="global.html#KioskPage">KioskPage</a></li><li><a href="global.html#LoginForm">LoginForm</a></li><li><a href="global.html#LoyaltyLoginForm">LoyaltyLoginForm</a></li><li><a href="global.html#LoyaltyLoginPage">LoyaltyLoginPage</a></li><li><a href="global.html#MealModal">MealModal</a></li><li><a href="global.html#MealSelectionPage">MealSelectionPage</a></li><li><a href="global.html#Menu">Menu</a></li><li><a href="global.html#MenuBoardPage">MenuBoardPage</a></li><li><a href="global.html#MenuPopularity">MenuPopularity</a></li><li><a href="global.html#MobilePage">MobilePage</a></li><li><a href="global.html#OrderCard">OrderCard</a></li><li><a href="global.html#OrderInfo">OrderInfo</a></li><li><a href="global.html#POST">POST</a></li><li><a href="global.html#PUT">PUT</a></li><li><a href="global.html#Page">Page</a></li><li><a href="global.html#PaymentPopUp">PaymentPopUp</a></li><li><a href="global.html#ProductUsageChart">ProductUsageChart</a></li><li><a href="global.html#RenderMenu">RenderMenu</a></li><li><a href="global.html#SalesChart">SalesChart</a></li><li><a href="global.html#SalesReport">SalesReport</a></li><li><a href="global.html#Side">Side</a></li><li><a href="global.html#SizeSelection">SizeSelection</a></li><li><a href="global.html#XReport">XReport</a></li><li><a href="global.html#ZReport">ZReport</a></li><li><a href="global.html#authOptions">authOptions</a></li><li><a href="global.html#cache">cache</a></li><li><a href="global.html#fetchEmployees">fetchEmployees</a></li><li><a href="global.html#fetchPayData">fetchPayData</a></li><li><a href="global.html#fetchPopularItems">fetchPopularItems</a></li><li><a href="global.html#fetchProductUsageData">fetchProductUsageData</a></li><li><a href="global.html#fetchWeather">fetchWeather</a></li><li><a href="global.html#fetchZReport">fetchZReport</a></li><li><a href="global.html#formatCurrency">formatCurrency</a></li><li><a href="global.html#handleNChange">handleNChange</a></li><li><a href="global.html#handleSubmit">handleSubmit</a></li><li><a href="global.html#inter">inter</a></li><li><a href="global.html#metadata">metadata</a></li><li><a href="global.html#pool">pool</a></li><li><a href="global.html#query">query</a></li><li><a href="global.html#weatherMap">weatherMap</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Wed Dec 11 2024 23:17:49 GMT-0600 (Central Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -5,27 +5,38 @@ import { useRouter } from "next/navigation";
 import Image from 'next/image';
 import pandaIcon from '/public/panda-icon.png';
 
+/**
+ * CustomerPage component renders the customer landing page with navigation options.
+ * @component
+ * @returns {JSX.Element} The rendered customer page component.
+ */
 const CustomerPage = () => {
     const router = useRouter();
 
+    /**
+     * Navigates to the Menu Board page.
+     */
     const navigateToMenuBoard = () => {
         router.push("/customer/menu-board"); // Navigate to the Menu Board page
     };
 
+    /**
+     * Navigates to the Kiosk Order page.
+     */
     const navigateToKioskOrder = () => {
         router.push("/customer/kiosk"); // Navigate to the Kiosk Order page
     };
 
-    /*
-    const navigateToMobileOrder = () => {
-        router.push("/customer/mobile"); // Navigate to the Mobile Order page
-    };
-    */
-
+    /**
+     * Navigates to the Customer Loyalty login page.
+     */
     const navigateToLoyaltyPage = () => {
         router.push("/customer/loyalty/login"); // Navigate to the Mobile Order page
     };
 
+    /**
+     * Navigates back to the Main Page.
+     */
     const navigateToMainPage = () => {
         router.push("/"); // Navigate back to the Main Page
     };

@@ -1,6 +1,28 @@
 // src/components/ui/employee/cashier/order/Cart.js
+
+/**
+ * @fileoverview This file contains the Cart component which displays the items in the cart,
+ * allows quantity adjustments, and handles item removal.
+ * @requires React
+ */
+
 import React, { useState } from 'react';
 
+/**
+ * Cart component to display and manage cart items.
+ *
+ * @param {Object[]} cartItems - Array of cart items.
+ * @param {Object} inProgressMeal - The meal currently being prepared.
+ * @param {Function} setInProgressMeal - Function to set the in-progress meal.
+ * @param {Function} setEntreeCount - Function to set the count of entrees.
+ * @param {Function} setSideCount - Function to set the count of sides.
+ * @param {Function} setCart - Function to set the cart items.
+ * @param {boolean} showQuantityControls - Flag to show or hide quantity controls.
+ * @param {Function} handleQuantityChange - Function to handle quantity changes.
+ * @param {Function} handleRemoveItem - Function to handle item removal.
+ * @param {string} currentMenu - The current menu being displayed.
+ * @returns {JSX.Element} The rendered Cart component.
+ */
 const Cart = ({
     cartItems,
     inProgressMeal,
@@ -15,6 +37,12 @@ const Cart = ({
 }) => {
     const [warningMessage, setWarningMessage] = useState('');
 
+    /**
+     * Renders the sub-items of a cart item.
+     *
+     * @param {Object[]} subItems - Array of sub-items.
+     * @returns {JSX.Element} The rendered sub-items.
+     */
     const renderSubItems = (subItems) => (
         <ul className="list-group list-group-flush">
             {subItems.map((subItem, subIndex) => (
@@ -25,6 +53,13 @@ const Cart = ({
         </ul>
     );
 
+    /**
+     * Renders a single cart item.
+     *
+     * @param {Object} item - The cart item.
+     * @param {number} index - The index of the cart item.
+     * @returns {JSX.Element} The rendered cart item.
+     */
     const renderCartItem = (item, index) => (
         <li
             key={index}

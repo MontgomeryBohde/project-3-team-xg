@@ -2,6 +2,12 @@
 import { NextResponse } from 'next/server';
 import { Client } from 'pg';
 
+/**
+ * Handles the POST request to create a new meal item.
+ * 
+ * @param {Request} request - The incoming request object.
+ * @returns {Promise<NextResponse>} - The response object containing the new meal item or an error message.
+ */
 export async function POST(request) {
   const connectionString = process.env.POSTGRES_URL;
   const client = new Client({ connectionString });
@@ -9,6 +15,16 @@ export async function POST(request) {
   try {
     await client.connect();
 
+    /**
+     * The request body containing meal item details.
+     * @typedef {Object} MealItem
+     * @property {string} meal_type - The type of the meal.
+     * @property {number} side_id - The ID of the side dish.
+     * @property {number[]} entree_ids - The IDs of the entrees.
+     * @property {number} price - The price of the meal.
+     */
+
+    /** @type {MealItem} */
     const { meal_type, side_id, entree_ids, price } = await request.json();
 
     // Insert new meal item into the database

@@ -1,14 +1,36 @@
 // CreditCardPopUp.js
 // src/components/ui/employee/cashier/order/confirmation/CreditCardPopUp.js
+
+/**
+ * @file CreditCardPopUp.js
+ * @description This file contains the CreditCardPopUp component which renders a popup for entering credit card information.
+ * @module CreditCardPopUp
+ * @requires React
+ * @requires next/navigation
+ */
+
 import React, { useState } from 'react';
 import { useRouter } from "next/navigation";
 
+/**
+ * CreditCardPopUp component renders a popup for entering credit card information.
+ *
+ * @component
+ * @param {Object} props - Component props
+ * @param {Function} props.onClose - Function to call when the popup is closed
+ * @returns {JSX.Element} The rendered component
+ */
 const CreditCardPopUp = ({ onClose }) => {
     const router = useRouter();
     const [cardNumber, setCardNumber] = useState('');
     const [cvv, setCvv] = useState('');
     const [expiryDate, setExpiryDate] = useState('');
 
+    /**
+     * Handles the form submission.
+     *
+     * @param {React.FormEvent<HTMLFormElement>} e - The form submission event
+     */
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log({ cardNumber, cvv, expiryDate });

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 /**
  * Form that takes customers' phone numbers, and if valid, redirects to the Loyalty Page
+ * @component
  * @returns Loyalty Login Form which redirects to the Loyalty Page
  */
 const LoyaltyLoginForm = () => {

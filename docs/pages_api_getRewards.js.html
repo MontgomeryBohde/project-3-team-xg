@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: pages/api/getRewards.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: pages/api/getRewards.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// pages/api/getRewards.js
+import { query } from '@lib/db';
+
+
+/**
+ * API handler for fetching rewards based on the request type.
+ * 
+ * @param {Object} req - The request object.
+ * @param {Object} req.query - The query parameters.
+ * @param {string} req.query.type - The type of rewards to fetch (e.g., 'orders').
+ * @param {string} req.query.customer_id - The ID of the customer.
+ * @param {string} [req.query.n] - The number of records to fetch (optional).
+ * @param {string} req.method - The HTTP method of the request.
+ * @param {Object} res - The response object.
+ * @returns {Promise&lt;void>} - A promise that resolves when the request is handled.
+ */
+export default async function handler(req, res) {
+    const { type, customer_id, n } = req.query;
+
+    // Default n to 5 if not provided
+    const limit = n ? Math.min(parseInt(n), 100) : 5; // Limit to a maximum of 100 orders, default to 5
+
+    if (req.method === 'GET' || req.method === 'POST') {
+        try {
+            let result;
+
+            switch (type) {
+                case 'orders': { // Get past &lt;= n orders
+                    console.log("Executing orders query");
+
+                    const queryText = `
+                        SELECT 
+                            o.id AS order_id,
+                            o.order_total,
+                            o.payment_method,
+                            o.placed_time,
+                            ARRAY(
+                                SELECT 
+                                    json_build_object(
+                                        'item_name', mi.item_name, 
+                                        'item_size', isize.item_size, 
+                                        'price', isize.price
+                                    )
+                                FROM item_sizes isize
+                                JOIN menu_items mi ON mi.id = isize.item_id
+                                WHERE isize.id = ANY(o.item_size_ids)
+                            ) AS item_size_details,
+                            ARRAY(
+                                SELECT 
+                                    json_build_object(
+                                        'item_name', mi.item_name, 
+                                        'side_name', side.item_name, 
+                                        'entree_names', STRING_AGG(entree.item_name, ', '), 
+                                        'price', m.price
+                                    )
+                                FROM meal_items m
+                                JOIN menu_items mi ON mi.id = m.id
+                                LEFT JOIN menu_items side ON side.id = m.side_id
+                                LEFT JOIN menu_items entree ON entree.id = ANY(m.entree_ids)
+                                WHERE m.id = ANY(o.meal_item_ids)
+                                GROUP BY mi.item_name, side.item_name, m.price
+                            ) AS meal_item_details
+                        FROM orders o
+                        WHERE o.customer_id = $1
+                        ORDER BY o.placed_time DESC
+                        LIMIT $2;                
+                    `;
+
+                    result = await query(queryText, [customer_id, limit]);
+                    break;
+                }
+
+                case 'points': { // Get number of points
+                    console.log("Fetching number of points");
+
+                    const queryText = `
+                        SELECT rewards_points
+                        FROM customers
+                        WHERE id = $1;
+                    `;
+
+                    result = await query(queryText, [customer_id]);
+                    break;
+                }
+
+                case 'month': {
+                    console.log("Fetching number of orders made this month");
+
+                    const queryText = `
+                        SELECT COUNT(*) AS orders_this_month
+                        FROM orders
+                        WHERE customer_id = $1
+                            AND EXTRACT(MONTH FROM placed_time) = EXTRACT(MONTH FROM CURRENT_DATE)
+                            AND EXTRACT(YEAR FROM placed_time) = EXTRACT(YEAR FROM CURRENT_DATE);
+                    `;
+
+                    result = await query(queryText, [customer_id]);
+                    break;
+                }
+
+                default:
+                    return res.status(400).json({ error: 'Invalid action' });
+            }
+
+            // Log the query result for debugging
+            console.log("Query result:", result);
+
+            // Send the query result as the response
+            res.status(200).json(result);
+
+        } catch (error) {
+            // Log the error for debugging
+            console.error('Error executing query:', error);
+
+            // Return a 500 error with the message
+            res.status(500).json({ error: 'Failed to execute query', details: error.message });
+        }
+    } else {
+        // Handle unsupported HTTP methods
+        console.log(`Method ${req.method} not allowed`);
+        res.setHeader('Allow', ['GET', 'POST']);
+        res.status(405).end(`Method ${req.method} Not Allowed`);
+    }
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-ConfirmationPage.html">ConfirmationPage</a></li><li><a href="module-CreditCardPopUp.html">CreditCardPopUp</a></li><li><a href="module-ManagerHomePage.html">ManagerHomePage</a></li><li><a href="module-OrderPage.html">OrderPage</a></li><li><a href="module-Page.html">Page</a></li><li><a href="module-api_getInventory.html">api/getInventory</a></li><li><a href="module-api_getItemSizes.html">api/getItemSizes</a></li><li><a href="module-api_getMenu.html">api/getMenu</a></li><li><a href="module-api_getProducts.html">api/getProducts</a></li><li><a href="module-api_getReports.html">api/getReports</a></li><li><a href="module-employee_cashier_order_confirmation_page.html">employee/cashier/order/confirmation/page</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Appetizer">Appetizer</a></li><li><a href="global.html#BootstrapClient">BootstrapClient</a></li><li><a href="global.html#CACHE_DURATION">CACHE_DURATION</a></li><li><a href="global.html#Cart">Cart</a></li><li><a href="global.html#CartPage">CartPage</a></li><li><a href="global.html#CartPageWrapper">CartPageWrapper</a></li><li><a href="global.html#CashConfirmation">CashConfirmation</a></li><li><a href="global.html#Chat">Chat</a></li><li><a href="global.html#ChatBot">ChatBot</a></li><li><a href="global.html#ClockPage">ClockPage</a></li><li><a href="global.html#ContactForm">ContactForm</a></li><li><a href="global.html#ContactPage">ContactPage</a></li><li><a href="global.html#CustomerHeader">CustomerHeader</a></li><li><a href="global.html#CustomerLoginForm">CustomerLoginForm</a></li><li><a href="global.html#CustomerLoginPage">CustomerLoginPage</a></li><li><a href="global.html#CustomerPage">CustomerPage</a></li><li><a href="global.html#DiscountPopUp">DiscountPopUp</a></li><li><a href="global.html#Drink">Drink</a></li><li><a href="global.html#EmployeeCard">EmployeeCard</a></li><li><a href="global.html#EmployeeDetails">EmployeeDetails</a></li><li><a href="global.html#EmployeeHeader">EmployeeHeader</a></li><li><a href="global.html#EmployeeHomePage">EmployeeHomePage</a></li><li><a href="global.html#EmployeeInfo">EmployeeInfo</a></li><li><a href="global.html#EmployeeLogInHeader">EmployeeLogInHeader</a></li><li><a href="global.html#EmployeeLoginButton">EmployeeLoginButton</a></li><li><a href="global.html#EmployeeLoginPage">EmployeeLoginPage</a></li><li><a href="global.html#EmployeePage">EmployeePage</a></li><li><a href="global.html#EmployeePay">EmployeePay</a></li><li><a href="global.html#Entree">Entree</a></li><li><a href="global.html#GET">GET</a></li><li><a href="global.html#GoogleTranslate">GoogleTranslate</a></li><li><a href="global.html#GuestLoginForm">GuestLoginForm</a></li><li><a href="global.html#Inventory">Inventory</a></li><li><a href="global.html#InventoryPopup">InventoryPopup</a></li><li><a href="global.html#ItemModal">ItemModal</a></li><li><a href="global.html#KioskPage">KioskPage</a></li><li><a href="global.html#LoginForm">LoginForm</a></li><li><a href="global.html#LoyaltyLoginForm">LoyaltyLoginForm</a></li><li><a href="global.html#LoyaltyLoginPage">LoyaltyLoginPage</a></li><li><a href="global.html#MealModal">MealModal</a></li><li><a href="global.html#MealSelectionPage">MealSelectionPage</a></li><li><a href="global.html#Menu">Menu</a></li><li><a href="global.html#MenuBoardPage">MenuBoardPage</a></li><li><a href="global.html#MenuPopularity">MenuPopularity</a></li><li><a href="global.html#MobilePage">MobilePage</a></li><li><a href="global.html#OrderCard">OrderCard</a></li><li><a href="global.html#OrderInfo">OrderInfo</a></li><li><a href="global.html#POST">POST</a></li><li><a href="global.html#PUT">PUT</a></li><li><a href="global.html#Page">Page</a></li><li><a href="global.html#PaymentPopUp">PaymentPopUp</a></li><li><a href="global.html#ProductUsageChart">ProductUsageChart</a></li><li><a href="global.html#RenderMenu">RenderMenu</a></li><li><a href="global.html#SalesChart">SalesChart</a></li><li><a href="global.html#SalesReport">SalesReport</a></li><li><a href="global.html#Side">Side</a></li><li><a href="global.html#SizeSelection">SizeSelection</a></li><li><a href="global.html#XReport">XReport</a></li><li><a href="global.html#ZReport">ZReport</a></li><li><a href="global.html#authOptions">authOptions</a></li><li><a href="global.html#cache">cache</a></li><li><a href="global.html#fetchEmployees">fetchEmployees</a></li><li><a href="global.html#fetchPayData">fetchPayData</a></li><li><a href="global.html#fetchPopularItems">fetchPopularItems</a></li><li><a href="global.html#fetchProductUsageData">fetchProductUsageData</a></li><li><a href="global.html#fetchWeather">fetchWeather</a></li><li><a href="global.html#fetchZReport">fetchZReport</a></li><li><a href="global.html#formatCurrency">formatCurrency</a></li><li><a href="global.html#handleNChange">handleNChange</a></li><li><a href="global.html#handleSubmit">handleSubmit</a></li><li><a href="global.html#inter">inter</a></li><li><a href="global.html#metadata">metadata</a></li><li><a href="global.html#pool">pool</a></li><li><a href="global.html#query">query</a></li><li><a href="global.html#weatherMap">weatherMap</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Wed Dec 11 2024 23:17:49 GMT-0600 (Central Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

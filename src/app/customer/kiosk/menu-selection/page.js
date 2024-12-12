@@ -11,6 +11,14 @@ import MealModal from "@/components/ui/customer/menu-selection/MealModal";
 import './menu-selection.css';
 import './menu-selection-trevor.css';
 
+/**
+ * MealSelectionPage component
+ * 
+ * This component represents the meal selection page where users can view and select menu items,
+ * add items to their cart, and view special deals.
+ * 
+ * @component
+ */
 const MealSelectionPage = () => {
     const [menuItems, setMenuItems] = useState([]);
     const [itemSizes, setItemSizes] = useState({});
@@ -34,8 +42,6 @@ const MealSelectionPage = () => {
     * 3. inventory data.
     * 4. loads the saved cart from sessionStorage.
     */
-
-    // rewards from sessionStorage
     const [rewards, setRewards] = useState();
     useEffect(() => {
         const storedRewards = JSON.parse(sessionStorage.getItem('rewards'));
@@ -45,7 +51,6 @@ const MealSelectionPage = () => {
         }
     }, []); 
 
-    // is customer logged in
     const [custLoggedIn, setCustLoggedIn] = useState(false);
     useEffect(() => {
         const loggedInCustomer = JSON.parse(sessionStorage.getItem('loggedInCustomer'));

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: pages/api/getReports.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: pages/api/getReports.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file getReports.js
+ * @description API handler for generating various types of reports including X-reports, Z-reports, sales summaries, and popularity rankings.
+ * @module api/getReports
+ * @requires @lib/db
+ */
+import { query } from '@lib/db';
+
+/**
+ * API handler function for generating reports.
+ * Supports creating X-reports, Z-reports, and other statistical summaries.
+ * 
+ * @param {object} req - The HTTP request object.
+ * @param {object} res - The HTTP response object.
+ */
+export default async function handler(req, res) {
+    /**
+     * Extract query parameters.
+     * @type {string} type - Type of report to generate (e.g., xReport, zReport, allSales, popularity).
+     * @type {string|number} [period] - Time period for filtering sales (e.g., past N days).
+     * @type {string|number} [hour] - Specific hour to filter sales for X-reports.
+     * @type {number} [n] - Limit for popularity results.
+     */
+    const { type, period, hour, n } = req.query;
+
+    if (req.method === 'GET') {
+        try {
+            let result;
+
+            switch (type) {
+                /**
+                 * Generate an X-report for sales by hour.
+                 * @route GET /api/getReports?type=xReport
+                 * @param {number} hour - Specific hour to filter sales data.
+                 */
+                case 'xReport': {
+					// Use the provided hour directly for filtering
+					result = await query(
+						`
+						SELECT 
+							EXTRACT(HOUR FROM placed_time) AS order_hour, 
+							SUM(order_total) AS total_sales,
+							COUNT(*) AS transaction_count,
+							SUM(CASE WHEN payment_method = 'cash' THEN order_total ELSE 0 END) AS cash_collected,
+							SUM(CASE WHEN payment_method = 'credit card' THEN order_total ELSE 0 END) AS credit_card_payments
+						FROM orders
+						WHERE DATE(placed_time) = DATE(NOW())
+						AND EXTRACT(HOUR FROM placed_time) = $1  -- Filter by the specific hour
+						GROUP BY order_hour
+						ORDER BY order_hour;
+						`,
+						[hour]  // Pass hour as parameter
+					);
+					result = result || []; // Ensure result is an array.
+					break;
+				}
+				
+                /**
+                 * Generate a Z-report for daily sales summaries.
+                 * @route GET /api/getReports?type=zReport
+                 */
+                case 'zReport': {
+					result = await query(
+						`
+						SELECT 
+							CURRENT_DATE AS date,
+							SUM(order_total) AS total_sales,
+							COUNT(*) AS transaction_count,
+							SUM(CASE WHEN payment_method = 'cash' THEN order_total ELSE 0 END) AS cash_total,
+							SUM(CASE WHEN payment_method = 'credit card' THEN order_total ELSE 0 END) AS credit_card_total
+						FROM orders
+						WHERE DATE(placed_time) = CURRENT_DATE;
+						`,
+						[]
+					);
+				
+					result = result || [];
+					break;
+				}
+
+                /**
+                 * Fetch all sales summaries over a given period.
+                 * @route GET /api/getReports?type=allSales
+                 * @param {number} period - Number of days to filter.
+                 */
+                case 'allSales': {
+                    const dateFilter = period
+                        ? `WHERE placed_time >= NOW() - INTERVAL '${parseInt(period)} days'`
+                        : '';
+                    result = await query(`
+                        SELECT DATE(placed_time) AS order_date, SUM(order_total) AS daily_total
+                        FROM orders
+                        ${dateFilter}
+                        GROUP BY DATE(placed_time)
+                        ORDER BY order_date;
+                    `);
+                    result = result || [];
+                    break;
+                }
+
+                /**
+                 * Generate a popularity report for top items.
+                 * @route GET /api/getReports?type=popularity
+                 * @param {number} n - Maximum number of top items to return.
+                 */
+                case 'popularity': {
+                    if (!n || isNaN(parseInt(n, 10))) {
+                        return res.status(400).json({ success: false, error: 'Invalid or missing "n" parameter' });
+                    }
+                    result = await query(
+                        `
+                        WITH combined_items AS (
+                            SELECT unnest(o.item_size_ids) AS item_id, 'menu_item' AS item_type
+                            FROM orders o
+                            UNION ALL
+                            SELECT unnest(meal_items.entree_ids) AS item_id, 'entree_item' AS item_type
+                            FROM orders o
+                            JOIN meal_items ON meal_items.id = ANY(o.meal_item_ids)
+                            UNION ALL
+                            SELECT meal_items.side_id AS item_id, 'side_item' AS item_type
+                            FROM orders o
+                            JOIN meal_items ON meal_items.id = ANY(o.meal_item_ids)
+                        )
+                        SELECT 
+                            COALESCE(menu_items.item_name, entree_items.item_name, side_items.item_name) AS food_name, 
+                            COALESCE(menu_items.category, entree_items.category, side_items.category) AS menu_category,
+                            COUNT(*) AS times_ordered
+                        FROM combined_items
+                        LEFT JOIN item_sizes ON item_sizes.id = combined_items.item_id
+                        LEFT JOIN menu_items ON menu_items.id = item_sizes.item_id
+                        LEFT JOIN menu_items entree_items ON entree_items.id = combined_items.item_id
+                        LEFT JOIN menu_items side_items ON side_items.id = combined_items.item_id
+                        GROUP BY food_name, menu_category
+                        ORDER BY times_ordered DESC
+                        LIMIT $1;
+                        `,
+                        [parseInt(n, 10)]
+                    );
+                    result = result || [];
+                    break;
+                }
+
+                default:
+                    return res.status(400).json({ success: false, error: 'Invalid report type' });
+            }
+
+            res.status(200).json({ success: true, data: result });
+        } catch (error) {
+            console.error('Error fetching report data:', error);
+            res.status(500).json({ success: false, error: error.message });
+        }
+    } else {
+        res.setHeader('Allow', ['GET']);
+        res.status(405).json({ success: false, error: `Method ${req.method} Not Allowed` });
+    }
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-ConfirmationPage.html">ConfirmationPage</a></li><li><a href="module-CreditCardPopUp.html">CreditCardPopUp</a></li><li><a href="module-ManagerHomePage.html">ManagerHomePage</a></li><li><a href="module-OrderPage.html">OrderPage</a></li><li><a href="module-Page.html">Page</a></li><li><a href="module-api_getInventory.html">api/getInventory</a></li><li><a href="module-api_getItemSizes.html">api/getItemSizes</a></li><li><a href="module-api_getMenu.html">api/getMenu</a></li><li><a href="module-api_getProducts.html">api/getProducts</a></li><li><a href="module-api_getReports.html">api/getReports</a></li><li><a href="module-employee_cashier_order_confirmation_page.html">employee/cashier/order/confirmation/page</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Appetizer">Appetizer</a></li><li><a href="global.html#BootstrapClient">BootstrapClient</a></li><li><a href="global.html#CACHE_DURATION">CACHE_DURATION</a></li><li><a href="global.html#Cart">Cart</a></li><li><a href="global.html#CartPage">CartPage</a></li><li><a href="global.html#CartPageWrapper">CartPageWrapper</a></li><li><a href="global.html#CashConfirmation">CashConfirmation</a></li><li><a href="global.html#Chat">Chat</a></li><li><a href="global.html#ChatBot">ChatBot</a></li><li><a href="global.html#ClockPage">ClockPage</a></li><li><a href="global.html#ContactForm">ContactForm</a></li><li><a href="global.html#ContactPage">ContactPage</a></li><li><a href="global.html#CustomerHeader">CustomerHeader</a></li><li><a href="global.html#CustomerLoginForm">CustomerLoginForm</a></li><li><a href="global.html#CustomerLoginPage">CustomerLoginPage</a></li><li><a href="global.html#CustomerPage">CustomerPage</a></li><li><a href="global.html#DiscountPopUp">DiscountPopUp</a></li><li><a href="global.html#Drink">Drink</a></li><li><a href="global.html#EmployeeCard">EmployeeCard</a></li><li><a href="global.html#EmployeeDetails">EmployeeDetails</a></li><li><a href="global.html#EmployeeHeader">EmployeeHeader</a></li><li><a href="global.html#EmployeeHomePage">EmployeeHomePage</a></li><li><a href="global.html#EmployeeInfo">EmployeeInfo</a></li><li><a href="global.html#EmployeeLogInHeader">EmployeeLogInHeader</a></li><li><a href="global.html#EmployeeLoginButton">EmployeeLoginButton</a></li><li><a href="global.html#EmployeeLoginPage">EmployeeLoginPage</a></li><li><a href="global.html#EmployeePage">EmployeePage</a></li><li><a href="global.html#EmployeePay">EmployeePay</a></li><li><a href="global.html#Entree">Entree</a></li><li><a href="global.html#GET">GET</a></li><li><a href="global.html#GoogleTranslate">GoogleTranslate</a></li><li><a href="global.html#GuestLoginForm">GuestLoginForm</a></li><li><a href="global.html#Inventory">Inventory</a></li><li><a href="global.html#InventoryPopup">InventoryPopup</a></li><li><a href="global.html#ItemModal">ItemModal</a></li><li><a href="global.html#KioskPage">KioskPage</a></li><li><a href="global.html#LoginForm">LoginForm</a></li><li><a href="global.html#LoyaltyLoginForm">LoyaltyLoginForm</a></li><li><a href="global.html#LoyaltyLoginPage">LoyaltyLoginPage</a></li><li><a href="global.html#MealModal">MealModal</a></li><li><a href="global.html#MealSelectionPage">MealSelectionPage</a></li><li><a href="global.html#Menu">Menu</a></li><li><a href="global.html#MenuBoardPage">MenuBoardPage</a></li><li><a href="global.html#MenuPopularity">MenuPopularity</a></li><li><a href="global.html#MobilePage">MobilePage</a></li><li><a href="global.html#OrderCard">OrderCard</a></li><li><a href="global.html#OrderInfo">OrderInfo</a></li><li><a href="global.html#POST">POST</a></li><li><a href="global.html#PUT">PUT</a></li><li><a href="global.html#Page">Page</a></li><li><a href="global.html#PaymentPopUp">PaymentPopUp</a></li><li><a href="global.html#ProductUsageChart">ProductUsageChart</a></li><li><a href="global.html#RenderMenu">RenderMenu</a></li><li><a href="global.html#SalesChart">SalesChart</a></li><li><a href="global.html#SalesReport">SalesReport</a></li><li><a href="global.html#Side">Side</a></li><li><a href="global.html#SizeSelection">SizeSelection</a></li><li><a href="global.html#XReport">XReport</a></li><li><a href="global.html#ZReport">ZReport</a></li><li><a href="global.html#authOptions">authOptions</a></li><li><a href="global.html#cache">cache</a></li><li><a href="global.html#fetchEmployees">fetchEmployees</a></li><li><a href="global.html#fetchPayData">fetchPayData</a></li><li><a href="global.html#fetchPopularItems">fetchPopularItems</a></li><li><a href="global.html#fetchProductUsageData">fetchProductUsageData</a></li><li><a href="global.html#fetchWeather">fetchWeather</a></li><li><a href="global.html#fetchZReport">fetchZReport</a></li><li><a href="global.html#formatCurrency">formatCurrency</a></li><li><a href="global.html#handleNChange">handleNChange</a></li><li><a href="global.html#handleSubmit">handleSubmit</a></li><li><a href="global.html#inter">inter</a></li><li><a href="global.html#metadata">metadata</a></li><li><a href="global.html#pool">pool</a></li><li><a href="global.html#query">query</a></li><li><a href="global.html#weatherMap">weatherMap</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Wed Dec 11 2024 23:17:49 GMT-0600 (Central Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

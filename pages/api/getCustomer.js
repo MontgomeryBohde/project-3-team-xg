@@ -1,6 +1,23 @@
 // pages/api/getCustomer.js
 import { query } from "@lib/db";
 
+/**
+ * API handler for customer-related operations.
+ * 
+ * @param {Object} req - The request object.
+ * @param {string} req.method - The HTTP method of the request.
+ * @param {Object} req.query - The query parameters of the request.
+ * @param {string} req.query.type - The type of operation to perform.
+ * @param {Object} req.body - The body of the request (for POST requests).
+ * @param {string} req.body.first_name - The first name of the customer.
+ * @param {string} [req.body.last_name] - The last name of the customer.
+ * @param {string} [req.body.phone_number] - The phone number of the customer.
+ * @param {string} [req.body.email] - The email of the customer.
+ * @param {number} [req.body.rewards_points=0] - The rewards points of the customer.
+ * @param {boolean} [req.body.is_guest=false] - Whether the customer is a guest.
+ * @param {Object} res - The response object.
+ * @returns {Promise<void>} - The response to the client.
+ */
 export default async function handler(req, res) {
     const { type } = req.query;
 

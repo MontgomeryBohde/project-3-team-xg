@@ -5,13 +5,24 @@ import { useRouter } from "next/navigation";
 import Image from 'next/image';
 import pandaIcon from '/public/panda-icon.png';
 
+/**
+ * MobilePage component for the mobile ordering page.
+ * @component
+ * @returns {JSX.Element} The rendered component.
+ */
 const MobilePage = () => {
     const router = useRouter();
 
+    /**
+     * Navigates to the Meal Selection page.
+     */
     const navigateToMeal = () => {
         router.push("/"); // Navigate to the Meal Selection page TODO: Update this to the correct path
     };
 
+    /**
+     * Navigates back to the Main Page.
+     */
     const navigateToMainPage = () => {
         router.push("/customer/"); // Navigate back to the Main Page
     };

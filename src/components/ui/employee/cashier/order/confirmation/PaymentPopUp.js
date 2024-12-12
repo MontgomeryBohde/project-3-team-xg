@@ -1,9 +1,27 @@
+/**
+ * @file PaymentPopUp.js
+ * @description This file contains the PaymentPopUp component which provides a popup for selecting payment methods.
+ * @requires React
+ * @requires ./CreditCardPopUp
+ */
+
 import React, { useState } from 'react';
 import CreditCardPopUp from './CreditCardPopUp'; // Adjust the import path as necessary
 
+/**
+ * PaymentPopUp component
+ * 
+ * @component
+ * @param {Object} props - Component props
+ * @param {Function} props.onClose - Function to call when the popup is closed
+ * @returns {JSX.Element} The PaymentPopUp component
+ */
 const PaymentPopUp = ({ onClose }) => {
     const [showCreditCardPopUp, setShowCreditCardPopUp] = useState(false);
 
+    /**
+     * Handles the click event for the card button
+     */
     const handleCardClick = () => {
         setShowCreditCardPopUp(true);
     };

@@ -1,12 +1,27 @@
 // src/components/ui/customer/header/CustomerHeader.js
 "use client";
 
+/**
+ * @fileoverview CustomerHeader component to display customer information, weather, and current time.
+ * @requires react
+ * @requires next/navigation
+ * @requires next/image
+ * @requires ./CustomerHeader.css
+ * @requires @/components/GoogleTranslate
+ */
+
+
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import './CustomerHeader.css';
 import GoogleTranslate from '@/components/GoogleTranslate';
 
+/**
+ * CustomerHeader component to display customer information, weather, and current time.
+ * @component
+ * @returns {JSX.Element} The CustomerHeader component.
+ */
 const CustomerHeader = () => {
   const [customer, setCustomer] = useState('');
   const [weather, setWeather] = useState({ temperature: '', description: '', icon: '' });
@@ -28,14 +43,18 @@ const CustomerHeader = () => {
   };
 
   useEffect(() => {
-    // Retrieve customer data from local storage
+    /**
+     * Retrieve customer data from local storage and set it to state.
+     */
     const storedCustomerJSON = window.localStorage.getItem("loggedInCustomerName");
     if (storedCustomerJSON) {
       const customerObject = (storedCustomerJSON);
       setCustomer(customerObject);
     }
 
-    // Update time every minute
+    /**
+     * Update the current time every minute.
+     */
     const updateTime = () => {
       const now = new Date();
       const hours = now.getHours();
@@ -45,7 +64,10 @@ const CustomerHeader = () => {
       setCurrentTime(formattedTime);
     };
 
-    // Fetch weather data from API
+    /**
+     * Fetch weather data from API and set it to state.
+     * @async
+     */
     const fetchWeather = async () => {
       try {
         const response = await fetch("/api/getWeather");
@@ -71,11 +93,20 @@ const CustomerHeader = () => {
     };
 }, []);
 
+  /**
+   * Handles navigation to the home page.
+   * @function
+   * @returns {void}
+   */
   const handleHomePush = () => {
     router.push("/customer");
   };
 
-  // Increase font size
+  /**
+   * Increase font size by 2px, up to a maximum of 24px.
+   * @function
+   * @returns {void}
+   */
   const increaseFontSize = () => {
     setFontSize((prev) => {
       const newFontSize = Math.min(prev + 2, 24); // Cap at 24px
@@ -84,7 +115,11 @@ const CustomerHeader = () => {
     });
   };
 
-  // Decrease font size
+  /**
+   * Decrease font size by 2px, down to a min of 12px.
+   * @function
+   * @returns {void}
+   */
   const decreaseFontSize = () => {
     setFontSize((prev) => {
       const newFontSize = Math.max(prev - 2, 12); // Minimum 12px

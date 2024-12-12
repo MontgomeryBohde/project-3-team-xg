@@ -1,6 +1,20 @@
 // Drink.js
+/**
+ * @fileoverview Drink component renders a list of drink items and allows adding them to the cart.
+ * @requires React
+ */
+
 import React from 'react';
 
+/**
+ * Drink component renders a list of drink items and allows adding them to the cart.
+ *
+ * @param {Object[]} menuItems - Array of drink items to display.
+ * @param {Object} menuItems[].id - Unique identifier for the drink item.
+ * @param {string} menuItems[].item_name - Name of the drink item.
+ * @param {Function} handleAddToCart - Function to handle adding a drink item to the cart.
+ * @returns {JSX.Element} The rendered component.
+ */
 const Drink = ({ menuItems, handleAddToCart }) => (
     <div className="card mb-4">
         <div className="card-body">

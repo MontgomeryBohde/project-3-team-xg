@@ -6,13 +6,24 @@ import Image from 'next/image';
 import pandaIcon from '/public/panda-icon.png';
 import EmployeeLoginButton from '@/components/ui/employee/auth/EmployeeLoginButton'; // Import the login button component
 
+/**
+ * Page component for the home page.
+ * @component
+ * @returns {JSX.Element} The rendered component.
+ */
 const Page = () => {
   const router = useRouter();
 
+  /**
+   * Navigate to the customer page.
+   */
   const navigateToCustomer = () => {
     router.push("/customer"); // Navigate to the customer page
   };
 
+  /**
+   * Navigate to the employee login page.
+   */
   const navigateToEmployee = () => {
     router.push("/employee"); // Navigate to the employee login page
   };

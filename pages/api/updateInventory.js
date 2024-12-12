@@ -4,6 +4,18 @@ const pool = new Pool({
     connectionString: process.env.POSTGRES_URL,
 });
 
+/**
+ * Handles HTTP requests to update the inventory of menu items.
+ * 
+ * @param {Object} req - The HTTP request object.
+ * @param {string} req.method - The HTTP method (e.g., 'POST').
+ * @param {Object} req.body - The body of the HTTP request.
+ * @param {number} req.body.menuItemId - The ID of the menu item to update.
+ * @param {number} req.body.inventoryItemId - The ID of the inventory item to add or remove.
+ * @param {string} req.body.action - The action to perform ('add' or 'remove').
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise<void>} - A promise that resolves when the request is handled.
+ */
 export default async function handler(req, res) {
     if (req.method === 'POST') {
         const { menuItemId, inventoryItemId, action } = req.body;  // 'action' can be 'add' or 'remove'

@@ -1,4 +1,9 @@
 // pages/api/getWeather.js
+
+/**
+ * A mapping of weather condition codes to icon names.
+ * @type {Object.<string, string>}
+ */
 const weatherMap = {
     '01d': 'brightness-high',
     '02d': 'cloud-sun',
@@ -11,9 +16,25 @@ const weatherMap = {
     '50d': 'cloud-haze',
   };
   
+  /**
+ * Cache object to store weather data and timestamp.
+ * @type {{ data: Object|null, timestamp: number|null }}
+ */
   let cache = { data: null, timestamp: null };
+
+  /**
+ * Duration for which the cache is valid (in milliseconds).
+ * @type {number}
+ */
   const CACHE_DURATION = 15 * 60 * 1000; // 15 minutes
   
+
+  /**
+ * API handler to fetch and return weather data.
+ * @param {import('next').NextApiRequest} req - The API request object.
+ * @param {import('next').NextApiResponse} res - The API response object.
+ * @returns {Promise<void>}
+ */
   export default async function handler(req, res) {
     const now = Date.now();
   

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: src/components/ui/customer/menu-selection/MealModal.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: src/components/ui/customer/menu-selection/MealModal.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// src/components/ui/customer/menu-selection/MealModal.js
+
+/**
+ * @file MealModal.js
+ * @description Component for selecting meal options in the menu selection UI.
+ * @requires React
+ */
+
+import React, { useState, useEffect } from "react";
+
+/**
+ * MealModal component for selecting meal options.
+ *
+ * @component
+ * @param {Object} props - Component props
+ * @param {string} props.mealType - Type of the meal (e.g., "Bowl", "Plate")
+ * @param {function} props.onClose - Function to call when the modal is closed
+ * @param {function} props.onConfirm - Function to call when the meal selection is confirmed
+ * @returns {JSX.Element} The rendered component
+ */
+const MealModal = ({ mealType, onClose, onConfirm }) => {
+    const [sides, setSides] = useState([]);
+    const [entrees, setEntrees] = useState([]);
+    const [selectedSides, setSelectedSides] = useState([]);
+    const [selectedEntrees, setSelectedEntrees] = useState([]);
+    const [mealDetails, setMealDetails] = useState({ sides: 0, entrees: 0, price: 0 });
+
+    /**
+     * Fetches menu items from the API and sets the sides and entrees state.
+     */
+    useEffect(() => {
+        const fetchMenuItems = async () => {
+            try {
+                const response = await fetch("/api/getMenu?type=menu");
+                const data = await response.json();
+                setSides(data.filter((item) => item.category.toLowerCase() === "side"));
+                setEntrees(data.filter((item) => item.category.toLowerCase() === "entree"));
+            } catch (error) {
+                console.error("Error fetching menu items:", error);
+            }
+        };
+
+        fetchMenuItems();
+
+        const mealTypes = {
+            Bowl: { sides: 1, entrees: 1, price: 8.30 },
+            Plate: { sides: 1, entrees: 2, price: 10.00 },
+            "Bigger Plate": { sides: 1, entrees: 3, price: 11.75 },
+            "Cub Meal": { sides: 1, entrees: 1, price: 6.00 },
+            "Family Meal": { sides: 2, entrees: 3, price: 32.00 },
+        };
+
+        setMealDetails(mealTypes[mealType]);
+    }, [mealType]);
+
+    /**
+     * Handles the selection of sides and entrees.
+     *
+     * @param {string} type - The type of item being selected ("side" or "entree")
+     * @param {string} itemName - The name of the item being selected
+     */
+    const handleSelection = (type, itemName) => {
+        if (type === "side") {
+            setSelectedSides((prev) =>
+                prev.includes(itemName)
+                    ? prev.filter((name) => name !== itemName)
+                    : prev.length &lt; mealDetails.sides
+                    ? [...prev, itemName]
+                    : prev
+            );
+        } else if (type === "entree") {
+            setSelectedEntrees((prev) =>
+                prev.includes(itemName)
+                    ? prev.filter((name) => name !== itemName)
+                    : prev.length &lt; mealDetails.entrees
+                    ? [...prev, itemName]
+                    : prev
+            );
+        }
+    };
+
+    /**
+     * Handles the change in quantity of entrees.
+     * @param {string} itemName - The name of the entree item
+     * @param {number} increment - The amount to increment the quantity by
+     * @returns {void}
+     */
+    const handleQuantityChange = (itemName, increment) => {
+        setSelectedEntrees((prev) => {
+            const updated = [...prev];
+            if (increment > 0 &amp;&amp; updated.length &lt; mealDetails.entrees) {
+                updated.push(itemName);
+            } else if (increment &lt; 0) {
+                const index = updated.indexOf(itemName);
+                if (index !== -1) updated.splice(index, 1);
+            }
+            return updated;
+        });
+    };
+
+    /**
+     * Handles the confirmation of the meal selection.
+     * @returns {void}
+     */
+    const handleConfirm = () => {
+        if (
+            selectedSides.length === mealDetails.sides &amp;&amp;
+            selectedEntrees.length === mealDetails.entrees
+        ) {
+            // Create the meal object
+            const mealCartItem = {
+                mealItem: mealType,
+                sides: selectedSides,
+                entrees: selectedEntrees,
+                price: mealDetails.price,
+                quantity: 1, // Default quantity
+            };
+
+            // Pass the meal object to the parent component via onConfirm
+            onConfirm(mealCartItem);
+            onClose();
+        } else {
+            alert(
+                `Please select ${mealDetails.sides} sides and ${mealDetails.entrees} entrees.`
+            );
+        }
+    };
+
+
+    return (
+        &lt;div className="modal fade show d-block" tabIndex="-1" role="dialog">
+            &lt;div className="modal-dialog modal-lg" style={{ maxWidth: "900px" }}>
+                &lt;div className="modal-content">
+                    &lt;div className="modal-header">
+                        &lt;h5 className="modal-title">Customize Your {mealType}&lt;/h5>
+                        &lt;button
+                            type="button"
+                            className="btn-close"
+                            onClick={onClose}
+                        >&lt;/button>
+                    &lt;/div>
+                    &lt;div className="modal-body">
+                        &lt;section>
+                            &lt;h4 className="text-center">Sides (Select {mealDetails.sides})&lt;/h4>
+                            &lt;div className="row row-cols-4 g-3">
+                                {sides.map((side) => (
+                                    &lt;div key={side.id} className="col">
+                                        &lt;button
+                                            className={`btn w-100 ${
+                                                selectedSides.includes(side.item_name)
+                                                    ? "btn-success"
+                                                    : "btn-outline-secondary"
+                                            }`}
+                                            onClick={() =>
+                                                handleSelection("side", side.item_name)
+                                            }
+                                        >
+                                            {side.item_name}
+                                        &lt;/button>
+                                    &lt;/div>
+                                ))}
+                            &lt;/div>
+                        &lt;/section>
+
+                        &lt;section className="mt-4">
+                            &lt;h4 className="text-center">Entrees (Select {mealDetails.entrees})&lt;/h4>
+                            &lt;div className="row row-cols-4 g-3">
+                                {entrees.map((entree) => (
+                                    &lt;div key={entree.id} className="col">
+                                        &lt;button
+                                            className={`btn w-100 ${
+                                                selectedEntrees.includes(entree.item_name)
+                                                    ? "btn-success"
+                                                    : "btn-outline-secondary"
+                                            }`}
+                                            onClick={() =>
+                                                handleSelection("entree", entree.item_name)
+                                            }
+                                        >
+                                            {entree.item_name}
+                                        &lt;/button>
+                                        {selectedEntrees.includes(entree.item_name) &amp;&amp;
+                                            mealDetails.entrees > 1 &amp;&amp; (
+                                                &lt;div className="quantity-slider mt-2">
+                                                    &lt;button
+                                                        className="btn btn-outline-secondary btn-sm"
+                                                        onClick={() =>
+                                                            handleQuantityChange(entree.item_name, -1)
+                                                        }
+                                                    >
+                                                        -
+                                                    &lt;/button>
+                                                    &lt;span className="mx-2">
+                                                        {
+                                                            selectedEntrees.filter(
+                                                                (e) => e === entree.item_name
+                                                            ).length
+                                                        }
+                                                    &lt;/span>
+                                                    &lt;button
+                                                        className="btn btn-outline-secondary btn-sm"
+                                                        onClick={() =>
+                                                            handleQuantityChange(entree.item_name, 1)
+                                                        }
+                                                    >
+                                                        +
+                                                    &lt;/button>
+                                                &lt;/div>
+                                            )}
+                                    &lt;/div>
+                                ))}
+                            &lt;/div>
+                        &lt;/section>
+                    &lt;/div>
+                    &lt;div className="modal-footer justify-content-center">
+                        &lt;button className="btn btn-secondary" onClick={onClose}>
+                            Cancel
+                        &lt;/button>
+                        &lt;button className="btn btn-danger" onClick={handleConfirm}>
+                            Confirm
+                        &lt;/button>
+                    &lt;/div>
+                &lt;/div>
+            &lt;/div>
+        &lt;/div>
+    );
+};
+
+export default MealModal;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-ConfirmationPage.html">ConfirmationPage</a></li><li><a href="module-CreditCardPopUp.html">CreditCardPopUp</a></li><li><a href="module-ManagerHomePage.html">ManagerHomePage</a></li><li><a href="module-OrderPage.html">OrderPage</a></li><li><a href="module-Page.html">Page</a></li><li><a href="module-api_getInventory.html">api/getInventory</a></li><li><a href="module-api_getItemSizes.html">api/getItemSizes</a></li><li><a href="module-api_getMenu.html">api/getMenu</a></li><li><a href="module-api_getProducts.html">api/getProducts</a></li><li><a href="module-api_getReports.html">api/getReports</a></li><li><a href="module-employee_cashier_order_confirmation_page.html">employee/cashier/order/confirmation/page</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Appetizer">Appetizer</a></li><li><a href="global.html#BootstrapClient">BootstrapClient</a></li><li><a href="global.html#CACHE_DURATION">CACHE_DURATION</a></li><li><a href="global.html#Cart">Cart</a></li><li><a href="global.html#CartPage">CartPage</a></li><li><a href="global.html#CartPageWrapper">CartPageWrapper</a></li><li><a href="global.html#CashConfirmation">CashConfirmation</a></li><li><a href="global.html#Chat">Chat</a></li><li><a href="global.html#ChatBot">ChatBot</a></li><li><a href="global.html#ClockPage">ClockPage</a></li><li><a href="global.html#ContactForm">ContactForm</a></li><li><a href="global.html#ContactPage">ContactPage</a></li><li><a href="global.html#CustomerHeader">CustomerHeader</a></li><li><a href="global.html#CustomerLoginForm">CustomerLoginForm</a></li><li><a href="global.html#CustomerLoginPage">CustomerLoginPage</a></li><li><a href="global.html#CustomerPage">CustomerPage</a></li><li><a href="global.html#DiscountPopUp">DiscountPopUp</a></li><li><a href="global.html#Drink">Drink</a></li><li><a href="global.html#EmployeeCard">EmployeeCard</a></li><li><a href="global.html#EmployeeDetails">EmployeeDetails</a></li><li><a href="global.html#EmployeeHeader">EmployeeHeader</a></li><li><a href="global.html#EmployeeHomePage">EmployeeHomePage</a></li><li><a href="global.html#EmployeeInfo">EmployeeInfo</a></li><li><a href="global.html#EmployeeLogInHeader">EmployeeLogInHeader</a></li><li><a href="global.html#EmployeeLoginButton">EmployeeLoginButton</a></li><li><a href="global.html#EmployeeLoginPage">EmployeeLoginPage</a></li><li><a href="global.html#EmployeePage">EmployeePage</a></li><li><a href="global.html#EmployeePay">EmployeePay</a></li><li><a href="global.html#Entree">Entree</a></li><li><a href="global.html#GET">GET</a></li><li><a href="global.html#GoogleTranslate">GoogleTranslate</a></li><li><a href="global.html#GuestLoginForm">GuestLoginForm</a></li><li><a href="global.html#Inventory">Inventory</a></li><li><a href="global.html#InventoryPopup">InventoryPopup</a></li><li><a href="global.html#ItemModal">ItemModal</a></li><li><a href="global.html#KioskPage">KioskPage</a></li><li><a href="global.html#LoginForm">LoginForm</a></li><li><a href="global.html#LoyaltyLoginForm">LoyaltyLoginForm</a></li><li><a href="global.html#LoyaltyLoginPage">LoyaltyLoginPage</a></li><li><a href="global.html#MealModal">MealModal</a></li><li><a href="global.html#MealSelectionPage">MealSelectionPage</a></li><li><a href="global.html#Menu">Menu</a></li><li><a href="global.html#MenuBoardPage">MenuBoardPage</a></li><li><a href="global.html#MenuPopularity">MenuPopularity</a></li><li><a href="global.html#MobilePage">MobilePage</a></li><li><a href="global.html#OrderCard">OrderCard</a></li><li><a href="global.html#OrderInfo">OrderInfo</a></li><li><a href="global.html#POST">POST</a></li><li><a href="global.html#PUT">PUT</a></li><li><a href="global.html#Page">Page</a></li><li><a href="global.html#PaymentPopUp">PaymentPopUp</a></li><li><a href="global.html#ProductUsageChart">ProductUsageChart</a></li><li><a href="global.html#RenderMenu">RenderMenu</a></li><li><a href="global.html#SalesChart">SalesChart</a></li><li><a href="global.html#SalesReport">SalesReport</a></li><li><a href="global.html#Side">Side</a></li><li><a href="global.html#SizeSelection">SizeSelection</a></li><li><a href="global.html#XReport">XReport</a></li><li><a href="global.html#ZReport">ZReport</a></li><li><a href="global.html#authOptions">authOptions</a></li><li><a href="global.html#cache">cache</a></li><li><a href="global.html#fetchEmployees">fetchEmployees</a></li><li><a href="global.html#fetchPayData">fetchPayData</a></li><li><a href="global.html#fetchPopularItems">fetchPopularItems</a></li><li><a href="global.html#fetchProductUsageData">fetchProductUsageData</a></li><li><a href="global.html#fetchWeather">fetchWeather</a></li><li><a href="global.html#fetchZReport">fetchZReport</a></li><li><a href="global.html#formatCurrency">formatCurrency</a></li><li><a href="global.html#handleNChange">handleNChange</a></li><li><a href="global.html#handleSubmit">handleSubmit</a></li><li><a href="global.html#inter">inter</a></li><li><a href="global.html#metadata">metadata</a></li><li><a href="global.html#pool">pool</a></li><li><a href="global.html#query">query</a></li><li><a href="global.html#weatherMap">weatherMap</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Wed Dec 11 2024 23:17:49 GMT-0600 (Central Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

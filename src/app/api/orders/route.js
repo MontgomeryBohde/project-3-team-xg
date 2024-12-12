@@ -2,6 +2,12 @@
 import { NextResponse } from 'next/server';
 import { Client } from 'pg';
 
+/**
+ * Handles the POST request to create a new order.
+ * 
+ * @param {Request} request - The incoming request object.
+ * @returns {Promise<Response>} - The response object containing the new order ID or an error message.
+ */
 export async function POST(request) {
   const { itemSizeIds, mealItemIds, customerId, cashierId, paymentMethod, price } = await request.json();
   const connectionString = process.env.POSTGRES_URL;

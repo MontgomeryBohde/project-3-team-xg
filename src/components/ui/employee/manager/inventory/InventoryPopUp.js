@@ -1,7 +1,39 @@
 'use client';
 
+/**
+ * @file InventoryPopUp.js
+ * @description This component provides a popup for managing inventory items, including adding, editing, and removing items.
+ * @requires react
+ */
+
 import React, { useState } from 'react';
 
+/**
+ * InventoryPopup component for managing inventory items.
+ * 
+ * @param {Object} props - The properties object.
+ * @param {string} props.itemId - The ID of the item.
+ * @param {string} props.itemName - The name of the item.
+ * @param {string} props.itemCategory - The category of the item.
+ * @param {number} props.itemPrice - The price of the item.
+ * @param {number} props.currentStock - The current stock of the item.
+ * @param {string} props.restockDate - The restock date of the item.
+ * @param {boolean} props.isAllergen - Whether the item is an allergen.
+ * @param {boolean} props.isVegan - Whether the item is vegan.
+ * @param {Function} props.setItemId - Setter function for item ID.
+ * @param {Function} props.setItemName - Setter function for item name.
+ * @param {Function} props.setItemCategory - Setter function for item category.
+ * @param {Function} props.setItemPrice - Setter function for item price.
+ * @param {Function} props.setCurrentStock - Setter function for current stock.
+ * @param {Function} props.setRestockDate - Setter function for restock date.
+ * @param {Function} props.setIsAllergen - Setter function for allergen status.
+ * @param {Function} props.setIsVegan - Setter function for vegan status.
+ * @param {Function} props.addItem - Function to add a new item.
+ * @param {Function} props.removeItem - Function to remove an item.
+ * @param {Function} props.resetFields - Function to reset input fields.
+ * @param {Function} props.editItem - Function to edit an existing item.
+ * @returns {JSX.Element} The InventoryPopup component.
+ */
 const InventoryPopup = ({
     itemId, // Add item ID for edit and remove actions
     itemName,
@@ -26,7 +58,11 @@ const InventoryPopup = ({
 }) => {
     const [errorMessage, setErrorMessage] = useState('');
 
-    // Helper function to validate inputs
+    /**
+     * Helper function to validate inputs.
+     * 
+     * @returns {boolean} True if inputs are valid, otherwise false.
+     */
     const validateInputs = () => {
         if (!itemName.trim()) {
             setErrorMessage('Item name cannot be empty.');

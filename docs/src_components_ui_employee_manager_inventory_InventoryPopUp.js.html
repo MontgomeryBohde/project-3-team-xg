@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: src/components/ui/employee/manager/inventory/InventoryPopUp.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: src/components/ui/employee/manager/inventory/InventoryPopUp.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use client';
+
+/**
+ * @file InventoryPopUp.js
+ * @description This component provides a popup for managing inventory items, including adding, editing, and removing items.
+ * @requires react
+ */
+
+import React, { useState } from 'react';
+
+/**
+ * InventoryPopup component for managing inventory items.
+ * 
+ * @param {Object} props - The properties object.
+ * @param {string} props.itemId - The ID of the item.
+ * @param {string} props.itemName - The name of the item.
+ * @param {string} props.itemCategory - The category of the item.
+ * @param {number} props.itemPrice - The price of the item.
+ * @param {number} props.currentStock - The current stock of the item.
+ * @param {string} props.restockDate - The restock date of the item.
+ * @param {boolean} props.isAllergen - Whether the item is an allergen.
+ * @param {boolean} props.isVegan - Whether the item is vegan.
+ * @param {Function} props.setItemId - Setter function for item ID.
+ * @param {Function} props.setItemName - Setter function for item name.
+ * @param {Function} props.setItemCategory - Setter function for item category.
+ * @param {Function} props.setItemPrice - Setter function for item price.
+ * @param {Function} props.setCurrentStock - Setter function for current stock.
+ * @param {Function} props.setRestockDate - Setter function for restock date.
+ * @param {Function} props.setIsAllergen - Setter function for allergen status.
+ * @param {Function} props.setIsVegan - Setter function for vegan status.
+ * @param {Function} props.addItem - Function to add a new item.
+ * @param {Function} props.removeItem - Function to remove an item.
+ * @param {Function} props.resetFields - Function to reset input fields.
+ * @param {Function} props.editItem - Function to edit an existing item.
+ * @returns {JSX.Element} The InventoryPopup component.
+ */
+const InventoryPopup = ({
+    itemId, // Add item ID for edit and remove actions
+    itemName,
+    itemCategory,
+    itemPrice,
+    currentStock,
+    restockDate,
+    isAllergen,
+    isVegan,
+    setItemId, // Add setter for item ID
+    setItemName,
+    setItemCategory,
+    setItemPrice,
+    setCurrentStock,
+    setRestockDate,
+    setIsAllergen,
+    setIsVegan,
+    addItem,
+    removeItem,
+    resetFields,
+    editItem, // Add function for editing items
+}) => {
+    const [errorMessage, setErrorMessage] = useState('');
+
+    /**
+     * Helper function to validate inputs.
+     * 
+     * @returns {boolean} True if inputs are valid, otherwise false.
+     */
+    const validateInputs = () => {
+        if (!itemName.trim()) {
+            setErrorMessage('Item name cannot be empty.');
+            return false;
+        }
+        if (!itemCategory) {
+            setErrorMessage('Item category must be selected.');
+            return false;
+        }
+        if (isNaN(itemPrice) || itemPrice &lt;= 0) {
+            setErrorMessage('Item price must be a positive number.');
+            return false;
+        }
+        if (isNaN(currentStock) || currentStock &lt; 0) {
+            setErrorMessage('Current stock must be a non-negative number.');
+            return false;
+        }
+        if (restockDate &amp;&amp; isNaN(Date.parse(restockDate))) {
+            setErrorMessage('Invalid restock date.');
+            return false;
+        }
+
+        // Basic sanitization against SQL injections or malicious input
+        const forbiddenChars = /[&lt;>;'"`\\]/;
+        if (forbiddenChars.test(itemName)) {
+            setErrorMessage('Item name contains invalid characters.');
+            return false;
+        }
+
+        return true;
+    };
+
+    const handleAddItem = () => {
+        if (validateInputs()) {
+            setErrorMessage('');
+            addItem();
+        }
+    };
+
+    const handleEditItem = () => {
+        if (validateInputs()) {
+            setErrorMessage('');
+            editItem(); // Call edit function
+        }
+    };    
+
+    const handleRemoveItem = () => {
+        if (itemId) {
+            setErrorMessage('');
+            removeItem(); // Ensure removal by ID
+        } else {
+            setErrorMessage('Cannot remove an item without a valid ID.');
+        }
+    };
+
+    return (
+        &lt;div className="modal show d-block" tabIndex="-1">
+            &lt;div className="modal-dialog">
+                &lt;div className="modal-content">
+                &lt;div className="modal-header">
+                    &lt;h5 className="modal-title">{itemId ? 'Edit Item' : 'Add New Item'}&lt;/h5>
+                    &lt;button type="button" className="btn-close" onClick={resetFields}>&lt;/button>
+                &lt;/div>
+                    &lt;div className="modal-body">
+                        {errorMessage &amp;&amp; (
+                            &lt;div className="alert alert-danger" role="alert">
+                                {errorMessage}
+                            &lt;/div>
+                        )}
+                        &lt;div className="mb-3">
+                            &lt;label className="form-label">Name&lt;/label>
+                            &lt;input
+                                type="text"
+                                className="form-control"
+                                value={itemName}
+                                onChange={(e) => setItemName(e.target.value)}
+                            />
+                        &lt;/div>
+                        &lt;div className="mb-3">
+                            &lt;label className="form-label">Category&lt;/label>
+                            &lt;select
+                                className="form-select"
+                                value={itemCategory}
+                                onChange={(e) => setItemCategory(e.target.value)}
+                            >
+                                &lt;option value="">Select a category&lt;/option>
+                                &lt;option value="Appetizer">Appetizer&lt;/option>
+                                &lt;option value="Meats">Meats&lt;/option>
+                                &lt;option value="Vegetables">Vegetables&lt;/option>
+                                &lt;option value="Assorted">Assorted&lt;/option>
+                                &lt;option value="Drinks">Drinks&lt;/option>
+                                &lt;option value="Utensils">Utensils&lt;/option>
+                            &lt;/select>
+                        &lt;/div>
+                        &lt;div className="mb-3">
+                            &lt;label className="form-label">Price&lt;/label>
+                            &lt;input
+                                type="number"
+                                className="form-control"
+                                value={itemPrice}
+                                onChange={(e) => setItemPrice(parseFloat(e.target.value))}
+                            />
+                        &lt;/div>
+                        &lt;div className="mb-3">
+                            &lt;label className="form-label">Current Stock&lt;/label>
+                            &lt;input
+                                type="number"
+                                className="form-control"
+                                value={currentStock}
+                                onChange={(e) => setCurrentStock(parseInt(e.target.value, 10))}
+                            />
+                        &lt;/div>
+                        &lt;div className="mb-3">
+                            &lt;label className="form-label">Restock Date&lt;/label>
+                            &lt;input
+                                type="date"
+                                className="form-control"
+                                value={restockDate}
+                                onChange={(e) => setRestockDate(e.target.value)}
+                            />
+                        &lt;/div>
+                        &lt;div className="form-check mb-3">
+                            &lt;input
+                                className="form-check-input"
+                                type="checkbox"
+                                checked={isAllergen}
+                                onChange={(e) => setIsAllergen(e.target.checked)}
+                            />
+                            &lt;label className="form-check-label">Is Allergen&lt;/label>
+                        &lt;/div>
+                        &lt;div className="form-check mb-3">
+                            &lt;input
+                                className="form-check-input"
+                                type="checkbox"
+                                checked={isVegan}
+                                onChange={(e) => setIsVegan(e.target.checked)}
+                            />
+                            &lt;label className="form-check-label">Is Vegan&lt;/label>
+                        &lt;/div>
+                    &lt;/div>
+                    &lt;div className="modal-footer">
+                        {itemId ? (
+                            &lt;>
+                                &lt;button className="btn btn-primary" onClick={handleEditItem}>
+                                    Save Changes
+                                &lt;/button>
+                                &lt;button className="btn btn-danger" onClick={handleRemoveItem}>
+                                    Remove
+                                &lt;/button>
+                            &lt;/>
+                        ) : (
+                            &lt;button className="btn btn-primary" onClick={handleAddItem}>
+                                Add Item
+                            &lt;/button>
+                        )}
+                        &lt;button className="btn btn-secondary" onClick={resetFields}>
+                            Cancel
+                        &lt;/button>
+                    &lt;/div>
+                &lt;/div>
+            &lt;/div>
+        &lt;/div>
+    );
+};
+
+export default InventoryPopup;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-ConfirmationPage.html">ConfirmationPage</a></li><li><a href="module-CreditCardPopUp.html">CreditCardPopUp</a></li><li><a href="module-ManagerHomePage.html">ManagerHomePage</a></li><li><a href="module-OrderPage.html">OrderPage</a></li><li><a href="module-Page.html">Page</a></li><li><a href="module-api_getInventory.html">api/getInventory</a></li><li><a href="module-api_getItemSizes.html">api/getItemSizes</a></li><li><a href="module-api_getMenu.html">api/getMenu</a></li><li><a href="module-api_getProducts.html">api/getProducts</a></li><li><a href="module-api_getReports.html">api/getReports</a></li><li><a href="module-employee_cashier_order_confirmation_page.html">employee/cashier/order/confirmation/page</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Appetizer">Appetizer</a></li><li><a href="global.html#BootstrapClient">BootstrapClient</a></li><li><a href="global.html#CACHE_DURATION">CACHE_DURATION</a></li><li><a href="global.html#Cart">Cart</a></li><li><a href="global.html#CartPage">CartPage</a></li><li><a href="global.html#CartPageWrapper">CartPageWrapper</a></li><li><a href="global.html#CashConfirmation">CashConfirmation</a></li><li><a href="global.html#Chat">Chat</a></li><li><a href="global.html#ChatBot">ChatBot</a></li><li><a href="global.html#ClockPage">ClockPage</a></li><li><a href="global.html#ContactForm">ContactForm</a></li><li><a href="global.html#ContactPage">ContactPage</a></li><li><a href="global.html#CustomerHeader">CustomerHeader</a></li><li><a href="global.html#CustomerLoginForm">CustomerLoginForm</a></li><li><a href="global.html#CustomerLoginPage">CustomerLoginPage</a></li><li><a href="global.html#CustomerPage">CustomerPage</a></li><li><a href="global.html#DiscountPopUp">DiscountPopUp</a></li><li><a href="global.html#Drink">Drink</a></li><li><a href="global.html#EmployeeCard">EmployeeCard</a></li><li><a href="global.html#EmployeeDetails">EmployeeDetails</a></li><li><a href="global.html#EmployeeHeader">EmployeeHeader</a></li><li><a href="global.html#EmployeeHomePage">EmployeeHomePage</a></li><li><a href="global.html#EmployeeInfo">EmployeeInfo</a></li><li><a href="global.html#EmployeeLogInHeader">EmployeeLogInHeader</a></li><li><a href="global.html#EmployeeLoginButton">EmployeeLoginButton</a></li><li><a href="global.html#EmployeeLoginPage">EmployeeLoginPage</a></li><li><a href="global.html#EmployeePage">EmployeePage</a></li><li><a href="global.html#EmployeePay">EmployeePay</a></li><li><a href="global.html#Entree">Entree</a></li><li><a href="global.html#GET">GET</a></li><li><a href="global.html#GoogleTranslate">GoogleTranslate</a></li><li><a href="global.html#GuestLoginForm">GuestLoginForm</a></li><li><a href="global.html#Inventory">Inventory</a></li><li><a href="global.html#InventoryPopup">InventoryPopup</a></li><li><a href="global.html#ItemModal">ItemModal</a></li><li><a href="global.html#KioskPage">KioskPage</a></li><li><a href="global.html#LoginForm">LoginForm</a></li><li><a href="global.html#LoyaltyLoginForm">LoyaltyLoginForm</a></li><li><a href="global.html#LoyaltyLoginPage">LoyaltyLoginPage</a></li><li><a href="global.html#MealModal">MealModal</a></li><li><a href="global.html#MealSelectionPage">MealSelectionPage</a></li><li><a href="global.html#Menu">Menu</a></li><li><a href="global.html#MenuBoardPage">MenuBoardPage</a></li><li><a href="global.html#MenuPopularity">MenuPopularity</a></li><li><a href="global.html#MobilePage">MobilePage</a></li><li><a href="global.html#OrderCard">OrderCard</a></li><li><a href="global.html#OrderInfo">OrderInfo</a></li><li><a href="global.html#POST">POST</a></li><li><a href="global.html#PUT">PUT</a></li><li><a href="global.html#Page">Page</a></li><li><a href="global.html#PaymentPopUp">PaymentPopUp</a></li><li><a href="global.html#ProductUsageChart">ProductUsageChart</a></li><li><a href="global.html#RenderMenu">RenderMenu</a></li><li><a href="global.html#SalesChart">SalesChart</a></li><li><a href="global.html#SalesReport">SalesReport</a></li><li><a href="global.html#Side">Side</a></li><li><a href="global.html#SizeSelection">SizeSelection</a></li><li><a href="global.html#XReport">XReport</a></li><li><a href="global.html#ZReport">ZReport</a></li><li><a href="global.html#authOptions">authOptions</a></li><li><a href="global.html#cache">cache</a></li><li><a href="global.html#fetchEmployees">fetchEmployees</a></li><li><a href="global.html#fetchPayData">fetchPayData</a></li><li><a href="global.html#fetchPopularItems">fetchPopularItems</a></li><li><a href="global.html#fetchProductUsageData">fetchProductUsageData</a></li><li><a href="global.html#fetchWeather">fetchWeather</a></li><li><a href="global.html#fetchZReport">fetchZReport</a></li><li><a href="global.html#formatCurrency">formatCurrency</a></li><li><a href="global.html#handleNChange">handleNChange</a></li><li><a href="global.html#handleSubmit">handleSubmit</a></li><li><a href="global.html#inter">inter</a></li><li><a href="global.html#metadata">metadata</a></li><li><a href="global.html#pool">pool</a></li><li><a href="global.html#query">query</a></li><li><a href="global.html#weatherMap">weatherMap</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Wed Dec 11 2024 23:17:49 GMT-0600 (Central Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

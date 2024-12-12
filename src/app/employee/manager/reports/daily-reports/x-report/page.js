@@ -1,16 +1,33 @@
 // src/app/employee/manager/reports/daily-reports/X-Report/page.js
 "use client";
 
+/**
+ * @requires useEffect
+ * @requires useState
+ * @requires EmployeeLogInHeader
+ * @requires Head
+ */
+
 import { useEffect, useState } from 'react';
 import EmployeeLogInHeader from '@/components/ui/employee/header/EmployeeLogInHeader';
 import Head from 'next/head';
 
+
+/**
+ * XReport component
+ * @component
+ * @returns {JSX.Element} The XReport component
+ */
 const XReport = () => {
     const [reportData, setReportData] = useState(null);
     const [selectedHour, setSelectedHour] = useState(getCurrentHour()); // Default to current hour
     const [hourlyData, setHourlyData] = useState(null);
 
-    // Get the current hour, adjusted for open hours (10:00 AM to 9:00 PM)
+    /**
+     * Get the current hour, adjusted for open hours (10:00 AM to 9:00 PM)
+     * @function
+     * @returns {number} The current hour adjusted for open hours
+     */
     function getCurrentHour() {
         const currentHour = new Date().getHours();
         if (currentHour < 10) {
@@ -19,13 +36,23 @@ const XReport = () => {
         return currentHour <= 21 ? currentHour : 21; // After 9:00 PM, default to 9:00 PM
     }
 
-    // Fetch report data for a selected hour
+    /**
+     * Handle hour change event
+     * @function
+     * @param {Object} event - The event object
+     */
     const handleHourChange = (event) => {
         const hour = event.target.value;
         setSelectedHour(hour);
         fetchReportForHour(hour);  // Fetch data for selected hour
     };
 
+    /**
+     * Fetch report data for a selected hour
+     * @async
+     * @function
+     * @param {number} hour - The selected hour
+     */
     const fetchReportForHour = async (hour) => {
         try {
             const response = await fetch(`/api/getReports?type=xReport&hour=${hour}`);

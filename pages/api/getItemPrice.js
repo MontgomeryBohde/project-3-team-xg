@@ -1,6 +1,18 @@
 // pages/api/getItemPrice.js
 import { query } from "@lib/db";
 
+/**
+ * API handler to get the price of a menu item based on its size.
+ * 
+ * @param {Object} req - The request object.
+ * @param {string} req.method - The HTTP method of the request.
+ * @param {Object} req.body - The body of the request.
+ * @param {number} req.body.menuItemId - The ID of the menu item.
+ * @param {number} req.body.itemSizeId - The ID of the item size.
+ * @param {Object} res - The response object.
+ * @param {Function} res.status - Function to set the HTTP status code.
+ * @param {Function} res.json - Function to send a JSON response.
+ */
 export default async function handler(req, res) {
     if (req.method === 'POST') {
         const { menuItemId, itemSizeId } = req.body;

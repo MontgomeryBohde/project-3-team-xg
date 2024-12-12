@@ -1,14 +1,33 @@
 // src/app/employee/manager/reports/menu-popularity/page.js
 "use client";
 
+/**
+ * @fileoverview This file contains the MenuPopularity component which fetches and displays the most popular menu items.
+ * @requires react
+ * @requires @/components/ui/employee/header/EmployeeLogInHeader
+ * @requires next/head
+ */
+
 import { useEffect, useState } from 'react';
 import EmployeeLogInHeader from '@/components/ui/employee/header/EmployeeLogInHeader';
 import Head from 'next/head';
 
+
+/**
+ * MenuPopularity component fetches and displays the most popular menu items.
+ * @component
+ * @returns {JSX.Element} The MenuPopularity component.
+ */
 const MenuPopularity = () => {
     const [popularItems, setPopularItems] = useState([]);
     const [n, setN] = useState(3); // Set default value to 3
 
+    /**
+     * Fetches the most popular menu items from the API.
+     * @async
+     * @function fetchPopularItems
+     * @returns {Promise<void>}
+     */
     useEffect(() => {
         async function fetchPopularItems() {
             try {
@@ -30,6 +49,11 @@ const MenuPopularity = () => {
         fetchPopularItems();
     }, [n]); // Refetch when `n` changes    
 
+    /**
+     * Handles the change in the number of items to display.
+     * @function handleNChange
+     * @param {Object} event - The event object.
+     */
     const handleNChange = (event) => {
         const newN = parseInt(event.target.value, 10);
         if (newN > 0) {

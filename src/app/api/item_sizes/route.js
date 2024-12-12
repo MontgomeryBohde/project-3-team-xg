@@ -1,6 +1,12 @@
 import { NextResponse } from 'next/server';
 import { Client } from 'pg';
 
+/**
+ * Handles GET requests to fetch item sizes based on item_id.
+ * 
+ * @param {Request} request - The incoming request object.
+ * @returns {Promise<NextResponse>} - The response object containing item sizes or an error message.
+ */
 export async function GET(request) {
   const connectionString = process.env.POSTGRES_URL;
   const client = new Client({ connectionString });

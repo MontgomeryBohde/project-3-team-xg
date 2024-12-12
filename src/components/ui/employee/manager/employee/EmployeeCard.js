@@ -1,6 +1,26 @@
 // src/components/ui/employee/manager/employee/EmployeeCard.js
+
+/**
+ * @file EmployeeCard.js
+ * @description This component renders a card displaying employee details.
+ * @requires React
+ */
+
 import React from "react";
 
+/**
+ * EmployeeCard component to display employee details.
+ *
+ * @component
+ * @param {Object} props - Component props
+ * @param {Object} props.employee - Employee object
+ * @param {string} props.employee.firstName - Employee's first name
+ * @param {string} props.employee.lastName - Employee's last name
+ * @param {string} props.employee.title - Employee's job title
+ * @param {string} props.employee.hireDate - Employee's hire date
+ * @param {number} props.employee.hourlyRate - Employee's hourly rate
+ * @returns {JSX.Element} A card displaying employee details
+ */
 const EmployeeCard = ({ employee }) => (
     <div className="card mb-3 shadow-sm">
         <div className="row g-0">

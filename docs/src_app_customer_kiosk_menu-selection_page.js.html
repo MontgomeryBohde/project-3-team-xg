@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: src/app/customer/kiosk/menu-selection/page.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: src/app/customer/kiosk/menu-selection/page.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>"use client";
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import Head from "next/head";
+import { FaUtensils, FaShoppingCart, FaDrumstickBite, FaCarrot, FaConciergeBell, FaGlassCheers, FaGift, FaTrophy } from "react-icons/fa";
+import { FiAlertTriangle } from "react-icons/fi";
+import CustomerHeader from "@/components/ui/customer/header/CustomerHeader";
+import RenderMenu from "@/components/ui/customer/menu-selection/RenderMenu";
+import ItemModal from "@/components/ui/customer/menu-selection/ItemModal";
+import MealModal from "@/components/ui/customer/menu-selection/MealModal";
+import './menu-selection.css';
+import './menu-selection-trevor.css';
+
+/**
+ * MealSelectionPage component
+ * 
+ * This component represents the meal selection page where users can view and select menu items,
+ * add items to their cart, and view special deals.
+ * 
+ * @component
+ */
+const MealSelectionPage = () => {
+    const [menuItems, setMenuItems] = useState([]);
+    const [itemSizes, setItemSizes] = useState({});
+    const [inventoryData, setInventoryData] = useState([]);
+    const [selectedItem, setSelectedItem] = useState(null); // To hold the item being added to the cart
+    const [selectedSize, setSelectedSize] = useState("Small");
+    const [selectedMeal, setSelectedMeal] = useState(null);
+    const [cart, setCart] = useState([]);
+    const [player, setPlayer] = useState(null);
+    const [isTrevorModeActive, setIsTrevorModeActive] = useState(false);
+
+    const deals = [
+        { name: "50 percent off", image: "/images/50per.jpg", sizeType: "special" }
+    ];
+
+
+    /**
+     * Fetches the initial data for the menu item page. Including:
+    * 1. menu items from the server.
+    * 2. available sizes for each menu item.
+    * 3. inventory data.
+    * 4. loads the saved cart from sessionStorage.
+    */
+    const [rewards, setRewards] = useState();
+    useEffect(() => {
+        const storedRewards = JSON.parse(sessionStorage.getItem('rewards'));
+        if(storedRewards){
+            setRewards(storedRewards);
+            console.log("stuffs: " , storedRewards);
+        }
+    }, []); 
+
+    const [custLoggedIn, setCustLoggedIn] = useState(false);
+    useEffect(() => {
+        const loggedInCustomer = JSON.parse(sessionStorage.getItem('loggedInCustomer'));
+        if(loggedInCustomer){
+            setCustLoggedIn(true);
+        }
+    }, []);
+
+
+
+    useEffect(() => {
+        const fetchMenuData = async () => {
+            try {
+                // Fetch menu items
+                const menuResponse = await fetch("/api/getMenu?type=menu");
+                const menuData = await menuResponse.json();
+                setMenuItems(menuData);
+    
+                // Fetch item sizes
+                const sizes = {};
+                await Promise.all(
+                    menuData.map(async (item) => {
+                        const sizeResponse = await fetch(`/api/getItemSizes?item_id=${item.id}`);
+                        const sizeData = await sizeResponse.json();
+                        sizes[item.id] = sizeData;
+                    })
+                );
+                setItemSizes(sizes);
+    
+                // Fetch inventory data
+                const inventoryResponse = await fetch("/api/getInventory?type=inventory");
+                const inventoryData = await inventoryResponse.json();
+                setInventoryData(inventoryData);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+    
+        fetchMenuData();
+        const savedCart = JSON.parse(sessionStorage.getItem("cart")) || [];
+        setCart(savedCart);
+    }, []);    
+
+    // YouTube API
+    useEffect(() => {
+        // Load YouTube Iframe API
+        const script = document.createElement("script");
+        script.src = "https://www.youtube.com/iframe_api";
+        script.async = true;
+        document.body.appendChild(script);
+
+        /**
+        * Initializes the YouTube player API.
+        *  Displays the Subway Surfers video for Trevor Mode
+        */
+        window.onYouTubeIframeAPIReady = () => {
+            const playerInstance = new window.YT.Player("trevor-video-iframe", {
+                videoId: "ObhmrE6FyNs",
+                playerVars: {
+                    autoplay: 0, // Do not autoplay initially
+                    loop: 1,
+                    playlist: "ObhmrE6FyNs",
+                    start: 9, // Start at 10 seconds
+                },
+                events: {
+                    onReady: () => {
+                        // Set volume to 30% when ready
+                        if (playerInstance) {
+                            playerInstance.setVolume(50);
+                        }
+                    },
+                },
+            });
+
+            setPlayer(playerInstance); // Set the player instance in state
+        };
+
+        return () => {
+            delete window.onYouTubeIframeAPIReady;
+        };
+    }, []);
+
+    /**
+    * Adds an item to the cart from menu. 
+    * Handles adding new items or increasing the quantity of existing items in the cart.
+    * Updates the cart state and sessionStorage. 
+    * @param {Object} item - The item going to be added to the cart.
+    * @param {string} size - The size of the item.
+    */
+    const handleAddToCart = (item, size) => {
+        if (size == "special") { // free bowls &amp; other rewards
+            let updatedCart;
+            updatedCart = [...cart, { name: item.name, size: size, quantity: 1 }];
+            setCart(updatedCart);
+            sessionStorage.setItem("cart", JSON.stringify(updatedCart));
+        }
+        else {
+            const selectedSize = size || "Small";
+            const existingItem = cart.find(cartItem => cartItem.name === item.item_name &amp;&amp; cartItem.size === selectedSize);
+
+            let updatedCart;
+            if (existingItem) {
+                updatedCart = cart.map(cartItem =>
+                    cartItem.name === item.item_name &amp;&amp; cartItem.size === selectedSize
+                        ? { ...cartItem, quantity: cartItem.quantity + 1 }
+                        : cartItem
+                );
+            } else {
+                updatedCart = [...cart, { name: item.item_name, size: selectedSize, quantity: 1 }];
+            }
+
+            setCart(updatedCart);
+            sessionStorage.setItem("cart", JSON.stringify(updatedCart));
+        }  
+    };
+
+    /**
+    * Allows the scroll to move smoothly to the clicked section. 
+    * Finds the element with the given ID and then scrolls the page to that element.
+    * @param {string} sectionId - The ID of the element to scroll to.
+    */
+    const handleScrollToSection = (sectionId) => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+            element.scrollIntoView({ behavior: "smooth" });
+        }
+    };
+
+    /**
+    * Displays a message that indicates whether or not currently in Trevor Mode.
+    * Creates a toast elementa and appends to document body.
+    * Removes the toast element after 3 seconds.
+    */
+    const showTrevorToast = () => {
+        const toast = document.createElement("div");
+        toast.innerText = isTrevorModeActive ? "Trevor Mode Deactivated 🚫" : "Trevor Mode Activated 🕶️";
+        toast.style.position = "fixed";
+        toast.style.bottom = "20px";
+        toast.style.right = "20px";
+        toast.style.backgroundColor = "#ff4500";
+        toast.style.color = "#fff";
+        toast.style.padding = "10px 20px";
+        toast.style.borderRadius = "5px";
+        toast.style.zIndex = "1000";
+        toast.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.3)";
+        toast.style.fontFamily = "Comic Sans MS, cursive";
+        toast.style.animation = "fade-out 3s forwards";
+    
+        document.body.appendChild(toast);
+    
+        setTimeout(() => {
+            document.body.removeChild(toast);
+        }, 3000);
+    };
+
+    /**
+    * Creates an Audio object for the "vine-boom.mp3" sound and
+    * plays a hover sound effect when cursor goes over the sidebar
+    */
+    const playHoverSound = () => {
+        const boomSound = new Audio("/sounds/vine-boom.mp3");
+        boomSound.volume = 0.2;
+    
+        try {
+            boomSound.play();
+        } catch (error) {
+            console.error("Audio playback failed:", error);
+        }
+    };
+    
+    /**
+    * Toggles Trevor Mode.
+    * 1. Toggles the `isTrevorModeActive` state.
+    * 2. Updates the `trevorModeActive` state in sessionStorage.
+    * 3. Plays a sound effect.
+    * 4. Shows a toast notification with the current Trevor Mode status.
+    * 5. Controls the YouTube player as well if Trevor Mode is on.
+    */
+    const toggleTrevorMode = () => {
+        const newState = !isTrevorModeActive;
+        setIsTrevorModeActive(newState);
+        sessionStorage.setItem("trevorModeActive", newState ? "true" : "false");
+    
+        // Play sound effect on toggle (user interaction guarantees playback)
+        const sound = new Audio('/sounds/OOF.mp3');
+        sound.volume = 0.2;
+    
+        try {
+            sound.play();
+        } catch (error) {
+            console.error("Audio playback failed:", error);
+        }
+    
+        // Show toast notification
+        showTrevorToast();
+
+        // Update the video iframe source
+        if (player) {
+            if (newState) {
+                player.playVideo(); // Play the video when Trevor Mode is active
+            } else {
+                player.stopVideo(); // Stop the video when Trevor Mode is inactive
+            }
+        }
+    };
+    
+    return (
+        &lt;div>
+            &lt;CustomerHeader />
+            &lt;div className={`container-fluid ${isTrevorModeActive ? "trevor-mode" : ""}`}>
+                &lt;Head>
+                    &lt;title>Customer Menu Selection&lt;/title>
+                &lt;/Head>
+                
+                &lt;div className="container-fluid">
+                    &lt;div className="row">
+                        {/* Sidebar */}
+                        &lt;nav className="col-md-3 d-none d-md-block bg-light sidebar">
+                            &lt;div className="position-fixed sidebar-container pt-4">
+                                &lt;ul className="nav flex-column">
+                                    {[
+                                        { id: "meals", label: "Meals", icon: &lt;FaUtensils className="icon me-3" /> },
+                                        { id: "entree", label: "Entrées", icon: &lt;FaDrumstickBite className="icon me-3" /> },
+                                        { id: "side", label: "Sides", icon: &lt;FaCarrot className="icon me-3" /> },
+                                        { id: "appetizer", label: "Appetizers", icon: &lt;FaConciergeBell className="icon me-3" /> },
+                                        { id: "drink", label: "Drinks", icon: &lt;FaGlassCheers className="icon me-3" /> },
+                                        { id: "deal", label: "Deals", icon: &lt;FaGift className="icon me-3" /> },
+                                        { id: "rewards", label: "Rewards", icon: &lt;FaTrophy className="icon me-3" /> },
+                                    ].map((section, index) => (
+                                        &lt;li key={index} className="nav-item mb-3">
+                                                &lt;a
+                                                    className="nav-link d-flex align-items-center px-4 py-3 rounded shadow-sm fs-5"
+                                                    onMouseEnter={isTrevorModeActive ? playHoverSound : undefined}
+                                                    onClick={() => handleScrollToSection(section.id)}
+                                                    style={{
+                                                        cursor: "pointer",
+                                                        transition: "background-color 0.3s ease, color 0.3s ease",
+                                                    }}
+                                                >
+                                                    {section.icon}
+                                                    &lt;span>{section.label}&lt;/span>
+                                                &lt;/a>
+                                            &lt;/li>
+                                        ))}
+                                        {/* View Cart */}
+                                        &lt;li className="nav-item mt-4">
+                                            &lt;Link href="/customer/kiosk/cart">
+                                                &lt;span
+                                                    className="nav-link text-danger d-flex align-items-center px-4 py-3 rounded shadow-sm fs-5"
+                                                    style={{
+                                                        backgroundColor: "#fff5f5",
+                                                        transition: "background-color 0.3s ease, color 0.3s ease",
+                                                    }}
+                                                >
+                                                    &lt;FaShoppingCart className="icon me-3" />
+                                                    View Cart {cart.length > 0 &amp;&amp; `(${cart.length})`}
+                                                &lt;/span>
+                                            &lt;/Link>
+                                        &lt;/li>
+
+                                        {/* Trevor Mode Toggle */}
+                                        &lt;li className="nav-item mt-4">
+                                            &lt;button
+                                                className={`btn ${isTrevorModeActive ? "btn-danger" : "btn-warning"} d-flex align-items-center px-4 py-3 rounded shadow-sm fs-5`}
+                                                onClick={toggleTrevorMode}
+                                                style={{
+                                                    backgroundColor: isTrevorModeActive ? "#ff4d4d" : "#ffd54f",
+                                                    transition: "transform 0.2s ease, background-color 0.3s ease",
+                                                }}
+                                            >
+                                                &lt;FiAlertTriangle className="icon me-3"/> {isTrevorModeActive ? "Deactivate" : "Trevor Mode"}
+                                            &lt;/button>
+                                        &lt;/li>
+                                &lt;/ul>
+                            &lt;/div>
+                        &lt;/nav>
+
+                        {/* Main Content */}
+                        &lt;main className="col-md-10 ms-sm-auto col-lg-10 px-md-4">
+
+                            {/* Meals Section */}
+                            &lt;section id="meals" className="py-3">
+                                &lt;h2>Meals&lt;/h2>
+                                &lt;div className="row g-3">
+                                    {["Bowl", "Plate", "Bigger Plate", "Cub Meal", "Family Meal"].map((meal, index) => (
+                                        &lt;div key={index} className="col-6 col-md-4">
+                                            &lt;button
+                                                className="btn btn-outline-dark w-100 meal-button py-3"
+                                                onClick={() => setSelectedMeal(meal)}
+                                            >
+                                                {meal}
+                                            &lt;/button>
+                                        &lt;/div>
+                                    ))}
+                                &lt;/div>
+                            &lt;/section>
+
+                            {/* Subway Surfer Section */}
+                            &lt;div id="trevor-video" className={`trevor-video ${isTrevorModeActive ? "active" : ""}`}>
+                                &lt;div id="trevor-video-iframe">&lt;/div>
+                            &lt;/div>
+
+                            {/* Meal Modal */}
+                            {selectedMeal &amp;&amp; (
+                                &lt;MealModal
+                                    mealType={selectedMeal}
+                                    onClose={() => setSelectedMeal(null)}
+                                    onConfirm={(mealData) => {
+                                        const updatedCart = [...cart, mealData];
+                                        setCart(updatedCart); // Update the cart state
+                                        sessionStorage.setItem("cart", JSON.stringify(updatedCart)); // Save to sessionStorage
+                                        setSelectedMeal(null); // Close the modal
+                                    }}
+                                />
+                            )}
+
+                            {/* RenderMenu grouped by category */}
+                            {Object.entries(
+                                menuItems.reduce((groups, item) => {
+                                    if (!groups[item.category]) {
+                                        groups[item.category] = [];
+                                    }
+                                    groups[item.category].push(item);
+                                    return groups;
+                                }, {})
+                            ).map(([category, items], index) => (
+                                &lt;section
+                                    key={index}
+                                    id={category.toLowerCase().replace(/\s+/g, "-")}
+                                    className="py-3"
+                                >
+                                    &lt;h2>{category}&lt;/h2>
+                                    &lt;div className="row">
+                                        &lt;RenderMenu
+                                            menuItems={items} // Pass only items in this category
+                                            itemSizes={itemSizes}
+                                            inventoryData={inventoryData}
+                                            setSelectedItem={setSelectedItem}
+                                        />
+                                    &lt;/div>
+                                &lt;/section>
+                            ))}
+
+                            {/* Deals Section */}
+                            &lt;section id="deal" className="py-3">
+                                &lt;h2>Deals&lt;/h2>
+                                &lt;div className="row">
+                                    {deals.map((deal, index) => (
+                                        &lt;div key={index} className="col-6 col-md-4 col-lg-3 mb-3">
+                                            &lt;div className="card">
+                                                &lt;img
+                                                    src={deal.image}
+                                                    className="card-img-top img-fluid"
+                                                    alt={deal.name}
+                                                />
+                                                &lt;div className="card-body text-center">
+                                                    &lt;p className="card-text">{deal.name}&lt;/p>
+                                                &lt;/div>
+                                            &lt;/div>
+                                        &lt;/div>
+                                    ))}
+                                &lt;/div>
+                            &lt;/section>
+
+                            {/* Rewards Section */}
+                            &lt;section id="deal" className="py-3">
+                                &lt;h2>Rewards&lt;/h2>
+                                {custLoggedIn ? (
+                                    &lt;div className="py-3" id="rewards">
+                                        &lt;p>You have not claimed any rewards yet.&lt;/p>
+                                    &lt;/div>
+                                ) : (
+                                    rewards &amp;&amp; rewards.length > 0 ? (
+                                        &lt;div className="py-3" id="rewards">
+                                            &lt;div className="row">
+                                                {rewards.map((reward, index) => (
+                                                    &lt;div key={index} className="col-6 col-md-4 col-lg-3 mb-3">
+                                                        &lt;div className="card">
+                                                            &lt;img
+                                                                src={reward.image}
+                                                                className="card-img-top img-fluid"
+                                                                alt={reward.name}
+                                                            />
+                                                            &lt;div className="card-body text-center">
+                                                                &lt;p className="card-text">{reward.name}&lt;/p>
+                                                                &lt;button
+                                                                    className="btn btn-danger"
+                                                                    onClick={() => handleAddToCart(reward, "special")}
+                                                                >
+                                                                    Add to Cart
+                                                                &lt;/button>
+                                                            &lt;/div>
+                                                        &lt;/div>
+                                                    &lt;/div>
+                                                ))}
+                                            &lt;/div>
+                                        &lt;/div>
+                                    ) : (
+                                        &lt;div className="py-3" id="rewards">
+                                            &lt;p>You have not claimed any rewards yet.&lt;/p>
+                                        &lt;/div>
+                                    )
+                                )}
+
+                            &lt;/section>
+
+                        &lt;/main>
+                    &lt;/div>
+                &lt;/div>
+
+                {/* Item Modal */}
+                {selectedItem &amp;&amp; (
+                    &lt;ItemModal
+                        item={selectedItem}
+                        sizes={itemSizes[selectedItem.id] || []}
+                        selectedSize={selectedSize}
+                        setSelectedSize={setSelectedSize}
+                        onClose={() => setSelectedItem(null)}
+                        onAdd={handleAddToCart}
+                    />
+                )}
+            &lt;/div>
+        &lt;/div>
+    );
+};
+
+
+export default MealSelectionPage;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-ConfirmationPage.html">ConfirmationPage</a></li><li><a href="module-CreditCardPopUp.html">CreditCardPopUp</a></li><li><a href="module-ManagerHomePage.html">ManagerHomePage</a></li><li><a href="module-OrderPage.html">OrderPage</a></li><li><a href="module-Page.html">Page</a></li><li><a href="module-api_getInventory.html">api/getInventory</a></li><li><a href="module-api_getItemSizes.html">api/getItemSizes</a></li><li><a href="module-api_getMenu.html">api/getMenu</a></li><li><a href="module-api_getProducts.html">api/getProducts</a></li><li><a href="module-api_getReports.html">api/getReports</a></li><li><a href="module-employee_cashier_order_confirmation_page.html">employee/cashier/order/confirmation/page</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Appetizer">Appetizer</a></li><li><a href="global.html#BootstrapClient">BootstrapClient</a></li><li><a href="global.html#CACHE_DURATION">CACHE_DURATION</a></li><li><a href="global.html#Cart">Cart</a></li><li><a href="global.html#CartPage">CartPage</a></li><li><a href="global.html#CartPageWrapper">CartPageWrapper</a></li><li><a href="global.html#CashConfirmation">CashConfirmation</a></li><li><a href="global.html#Chat">Chat</a></li><li><a href="global.html#ChatBot">ChatBot</a></li><li><a href="global.html#ClockPage">ClockPage</a></li><li><a href="global.html#ContactForm">ContactForm</a></li><li><a href="global.html#ContactPage">ContactPage</a></li><li><a href="global.html#CustomerHeader">CustomerHeader</a></li><li><a href="global.html#CustomerLoginForm">CustomerLoginForm</a></li><li><a href="global.html#CustomerLoginPage">CustomerLoginPage</a></li><li><a href="global.html#CustomerPage">CustomerPage</a></li><li><a href="global.html#DiscountPopUp">DiscountPopUp</a></li><li><a href="global.html#Drink">Drink</a></li><li><a href="global.html#EmployeeCard">EmployeeCard</a></li><li><a href="global.html#EmployeeDetails">EmployeeDetails</a></li><li><a href="global.html#EmployeeHeader">EmployeeHeader</a></li><li><a href="global.html#EmployeeHomePage">EmployeeHomePage</a></li><li><a href="global.html#EmployeeInfo">EmployeeInfo</a></li><li><a href="global.html#EmployeeLogInHeader">EmployeeLogInHeader</a></li><li><a href="global.html#EmployeeLoginButton">EmployeeLoginButton</a></li><li><a href="global.html#EmployeeLoginPage">EmployeeLoginPage</a></li><li><a href="global.html#EmployeePage">EmployeePage</a></li><li><a href="global.html#EmployeePay">EmployeePay</a></li><li><a href="global.html#Entree">Entree</a></li><li><a href="global.html#GET">GET</a></li><li><a href="global.html#GoogleTranslate">GoogleTranslate</a></li><li><a href="global.html#GuestLoginForm">GuestLoginForm</a></li><li><a href="global.html#Inventory">Inventory</a></li><li><a href="global.html#InventoryPopup">InventoryPopup</a></li><li><a href="global.html#ItemModal">ItemModal</a></li><li><a href="global.html#KioskPage">KioskPage</a></li><li><a href="global.html#LoginForm">LoginForm</a></li><li><a href="global.html#LoyaltyLoginForm">LoyaltyLoginForm</a></li><li><a href="global.html#LoyaltyLoginPage">LoyaltyLoginPage</a></li><li><a href="global.html#MealModal">MealModal</a></li><li><a href="global.html#MealSelectionPage">MealSelectionPage</a></li><li><a href="global.html#Menu">Menu</a></li><li><a href="global.html#MenuBoardPage">MenuBoardPage</a></li><li><a href="global.html#MenuPopularity">MenuPopularity</a></li><li><a href="global.html#MobilePage">MobilePage</a></li><li><a href="global.html#OrderCard">OrderCard</a></li><li><a href="global.html#OrderInfo">OrderInfo</a></li><li><a href="global.html#POST">POST</a></li><li><a href="global.html#PUT">PUT</a></li><li><a href="global.html#Page">Page</a></li><li><a href="global.html#PaymentPopUp">PaymentPopUp</a></li><li><a href="global.html#ProductUsageChart">ProductUsageChart</a></li><li><a href="global.html#RenderMenu">RenderMenu</a></li><li><a href="global.html#SalesChart">SalesChart</a></li><li><a href="global.html#SalesReport">SalesReport</a></li><li><a href="global.html#Side">Side</a></li><li><a href="global.html#SizeSelection">SizeSelection</a></li><li><a href="global.html#XReport">XReport</a></li><li><a href="global.html#ZReport">ZReport</a></li><li><a href="global.html#authOptions">authOptions</a></li><li><a href="global.html#cache">cache</a></li><li><a href="global.html#fetchEmployees">fetchEmployees</a></li><li><a href="global.html#fetchPayData">fetchPayData</a></li><li><a href="global.html#fetchPopularItems">fetchPopularItems</a></li><li><a href="global.html#fetchProductUsageData">fetchProductUsageData</a></li><li><a href="global.html#fetchWeather">fetchWeather</a></li><li><a href="global.html#fetchZReport">fetchZReport</a></li><li><a href="global.html#formatCurrency">formatCurrency</a></li><li><a href="global.html#handleNChange">handleNChange</a></li><li><a href="global.html#handleSubmit">handleSubmit</a></li><li><a href="global.html#inter">inter</a></li><li><a href="global.html#metadata">metadata</a></li><li><a href="global.html#pool">pool</a></li><li><a href="global.html#query">query</a></li><li><a href="global.html#weatherMap">weatherMap</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Wed Dec 11 2024 23:17:49 GMT-0600 (Central Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

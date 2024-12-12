@@ -2,6 +2,16 @@ import { Pool } from 'pg';
 
 const pool = new Pool({ connectionString: process.env.POSTGRES_URL });
 
+/**
+ * Handler function to process incoming HTTP requests.
+ * 
+ * @param {Object} req - The HTTP request object.
+ * @param {string} req.method - The HTTP method of the request.
+ * @param {Object} req.query - The query parameters of the request.
+ * @param {string} req.query.name - The name of the inventory item to fetch the ID for.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise<void>} - A promise that resolves when the response is sent.
+ */
 export default async function handler(req, res) {
     if (req.method === 'GET') {
         const { name } = req.query;

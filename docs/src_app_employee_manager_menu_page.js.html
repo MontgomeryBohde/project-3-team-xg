@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: src/app/employee/manager/menu/page.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: src/app/employee/manager/menu/page.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use client';
+
+/**
+ * @file page.js
+ * @description Contains the Menu component which displays menu items.
+ * @requires React
+ * @requires EmployeeLogInHeader
+ */
+
+import React, { useEffect, useState } from "react";
+import EmployeeLogInHeader from '@/components/ui/employee/header/EmployeeLogInHeader';
+
+/**
+ * Menu component that fetches and displays menu items.
+ * @returns {JSX.Element} The rendered Menu component.
+ */
+const Menu = () => {
+    const [entrees, setEntrees] = useState([]);
+	const [sides, setSides] = useState([]);
+    const [appetizers, setAppetizers] = useState([]);
+    const [drinks, setDrinks] = useState([]);
+    const [seasonal, setSeasonal] = useState([]);
+    const [inventoryItems, setInventoryItems] = useState([]);
+
+    /**
+     * Fetches inventory items from the API.
+     * @async
+     * @function
+     * @returns {Promise&lt;void>}
+     */
+const fetchInventoryItems = async () => {
+    try {
+        const response = await fetch("/api/inventory-items");
+        if (!response.ok) throw new Error("Failed to fetch inventory items");
+
+        const data = await response.json();
+        setInventoryItems(data); 
+    } catch (err) {
+        console.error("Error fetching inventory items:", err);
+    }
+};
+
+useEffect(() => {
+    fetchInventoryItems(); 
+}, []);
+
+    /**
+     * Fetches menu items from the API and groups them by item ID.
+     * @async
+     * @function
+     * @returns {Promise&lt;void>}
+     */
+    const fetchMenuItems = async () => {
+        try {
+            const response = await fetch("/api/getProducts?type=menu-with-sizes");
+            if (!response.ok) throw new Error("Failed to fetch menu items");
+    
+            const data = await response.json();
+    
+            if (!Array.isArray(data)) {
+                throw new Error("Invalid data format from API");
+            }
+    
+            const groupedItems = data.reduce((acc, item) => {
+                if (!acc[item.item_id]) {
+                    acc[item.item_id] = {
+                        ...item,
+                        sizes: [],
+                    };
+                }
+    
+                acc[item.item_id].sizes.push({
+                    size: item.size,
+                    price: item.price,
+                    calories: item.calories,
+                });
+                return acc;
+            }, {});
+    
+            setEntrees(Object.values(groupedItems).filter(item => item.category?.toLowerCase() === "entree"));
+            setSides(Object.values(groupedItems).filter(item => item.category?.toLowerCase() === "side"));
+            setAppetizers(Object.values(groupedItems).filter(item => item.category?.toLowerCase() === "appetizer"));
+            setDrinks(Object.values(groupedItems).filter(item => item.category?.toLowerCase() === "drink"));
+            setSeasonal(Object.values(groupedItems).filter(item => item.category?.toLowerCase() === "seasonal"));
+        } catch (err) {
+            console.error("Error fetching menu items:", err);
+        }
+    };
+    
+    
+
+    // to only run one time
+    useEffect(() => {
+        fetchMenuItems();
+    }, []);
+
+    const [selectedItem, setSelectedItem] = useState(null);
+    const [itemName, setItemName] = useState('');
+    const [itemSize, setItemSize] = useState('Medium');
+    const [itemCategory, setItemCategory] = useState('Entree');
+   // const [inventoryItems, setInventoryItems] = useState([]);  // This will hold the inventory items
+    const [inventoryIds, setInventoryIds] = useState(""); 
+    const [itemPrice, setItemPrice] = useState(0.00);
+    const [itemCalories, setItemCalories] = useState(0); 
+    
+    const handlePopup = (item, category) => {
+        if (!item) {
+            console.log("in");
+            setItemName('');
+            setItemSize('Medium');
+            setItemCategory(category);
+            setInventoryIds('');
+            setItemPrice(0.00);
+            setItemCalories(0);
+
+            setSelectedItem('Item Name'); 
+        } else {
+            setItemName(item.name);
+            setItemCategory(category);
+            setSelectedItem(item);
+            setInventoryIds(item.inventory_names ? item.inventory_names.join(', ') : ''); 
+            setItemSize(item.sizes[0]?.size || 'Medium');
+            setItemPrice(item.sizes[0]?.price || 0.00);
+            setItemCalories(item.sizes[0]?.calories || 0);
+        }
+    };
+    
+      
+
+    const handleSizeChange = (selectedSize) => {
+        console.log("chanfing");
+        setItemSize(selectedSize); 
+        const selectedSizeDetails = selectedItem.sizes.find(size => size.item_size === selectedSize);
+    
+        if (selectedSizeDetails) {
+            setItemPrice(selectedSizeDetails.price); 
+            setItemCalories(selectedSizeDetails.calories); 
+        }
+    };  
+    
+
+    const handleNavigation = (sectionId) => {
+        const section = document.getElementById(sectionId);
+        if (section) {
+            section.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+
+    const resetFields = () => {
+        setSelectedItem(null);
+        setItemName('');
+        setItemSize('Medium');
+        setItemCategory('Entree');
+        setInventoryIds('');
+        setItemPrice(0.00);
+        setItemCalories(0);
+    };
+
+    const [availableInventoryItems, setAvailableInventoryItems] = useState([]);
+   
+
+    /**
+     * Fetches available inventory items from the API.
+     * @async
+     * @function
+     * @returns {Promise&lt;void>}
+     */
+    const fetchAvailableInventoryItems = async () => {
+        try {
+            const response = await fetch("/api/inventory-items");
+            if (!response.ok) throw new Error("Failed to fetch inventory items");
+    
+            const data = await response.json();
+            setAvailableInventoryItems(data); 
+        } catch (err) {
+            console.error("Error fetching inventory items:", err);
+        }
+    };
+
+    
+
+    
+    useEffect(() => {
+        fetchAvailableInventoryItems();
+    }, []);
+
+    /**
+     * Adds a new menu item to the database.
+     * @async
+     * @function
+     * @returns {Promise&lt;void>}
+    */
+    const addItem = async () => {
+        const itemData = {
+            item_name: itemName,
+            category: itemCategory,
+            inventory_item_names: inventoryIds.split(',').map(name => name.trim()), 
+            available: true,
+            is_seasonal: itemCategory === "Seasonal",
+            image_url: "",
+            sizes: [
+                { 
+                    item_size: itemSize, 
+                    price: parseFloat(itemPrice), 
+                    calories: itemCalories 
+                }
+            ]
+        };
+        try {
+            const response = await fetch("/api/manageMenuItems", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(itemData),
+            });
+    
+            if (response.ok) {
+                console.log("Item added successfully");
+                fetchMenuItems();
+                resetFields();
+            } else {
+                console.error("Failed to add item");
+            }
+        } catch (error) {
+            console.error("Error adding menu item:", error);
+        }
+    };
+    
+    
+    /**
+     * Removes a menu item from the database.
+     * @async
+     * @function
+     * @returns {Promise&lt;void>}
+     */
+    const removeItem = async () => {
+        if (!selectedItem || !selectedItem.item_id) {
+            console.error("No item selected for removal.");
+            return; 
+        }
+    
+        const itemData = { id: selectedItem.item_id };  
+        
+        try {
+            const response = await fetch("/api/manageMenuItems", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(itemData), 
+            });
+    
+            if (response.ok) {
+                console.log("Item removed successfully");
+                fetchMenuItems(); 
+                resetFields(); 
+            } else {
+                console.error("Failed to remove item:", response.status, response.statusText);
+            }
+        } catch (error) {
+            console.error("Error removing menu item:", error);
+        }
+    };
+  
+    /**
+     * Adds an inventory item to a menu item.
+     * @async
+     * @function
+     * @param {string} selectedInventoryItemName - The name of the inventory item to add.
+     * @returns {Promise&lt;void>}
+     */
+    const handleAddInventoryItem = async (selectedInventoryItemName) => {
+        try {
+           
+            console.log("Selected ITEM :", selectedItem);
+            console.log("Selected Inventory Item Name:", selectedInventoryItemName);
+        console.log("Selected Menu Item ID:", selectedItem.item_id);  
+
+            const inventoryResponse = await fetch(`/api/getInventoryId?name=${encodeURIComponent(selectedInventoryItemName)}`);
+            const inventoryData = await inventoryResponse.json();
+    
+            if (!inventoryResponse.ok) {
+                console.error("Error fetching inventory ID:", inventoryData.error);
+                return;
+            }
+    
+            const inventoryItemId = inventoryData.id; 
+    
+          
+            const response = await fetch('/api/updateInventory', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    menuItemId: selectedItem.item_id,
+                    inventoryItemId: inventoryItemId,   
+                    action: 'add',                    
+                }),
+            });
+            
+            if (response.ok) {
+                const updatedItem = await response.json();
+                setInventoryIds(updatedItem.inventory_item_ids.join(", "));
+                setInventoryIds(selectedItem.inventory_names ? selectedItem.inventory_names.join(', ') : ''); 
+    
+                console.log("Inventory updated successfully:", updatedItem);
+            } else {
+                const errorData = await response.json();
+                console.error("Error updating inventory:", errorData.error);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    };
+
+    /**
+     * Removes an inventory item from a menu item.
+     * @async
+     * @function
+     * @param {string} selectedInventoryItemName - The name of the inventory item to remove.
+     * @returns {Promise&lt;void>}
+     */
+    const handleRemoveInventoryItem = async (selectedInventoryItemName) => {
+        try {
+            console.log("Selected ITEM:", selectedItem);
+            console.log("Selected Inventory Item Name:", selectedInventoryItemName);
+            console.log("Selected Menu Item ID:", selectedItem.item_id);
+
+            const inventoryResponse = await fetch(`/api/getInventoryId?name=${encodeURIComponent(selectedInventoryItemName)}`);
+            const inventoryData = await inventoryResponse.json();
+
+            if (!inventoryResponse.ok) {
+                console.error("Error fetching inventory ID:", inventoryData.error);
+                return;
+            }
+
+            const inventoryItemId = inventoryData.id;  
+
+           
+            const response = await fetch('/api/updateInventory', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    menuItemId: selectedItem.item_id,
+                    inventoryItemId: inventoryItemId,
+                    action: 'remove',
+                }),
+            });
+
+            if (response.ok) {
+                const updatedItem = await response.json();
+                setInventoryIds(updatedItem.inventory_item_ids.join(", "));
+                console.log("Inventory updated successfully:", updatedItem);
+            } else {
+                const errorData = await response.json();
+                console.error("Error updating inventory:", errorData.error);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    };
+    
+    const renderMenuItems = (items, category) => (
+        items.length > 0 ? (
+            items.map((item, index) => (
+                &lt;div key={index} className="col-md-3 mb-3">
+                    &lt;button
+                        className="btn btn-outline-primary w-100 btn-lg"
+                        onClick={() => handlePopup(item, category)}
+                    >
+                        {item.name}
+                    &lt;/button>
+                &lt;/div>
+            ))
+        ) : (
+            &lt;div className="text-center text-muted">No items available in this category&lt;/div>
+        )
+    );
+    
+
+    const renderPopup = () => {
+        if (!selectedItem) return null;
+    
+        return (
+            &lt;div className="modal fade show d-block" tabIndex="-1" role="dialog" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                &lt;div className="modal-dialog modal-dialog-centered" role="document">
+                    &lt;div className="modal-content">
+                        &lt;div className="modal-header">
+                            &lt;h5 className="modal-title">Edit Item&lt;/h5>
+                            &lt;button type="button" className="btn-close" onClick={() => setSelectedItem(null)}>&lt;/button>
+                        &lt;/div>
+                        &lt;div className="modal-body">
+                            {/* Name Input */}
+                            &lt;div className="mb-3">
+                                &lt;label className="form-label">Name:&lt;/label>
+                                &lt;input 
+                                    type="text" 
+                                    className="form-control" 
+                                    value={itemName} 
+                                    onChange={(e) => setItemName(e.target.value)} 
+                                />
+                            &lt;/div>
+        
+                            {/* Conditional Size Input */}
+                            &lt;div className="mb-3">
+                                &lt;label className="form-label">Size:&lt;/label>
+                                {selectedItem === 'Item Name' ? (
+                                    &lt;input 
+                                        type="text" 
+                                        className="form-control" 
+                                        value={itemSize} 
+                                        onChange={(e) => setItemSize(e.target.value)} 
+                                    />
+                                ) : (
+                                    &lt;select 
+                                        className="form-select" 
+                                        value={itemSize} 
+                                        onChange={(e) => handleSizeChange(e.target.value)}
+                                    >
+                                        {selectedItem.sizes.map((size, idx) => (
+                                            &lt;option key={idx} value={size.size}>
+                                                {size.size}
+                                            &lt;/option>
+                                        ))}
+                                    &lt;/select>
+                                )}
+                            &lt;/div>
+        
+                            {/* Category Dropdown */}
+                            &lt;div className="mb-3">
+                                &lt;label className="form-label">Category:&lt;/label>
+                                &lt;select 
+                                    className="form-select" 
+                                    value={itemCategory} 
+                                    onChange={(e) => setItemCategory(e.target.value)}
+                                >
+                                    &lt;option value="Entree">Entree&lt;/option>
+                                    &lt;option value="Side">Side&lt;/option>
+                                    &lt;option value="Appetizer">Appetizer&lt;/option>
+                                    &lt;option value="Drink">Drink&lt;/option>
+                                    &lt;option value="Seasonal">Seasonal&lt;/option>
+                                &lt;/select>
+                            &lt;/div>
+        
+                            {/* Inventory Items: Text Input + Dropdown */}
+                            &lt;div className="mb-3">
+                                &lt;label className="form-label">Inventory Items:&lt;/label>
+                                
+                                  {/* Current Inventory Items */}
+        &lt;input
+            type="text"
+            className="form-control"
+            value={inventoryIds}
+            onChange={(e) => setInventoryIds(e.target.value)}
+            placeholder="Comma-separated inventory item names"
+        />
+
+        {/* Dropdown for adding new inventory items */}
+        &lt;div className="mt-2">
+            &lt;select
+                className="form-select"
+                onChange={(e) => {
+                    const selectedItem = e.target.value;
+                    // Call the function only if a valid item is selected (not empty string)
+                    if (selectedItem) {
+                        handleAddInventoryItem(selectedItem);
+                    }
+                }}
+            >
+        &lt;option value="">Select an item to add&lt;/option>
+        {availableInventoryItems.map((item, idx) => {
+            
+            console.log("Checking item:", item.item_name);
+            console.log("inventoryIds:", inventoryIds);
+
+           
+            const isItemSelected = inventoryIds
+                .split(',')
+                .map((id) => id.trim().toLowerCase())
+                .includes(item.item_name.toLowerCase());
+            console.log("Is item selected?", isItemSelected);
+
+           
+            return !isItemSelected &amp;&amp; (
+                &lt;option key={idx} value={item.item_name}>
+                    {item.item_name}
+                &lt;/option>
+            );
+        })}
+    &lt;/select>
+            &lt;/div>
+                &lt;/div>
+                    {/*Remove inventory items*/}
+                        &lt;div className="mt-2">
+                            &lt;select
+                                className="form-select"
+                                onChange={(e) => {
+                                    const selectedItem = e.target.value;
+                                    if (selectedItem) {
+                                        handleRemoveInventoryItem(selectedItem);
+                                    }
+                                }}
+                            >
+                    &lt;option value="">Select an item to remove&lt;/option>
+                    {inventoryIds.length > 0 &amp;&amp; inventoryIds.split(',').map((inventoryItemName, idx) => (
+                        &lt;option key={idx} value={inventoryItemName.trim()}>
+                            {inventoryItemName.trim()}
+                        &lt;/option>
+                    ))}
+                &lt;/select>
+            &lt;/div>
+        
+                            {/* Price Input */}
+                            &lt;div className="mb-3">
+                                &lt;label className="form-label">Price:&lt;/label>
+                                &lt;input 
+                                    type="number" 
+                                    className="form-control" 
+                                    value={itemPrice} 
+                                    onChange={(e) => setItemPrice(parseFloat(e.target.value))} 
+                                />
+                            &lt;/div>
+        
+                            {/* Calories Input */}
+                            &lt;div className="mb-3">
+                                &lt;label className="form-label">Calories:&lt;/label>
+                                &lt;input 
+                                    type="number" 
+                                    className="form-control" 
+                                    value={itemCalories} 
+                                    onChange={(e) => setItemCalories(parseInt(e.target.value))} 
+                                />
+                            &lt;/div>
+                        &lt;/div>
+                        &lt;div className="modal-footer">
+                            &lt;button 
+                                type="button" 
+                                className="btn btn-success btn-lg" 
+                                onClick={addItem}
+                            >
+                                Save
+                            &lt;/button>
+                            &lt;button 
+                                type="button" 
+                                className="btn btn-danger btn-lg" 
+                                onClick={removeItem}
+                            >
+                                Remove
+                            &lt;/button>
+                            &lt;button 
+                                type="button" 
+                                className="btn btn-secondary btn-lg" 
+                                onClick={() => setSelectedItem(null)}
+                            >
+                                Cancel
+                            &lt;/button>
+                        &lt;/div>
+                    &lt;/div>
+                &lt;/div>
+            &lt;/div>
+        );
+        
+    }
+        
+    
+    
+
+    return (
+        &lt;div className="container-fluid p-0">
+            &lt;EmployeeLogInHeader />
+
+            &lt;div className="d-flex">
+                {/* Sidebar Navigation */}
+                &lt;div className="bg-light p-4" style={{ width: '250px', position: 'sticky', top: '0', height: '100vh' }}>
+                    &lt;ul className="nav flex-column">
+                        &lt;li className="nav-item mb-3">
+                            &lt;button className="btn btn-outline-secondary btn-lg w-100" onClick={() => handleNavigation('entrees')}>Entrees&lt;/button>
+                        &lt;/li>
+                        &lt;li className="nav-item mb-3">
+                            &lt;button className="btn btn-outline-secondary btn-lg w-100" onClick={() => handleNavigation('sides')}>Sides&lt;/button>
+                        &lt;/li>
+                        &lt;li className="nav-item mb-3">
+                            &lt;button className="btn btn-outline-secondary btn-lg w-100" onClick={() => handleNavigation('appetizers')}>Appetizers&lt;/button>
+                        &lt;/li>
+                        &lt;li className="nav-item mb-3">
+                            &lt;button className="btn btn-outline-secondary btn-lg w-100" onClick={() => handleNavigation('drinks')}>Drinks&lt;/button>
+                        &lt;/li>
+                        &lt;li className="nav-item mb-3">
+                            &lt;button className="btn btn-outline-secondary btn-lg w-100" onClick={() => handleNavigation('seasonal')}>Seasonal&lt;/button>
+                        &lt;/li>
+                    &lt;/ul>
+                &lt;/div>
+
+                &lt;div className="container mt-4">
+                    &lt;h1 className="text-center mb-4">Menu&lt;/h1>
+                    &lt;div className="content">
+                        &lt;section id="entrees" className="mb-5">
+                            &lt;h2 className="text-center">Entrees&lt;/h2>
+                            &lt;div className="row">
+                                {renderMenuItems(entrees, "Entree")}
+                            &lt;/div>
+                            &lt;button
+                                className="btn btn-outline-success btn-lg w-100 mt-3"
+                                onClick={() => handlePopup(null, "Entree")} // Opens the popup with category
+                            >
+                                Add New Item
+                            &lt;/button>
+                        &lt;/section>
+
+                        &lt;section id="sides" className="mb-5">
+                            &lt;h2 className="text-center">Sides&lt;/h2>
+                            &lt;div className="row">
+                                {renderMenuItems(sides, "Side")}
+                            &lt;/div>
+                            &lt;button
+                                className="btn btn-outline-success btn-lg w-100 mt-3"
+                                onClick={() => handlePopup(null, "Side")} // Opens the popup with category
+                            >
+                                Add New Item
+                            &lt;/button>
+                        &lt;/section>
+
+                        &lt;section id="appetizers" className="mb-5">
+                            &lt;h2 className="text-center">Appetizers&lt;/h2>
+                            &lt;div className="row">
+                                {renderMenuItems(appetizers, "Appetizer")}
+                            &lt;/div>
+                            &lt;button
+                                className="btn btn-outline-success btn-lg w-100 mt-3"
+                                onClick={() => handlePopup(null, "Appetizer")} // Opens the popup with category
+                            >
+                                Add New Item
+                            &lt;/button>
+                        &lt;/section>
+
+                        &lt;section id="drinks" className="mb-5">
+                            &lt;h2 className="text-center">Drinks&lt;/h2>
+                            &lt;div className="row">
+                                {renderMenuItems(drinks, "Drink")}
+                            &lt;/div>
+                            &lt;button
+                                className="btn btn-outline-success btn-lg w-100 mt-3"
+                                onClick={() => handlePopup(null, "Drink")} // Opens the popup with category
+                            >
+                                Add New Item
+                            &lt;/button>
+                        &lt;/section>
+
+                        &lt;section id="seasonal" className="mb-5">
+                            &lt;h2 className="text-center">Seasonal&lt;/h2>
+                            &lt;div className="row">
+                                {renderMenuItems(seasonal, "Seasonal")}
+                            &lt;/div>
+                            &lt;button
+                                className="btn btn-outline-success btn-lg w-100 mt-3"
+                                onClick={() => handlePopup(null, "Seasonal")} // Opens the popup with category
+                            >
+                                Add New Item
+                            &lt;/button>
+                        &lt;/section>
+                    &lt;/div>
+                &lt;/div>
+            &lt;/div>
+
+            
+            {renderPopup()}
+        &lt;/div>
+    );
+}
+
+export default Menu;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-ConfirmationPage.html">ConfirmationPage</a></li><li><a href="module-CreditCardPopUp.html">CreditCardPopUp</a></li><li><a href="module-ManagerHomePage.html">ManagerHomePage</a></li><li><a href="module-OrderPage.html">OrderPage</a></li><li><a href="module-Page.html">Page</a></li><li><a href="module-api_getInventory.html">api/getInventory</a></li><li><a href="module-api_getItemSizes.html">api/getItemSizes</a></li><li><a href="module-api_getMenu.html">api/getMenu</a></li><li><a href="module-api_getProducts.html">api/getProducts</a></li><li><a href="module-api_getReports.html">api/getReports</a></li><li><a href="module-employee_cashier_order_confirmation_page.html">employee/cashier/order/confirmation/page</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Appetizer">Appetizer</a></li><li><a href="global.html#BootstrapClient">BootstrapClient</a></li><li><a href="global.html#CACHE_DURATION">CACHE_DURATION</a></li><li><a href="global.html#Cart">Cart</a></li><li><a href="global.html#CartPage">CartPage</a></li><li><a href="global.html#CartPageWrapper">CartPageWrapper</a></li><li><a href="global.html#CashConfirmation">CashConfirmation</a></li><li><a href="global.html#Chat">Chat</a></li><li><a href="global.html#ChatBot">ChatBot</a></li><li><a href="global.html#ClockPage">ClockPage</a></li><li><a href="global.html#ContactForm">ContactForm</a></li><li><a href="global.html#ContactPage">ContactPage</a></li><li><a href="global.html#CustomerHeader">CustomerHeader</a></li><li><a href="global.html#CustomerLoginForm">CustomerLoginForm</a></li><li><a href="global.html#CustomerLoginPage">CustomerLoginPage</a></li><li><a href="global.html#CustomerPage">CustomerPage</a></li><li><a href="global.html#DiscountPopUp">DiscountPopUp</a></li><li><a href="global.html#Drink">Drink</a></li><li><a href="global.html#EmployeeCard">EmployeeCard</a></li><li><a href="global.html#EmployeeDetails">EmployeeDetails</a></li><li><a href="global.html#EmployeeHeader">EmployeeHeader</a></li><li><a href="global.html#EmployeeHomePage">EmployeeHomePage</a></li><li><a href="global.html#EmployeeInfo">EmployeeInfo</a></li><li><a href="global.html#EmployeeLogInHeader">EmployeeLogInHeader</a></li><li><a href="global.html#EmployeeLoginButton">EmployeeLoginButton</a></li><li><a href="global.html#EmployeeLoginPage">EmployeeLoginPage</a></li><li><a href="global.html#EmployeePage">EmployeePage</a></li><li><a href="global.html#EmployeePay">EmployeePay</a></li><li><a href="global.html#Entree">Entree</a></li><li><a href="global.html#GET">GET</a></li><li><a href="global.html#GoogleTranslate">GoogleTranslate</a></li><li><a href="global.html#GuestLoginForm">GuestLoginForm</a></li><li><a href="global.html#Inventory">Inventory</a></li><li><a href="global.html#InventoryPopup">InventoryPopup</a></li><li><a href="global.html#ItemModal">ItemModal</a></li><li><a href="global.html#KioskPage">KioskPage</a></li><li><a href="global.html#LoginForm">LoginForm</a></li><li><a href="global.html#LoyaltyLoginForm">LoyaltyLoginForm</a></li><li><a href="global.html#LoyaltyLoginPage">LoyaltyLoginPage</a></li><li><a href="global.html#MealModal">MealModal</a></li><li><a href="global.html#MealSelectionPage">MealSelectionPage</a></li><li><a href="global.html#Menu">Menu</a></li><li><a href="global.html#MenuBoardPage">MenuBoardPage</a></li><li><a href="global.html#MenuPopularity">MenuPopularity</a></li><li><a href="global.html#MobilePage">MobilePage</a></li><li><a href="global.html#OrderCard">OrderCard</a></li><li><a href="global.html#OrderInfo">OrderInfo</a></li><li><a href="global.html#POST">POST</a></li><li><a href="global.html#PUT">PUT</a></li><li><a href="global.html#Page">Page</a></li><li><a href="global.html#PaymentPopUp">PaymentPopUp</a></li><li><a href="global.html#ProductUsageChart">ProductUsageChart</a></li><li><a href="global.html#RenderMenu">RenderMenu</a></li><li><a href="global.html#SalesChart">SalesChart</a></li><li><a href="global.html#SalesReport">SalesReport</a></li><li><a href="global.html#Side">Side</a></li><li><a href="global.html#SizeSelection">SizeSelection</a></li><li><a href="global.html#XReport">XReport</a></li><li><a href="global.html#ZReport">ZReport</a></li><li><a href="global.html#authOptions">authOptions</a></li><li><a href="global.html#cache">cache</a></li><li><a href="global.html#fetchEmployees">fetchEmployees</a></li><li><a href="global.html#fetchPayData">fetchPayData</a></li><li><a href="global.html#fetchPopularItems">fetchPopularItems</a></li><li><a href="global.html#fetchProductUsageData">fetchProductUsageData</a></li><li><a href="global.html#fetchWeather">fetchWeather</a></li><li><a href="global.html#fetchZReport">fetchZReport</a></li><li><a href="global.html#formatCurrency">formatCurrency</a></li><li><a href="global.html#handleNChange">handleNChange</a></li><li><a href="global.html#handleSubmit">handleSubmit</a></li><li><a href="global.html#inter">inter</a></li><li><a href="global.html#metadata">metadata</a></li><li><a href="global.html#pool">pool</a></li><li><a href="global.html#query">query</a></li><li><a href="global.html#weatherMap">weatherMap</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Wed Dec 11 2024 23:17:49 GMT-0600 (Central Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

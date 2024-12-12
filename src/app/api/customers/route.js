@@ -2,6 +2,12 @@
 import { NextResponse } from 'next/server';
 import { Client } from 'pg';
 
+/**
+ * Handles the PUT request to update customer rewards points.
+ * 
+ * @param {Request} request - The incoming request object.
+ * @returns {Promise<Response>} - The response object.
+ */
 export async function PUT(request) {
   const connectionString = process.env.POSTGRES_URL;
   const client = new Client({ connectionString });
@@ -46,6 +52,11 @@ export async function PUT(request) {
   }
 }
 
+/**
+ * Handles the GET request to retrieve customer data.
+ * 
+ * @returns {Promise<Response>} - The response object.
+ */
 export async function GET() {
     const connectionString = process.env.POSTGRES_URL;
     const client = new Client({ connectionString });
