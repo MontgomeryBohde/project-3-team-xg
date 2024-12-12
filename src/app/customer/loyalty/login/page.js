@@ -7,6 +7,7 @@ const LoyaltyLoginPage = () => {
     useEffect(() => {
         // Delete items from localStorage on page load
         localStorage.removeItem('loyaltyCustomer');
+        localStorage.removeItem('loggedInCustomer');
         localStorage.removeItem('loggedInCustomerName');
     }, []);
 

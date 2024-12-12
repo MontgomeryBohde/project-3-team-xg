@@ -20,11 +20,11 @@ const CustomerLoginForm = () => {
             // Validate the 4-digit code
             if (code === "1234") {
                 // Simulate fetching customer data associated with the code
-                const customer = { name: "Guest 1", id: 1 }; // Replace with real customer data if applicable
+                const customer = { name: "Mike Moore", id: 1 }; // Replace with real customer data if applicable
 
                 // Store customer in sessionStorage
-                window.sessionStorage.setItem("loggedInCustomer", JSON.stringify(customer));
-                window.sessionStorage.setItem("loggedInCustomerName", customer.name);
+                window.localStorage.setItem("loggedInCustomer", JSON.stringify(customer));
+                window.localStorage.setItem("loggedInCustomerName", customer.name);
 
                 // Navigate to menu selection
                 router.push("/customer/kiosk/menu-selection/");

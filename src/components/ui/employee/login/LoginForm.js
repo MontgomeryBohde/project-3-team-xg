@@ -3,6 +3,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from "next/navigation";
+import { signIn } from 'next-auth/react';
+import { FaGithub } from 'react-icons/fa'; // Import GitHub icon
 
 const LoginForm = () => {
   const [userId, setUserId] = useState('');
@@ -58,6 +60,12 @@ const LoginForm = () => {
     router.push('/employee/home');
   };
 
+  const handleGithubLogin = () => {
+    const employee = employees.find(emp => emp.id.toString() === 1);
+    localStorage.setItem('loggedInEmployee', JSON.stringify(employee));
+    signIn("github", { callbackUrl: "/employee/home"});
+  };
+
   return (
     <div id="form-wrapper">
       <form className="p-4" onSubmit={handleSubmit}>
@@ -92,6 +100,15 @@ const LoginForm = () => {
 
         <button type="submit" className="btn btn-primary bg-danger w-100">
           Submit
+        </button>
+        {/* GitHub Login Button */}
+        <button
+          type="button"
+          className="btn btn-dark w-100 mt-3 d-flex align-items-center justify-content-center"
+          onClick={handleGithubLogin}
+        >
+          <FaGithub size={20} className="me-2" />
+          Login with GitHub
         </button>
       </form>
     </div>

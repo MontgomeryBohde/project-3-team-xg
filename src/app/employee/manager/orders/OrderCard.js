@@ -46,13 +46,13 @@ const OrderCard = ({ order, onDelete }) => {
 
                             {order.side && order.side.length > 0 && (
                                 <div className="mt-3">
-                                    <div className="fs-4 fw-bold mt-2">Entree(s):</div>
+                                    <div className="fs-4 fw-bold mt-2">Side(s):</div>
                                     <div className="fs-5">{order.side.join(', ')}</div>
                                 </div>
                             )}
 
                             <div className="mt-3">
-                                <div className="fs-4 fw-bold mt-2">Sides, Appetizers, and Drinks:</div>
+                                <div className="fs-4 fw-bold mt-2">Entrees, Appetizers, and Drinks:</div>
                                 {Array.isArray(order.entree_names) && order.entree_names.length > 0 ? (
                                     order.entree_names.map((entree, index) => (
                                         <div key={index} className="fs-5">{entree}</div>
