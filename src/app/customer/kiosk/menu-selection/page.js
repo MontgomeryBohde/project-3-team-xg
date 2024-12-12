@@ -400,12 +400,12 @@ const MealSelectionPage = () => {
                                         </div>
                                     ) : (
                                         <div className="py-3" id="rewards">
-                                            <p>You have not claimed any rewards yet!</p>
+                                            <p>You have not claimed any rewards yet.</p>
                                         </div>
                                     )
                                 ) : (
                                     <div className="py-3" id="rewards">
-                                        <p>You are logged in as a guest and thus do not have any rewards.</p>
+                                        <p>You have not claimed any rewards yet.</p>
                                     </div>
                                 )}
 
