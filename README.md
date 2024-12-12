@@ -1,4 +1,5 @@
-# This is the Git repo for Team XG's [Panda Express Website](https://project-3-team-xg.vercel.app/) for CSCE 331 Fall 2024.
+# Panda Express POS System
+This is the Git repo for Team XG's [Panda Express POS Website](https://project-3-team-xg.vercel.app/) for CSCE 331 Project 3 Fall 2024.
 
 ## Documentation
 A publically hosted JSDoc documentation wiki for this project can be found [here](https://montgomerybohde.github.io/project-3-team-xg/).
