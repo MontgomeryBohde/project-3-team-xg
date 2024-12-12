@@ -15,7 +15,9 @@ const EmployeeHomePage = () => {
 		if (loggedInEmployee && loggedInEmployee !== "undefined") {
 			setEmployee(JSON.parse(loggedInEmployee));
 		} else {
-		// Redirect to login if no employee data is found
+		    // Redirect to login if no employee data is found
+            console.log("loggedInEmployee: ", loggedInEmployee);
+            console.log("No employee data found. Redirecting to login page...");
 			router.push("/employee");
 		}
 	}, [router]);

@@ -71,6 +71,7 @@ const EmployeeLogInHeader = () => {
   const handleLogout = () => {
     localStorage.removeItem('loggedInEmployee'); // Optional: clear employee data
     localStorage.setItem('loggedIn', 'false'); // Set loggedIn to false on logout
+    console.log("Logged out");
     router.push('/employee');
   };
 
