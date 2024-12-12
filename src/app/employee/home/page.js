@@ -1,14 +1,33 @@
-// src/app/employee/home/page.js
+/**
+ * @file page.js
+ * @description Employee home page, providing navigation options for Clock In/Out, Cashier, and Manager functionalities. 
+ * Redirects to the login page if no employee is logged in.
+ * @module app/employee/home/page
+ * @requires React
+ * @requires useRouter
+ * @requires EmployeeLogInHeader
+ */
+
 "use client";
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import EmployeeLogInHeader from "@/components/ui/employee/header/EmployeeLogInHeader";
 
+/**
+ * EmployeeHomePage component for the employee dashboard.
+ * Displays navigation options based on the logged-in employee's role.
+ * 
+ * @component
+ */
 const EmployeeHomePage = () => {
 	const [employee, setEmployee] = useState(null);
 	const router = useRouter();
 
+    /**
+     * Retrieves the logged-in employee's information from local storage.
+     * Redirects to the login page if no employee data is found.
+     */
 	useEffect(() => {
 		// Retrieve the logged-in employee data from localStorage
 		const loggedInEmployee = localStorage.getItem("loggedInEmployee");
@@ -26,6 +45,10 @@ const EmployeeHomePage = () => {
 		return <div>Loading...</div>; // Loading state while fetching employee data
 	}
 
+    /**
+     * Navigates to a specified path.
+     * @param {string} path - The path to navigate to.
+     */
 	const handleNavigation = (path) => {
 		router.push(path);
 	};

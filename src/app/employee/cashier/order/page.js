@@ -1,4 +1,19 @@
-// src/app/employee/cashier/order/page.js
+/**
+ * @file page.js
+ * @description Order page for the cashier interface, allowing employees to create, customize, and manage meal orders. 
+ * Provides functionalities for selecting meal types, adding menu items, customizing sizes, and managing the cart.
+ * @module app/employee/cashier/order/page
+ * @requires React
+ * @requires Link
+ * @requires Cart
+ * @requires EmployeeLogInHeader
+ * @requires Appetizer
+ * @requires Entree
+ * @requires Side
+ * @requires Drink
+ * @requires SizeSelection
+ */
+
 'use client';
 import React, { useState, useEffect } from 'react';
 import Cart from '@/components/ui/employee/cashier/order/Cart';
@@ -10,6 +25,12 @@ import Side from '@/components/ui/employee/cashier/order/Side';
 import Drink from '@/components/ui/employee/cashier/order/Drink';
 import SizeSelection from '@/components/ui/employee/cashier/order/SizeSelection';
 
+/**
+ * OrderPage component for managing orders in the cashier interface.
+ * Handles meal customization, menu navigation, cart management, and checkout.
+ * 
+ * @component
+ */
 const OrderPage = () => {
     const [entreeCount, setEntreeCount] = useState(0);
     const [sideCount, setSideCount] = useState(0);
@@ -34,12 +55,17 @@ const OrderPage = () => {
         { item_name: "Family Meal", sides: 2, entrees: 3, price: 32.00 }
     ];
 
+    /**
+     * Logs the current state of the in-progress meal whenever it changes.
+     */
     useEffect(() => {
         console.log('Current inProgressMeal:', inProgressMeal);
     }, [inProgressMeal]);
 
     
-    // Fetch menu items from the database using the API endpoint
+    /**
+     * Fetches menu items from the API and categorizes them into appetizers, entrees, sides, and drinks.
+     */
     useEffect(() => {
         const fetchMenuItems = async () => {
             try {
@@ -63,6 +89,9 @@ const OrderPage = () => {
         fetchMenuItems();
     }, []);    
 
+    /**
+     * Restores cart items from sessionStorage when navigating back or refreshing the page.
+     */
     useEffect(() => {
         const handlePopState = () => {
             // Retrieve cart items from sessionStorage when navigating back
@@ -82,7 +111,10 @@ const OrderPage = () => {
         };
     }, []);    
 
-    // Start meal order without adding it to the cart immediately
+    /**
+     * Initializes a new meal order based on the selected meal type.
+     * @param {object} mealType - The selected meal type.
+     */
     const handleStartMealOrder = (mealType) => {
         setInProgressMeal({ 
             ...mealType, 
@@ -96,7 +128,12 @@ const OrderPage = () => {
         setWarningMessage('');
         setCurrentMenu('mealSelection');
     };    
-    // Add entree or side to the in-progress meal
+
+    /**
+     * Adds an item to the in-progress meal based on its type (entree or side).
+     * @param {object} item - The menu item to add.
+     * @param {string} type - The type of item ('entree' or 'side').
+     */
     const handleAddToInProgressMeal = (item, type) => {
         if (!inProgressMeal) {
             console.log('In-progress meal is null');
@@ -123,7 +160,9 @@ const OrderPage = () => {
         console.log('Updated meal:', updatedMeal);
     };    
 
-    // Complete the in-progress meal and add to cart
+    /**
+     * Completes the in-progress meal and adds it to the cart.
+     */
     const handleCompleteMealOrder = () => {
         if (inProgressMeal && entreeCount === selectedMealType.entrees && sideCount === selectedMealType.sides) {
             setCart([...cart, inProgressMeal]);
@@ -137,7 +176,9 @@ const OrderPage = () => {
         }
     };
 
-    // Handle selecting an item to choose size
+    /**
+     * Handles adding an item to the cart with a selected size.
+     */
     const handleAddToCart = (item, size, price) => {
         try {
             setCart([...cart, { ...item, size: size, price: price, quantity: 1 }]);
@@ -149,6 +190,10 @@ const OrderPage = () => {
         }
     };
 
+    /**
+     * Selects an item and fetches its available sizes for customization.
+     * @param {*} item 
+     */
     const handleSelectItemForSize = async (item) => {
         try {
             const response = await fetch(`/api/getItemSizes?item_id=${item.id}`);
@@ -180,6 +225,9 @@ const OrderPage = () => {
         }
     };
 
+    /**
+     * Handles the navigation to the confirmation page by saving the cart to sessionStorage.
+     */
     const handleNavigateToConfirmation = () => {
         // Save the current cart state to local storage before navigating
         sessionStorage.setItem('cart', JSON.stringify(cart));
