@@ -12,7 +12,7 @@ const EmployeeHomePage = () => {
 	useEffect(() => {
 		// Retrieve the logged-in employee data from localStorage
 		const loggedInEmployee = localStorage.getItem("loggedInEmployee");
-		if (loggedInEmployee) {
+		if (loggedInEmployee && loggedInEmployee !== "undefined") {
 			setEmployee(JSON.parse(loggedInEmployee));
 		} else {
 		// Redirect to login if no employee data is found
