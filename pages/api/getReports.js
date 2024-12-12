@@ -1,7 +1,26 @@
-// pages/api/getReports.js
+/**
+ * @file getReports.js
+ * @description API handler for generating various types of reports including X-reports, Z-reports, sales summaries, and popularity rankings.
+ * @module api/getReports
+ * @requires @lib/db
+ */
 import { query } from '@lib/db';
 
+/**
+ * API handler function for generating reports.
+ * Supports creating X-reports, Z-reports, and other statistical summaries.
+ * 
+ * @param {object} req - The HTTP request object.
+ * @param {object} res - The HTTP response object.
+ */
 export default async function handler(req, res) {
+    /**
+     * Extract query parameters.
+     * @type {string} type - Type of report to generate (e.g., xReport, zReport, allSales, popularity).
+     * @type {string|number} [period] - Time period for filtering sales (e.g., past N days).
+     * @type {string|number} [hour] - Specific hour to filter sales for X-reports.
+     * @type {number} [n] - Limit for popularity results.
+     */
     const { type, period, hour, n } = req.query;
 
     if (req.method === 'GET') {
@@ -9,6 +28,11 @@ export default async function handler(req, res) {
             let result;
 
             switch (type) {
+                /**
+                 * Generate an X-report for sales by hour.
+                 * @route GET /api/getReports?type=xReport
+                 * @param {number} hour - Specific hour to filter sales data.
+                 */
                 case 'xReport': {
 					// Use the provided hour directly for filtering
 					result = await query(
@@ -31,6 +55,10 @@ export default async function handler(req, res) {
 					break;
 				}
 				
+                /**
+                 * Generate a Z-report for daily sales summaries.
+                 * @route GET /api/getReports?type=zReport
+                 */
                 case 'zReport': {
 					result = await query(
 						`
@@ -50,6 +78,11 @@ export default async function handler(req, res) {
 					break;
 				}
 
+                /**
+                 * Fetch all sales summaries over a given period.
+                 * @route GET /api/getReports?type=allSales
+                 * @param {number} period - Number of days to filter.
+                 */
                 case 'allSales': {
                     const dateFilter = period
                         ? `WHERE placed_time >= NOW() - INTERVAL '${parseInt(period)} days'`
@@ -65,6 +98,11 @@ export default async function handler(req, res) {
                     break;
                 }
 
+                /**
+                 * Generate a popularity report for top items.
+                 * @route GET /api/getReports?type=popularity
+                 * @param {number} n - Maximum number of top items to return.
+                 */
                 case 'popularity': {
                     if (!n || isNaN(parseInt(n, 10))) {
                         return res.status(400).json({ success: false, error: 'Invalid or missing "n" parameter' });

@@ -1,6 +1,25 @@
+/**
+ * @file getProducts.js
+ * @description API handler for retrieving product information including usage, pricing, and menu details.
+ * @module api/getProducts
+ * @requires @lib/db
+ */
+
 import { query } from '@lib/db';
 
+/**
+ * API handler function for managing product-related queries.
+ * Supports fetching usage statistics, pricing, and menu details.
+ * 
+ * @param {object} req - The HTTP request object.
+ * @param {object} res - The HTTP response object.
+ */
 export default async function handler(req, res) {
+    /**
+     * Extract query parameters.
+     * @type {string} type - Type of the query (e.g., usage, price, menu).
+     * @type {number} [limit=10] - Maximum number of results (default: 10).
+     */
     const { type, limit } = req.query;
     const limitValue = limit ? parseInt(limit, 10) : 10;
 
@@ -9,6 +28,11 @@ export default async function handler(req, res) {
             let result;
 
             switch (type) {
+                /**
+                 * Fetch product usage statistics.
+                 * @route GET /api/getProducts?type=usage
+                 * @param {number} limit - Maximum number of items to return.
+                 */
                 case 'usage': {
                     console.log("Executing usage query");
 
@@ -40,6 +64,11 @@ export default async function handler(req, res) {
                     result = await query(queryText, [limitValue]);
                     break;
                 }
+                /**
+                 * Fetch product prices for specific items.
+                 * @route POST /api/getProducts?type=price
+                 * @param {string[]} foodNames - List of food item names to fetch prices for.
+                 */
                 case 'price': {
                     const { foodNames } = req.body || {};
 
@@ -64,6 +93,10 @@ export default async function handler(req, res) {
 
                     break;
                 }
+                /**
+                 * Fetch a list of menu items.
+                 * @route GET /api/getProducts?type=menu
+                 */
                 case 'menu': {
                     console.log("Fetching menu items");
                     const queryText = `
@@ -74,6 +107,10 @@ export default async function handler(req, res) {
                     break;
                 }
 
+                /**
+                 * Fetch menu items with sizes and associated data.
+                 * @route GET /api/getProducts?type=menu-with-sizes
+                 */
                 case 'menu-with-sizes': {
                     console.log("Fetching menu items with sizes, IDs, and calories");
                     const queryText = `
@@ -94,8 +131,6 @@ export default async function handler(req, res) {
                     result = await query(queryText);
                     break;
                 }
-
-                
 
                 default:
                     return res.status(400).json({ error: 'Invalid action' });
