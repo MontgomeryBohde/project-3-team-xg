@@ -10,9 +10,9 @@ npm run dev
 The website will be hosted at `localhost:3000`.
 
 ## Project Contributors
-- [Rebecca Chen]
-- [Montgomery Bohde]
-- [Tee Li]
-- [Alisa Lu]
-- [Risha Thimmancherla]
+- [Rebecca Chen](https://github.com/rrrrrrr03)
+- [Montgomery Bohde](https://github.com/MontgomeryBohde)
+- [Tee Li](https://github.com/RainSuds)
+- [Alisa Lu](https://github.com/alisayiranlu)
+- [Risha Thimmancherla](https://github.com/rishathi)
 
