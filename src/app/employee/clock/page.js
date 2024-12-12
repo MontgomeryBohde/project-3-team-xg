@@ -1,6 +1,21 @@
-// src/app/employee/clock/page.js
+/**
+ * @file page.js
+ * @description Clock In/Out page for employees. Allows employees to manage their shifts by clocking in and out. 
+ * Fetches the current active shift and updates shift information in the backend.
+ * @module app/employee/clock/page
+ * @requires React
+ * @requires useRouter
+ * @requires EmployeeLogInHeader
+ */
+
 "use client";
 
+/**
+ * ClockPage component for managing employee shifts.
+ * Handles fetching the current shift, clocking in, and clocking out.
+ * 
+ * @component
+ */
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import EmployeeLogInHeader from "@/components/ui/employee/header/EmployeeLogInHeader";
@@ -12,6 +27,9 @@ const ClockPage = () => {
     const [successMessage, setSuccessMessage] = useState(null);
     const router = useRouter();
 
+    /**
+     * Loads the logged-in employee's information from local storage and fetches their current shift.
+     */
     useEffect(() => {
         const loggedInEmployee = localStorage.getItem("loggedInEmployee");
         if (loggedInEmployee) {
@@ -25,6 +43,11 @@ const ClockPage = () => {
         }
     }, [router]);
 
+    /**
+     * Fetches the current active shift for the logged-in employee.
+     * 
+     * @param {number} employeeId - The ID of the employee whose shift is being fetched.
+     */
     const fetchCurrentShift = async (employeeId) => {
         try {
             const response = await fetch(`/api/getShifts`, {
@@ -48,6 +71,9 @@ const ClockPage = () => {
         }
     };
 
+    /**
+     * Handles clocking in for the employee. Creates a new shift in the backend.
+     */
     const handleClockIn = async () => {
         setError(null);
         setSuccessMessage(null);
@@ -72,6 +98,9 @@ const ClockPage = () => {
         }
     };
 
+    /**
+     * Handles clocking out for the employee. Ends the current shift in the backend.
+     */
     const handleClockOut = async () => {
         setError(null);
         setSuccessMessage(null);
