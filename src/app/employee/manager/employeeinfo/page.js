@@ -6,9 +6,19 @@ import EmployeeLogInHeader from '@/components/ui/employee/header/EmployeeLogInHe
 import EmployeeDetails from "@/components/ui/employee/manager/employee/EmployeeDetails";
 import EmployeePay from "@/components/ui/employee/manager/employee/EmployeePay";
 
+/**
+ * Renders the main component for displaying innformation about all employees.
+ *
+ * @returns {JSX.Element} The JSX element representing this component.
+ */
 const EmployeeInfo = () => {
     const [activeTab, setActiveTab] = useState("details");
 
+    /**
+     * Renders the right tab content based on the whichever tab is active currently.
+     *
+     * @returns {JSX.Element} The JSX element for the active tab's content.
+     */
     const renderTabContent = () => {
         if (activeTab === "details") {
             return <EmployeeDetails />;

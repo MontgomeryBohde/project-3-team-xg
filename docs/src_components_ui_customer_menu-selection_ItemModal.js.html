@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: src/components/ui/customer/menu-selection/ItemModal.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: src/components/ui/customer/menu-selection/ItemModal.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// src/components/ui/customer/menu-selection/ItemModal.js
+
+/**
+ * @fileoverview ItemModal component for displaying item details and size selection in a modal.
+ * @requires React
+ */
+
+import React from "react";
+
+/**
+ * ItemModal component displays a modal with item details and size selection.
+ *
+ * @param {Object} props - The component props.
+ * @param {Object} props.item - The item details.
+ * @param {Array} props.sizes - The available sizes for the item.
+ * @param {string} props.selectedSize - The currently selected size.
+ * @param {Function} props.setSelectedSize - Function to set the selected size.
+ * @param {Function} props.onClose - Function to handle closing the modal.
+ * @param {Function} props.onAdd - Function to handle adding the item.
+ * @returns {JSX.Element|null} The rendered component or null if no item is provided.
+ */
+const ItemModal = ({ item, sizes, selectedSize, setSelectedSize, onClose, onAdd }) => {
+    if (!item) return null;
+
+    /**
+     * Handles the change of the selected size.
+     *
+     * @param {Object} e - The event object.
+     */
+    const handleSizeChange = (e) => {
+        setSelectedSize(e.target.value); // Update the selected size
+    };
+
+    const selectedSizeDetails = sizes.find(size => size.item_size === selectedSize);
+
+    return (
+        &lt;div className="modal fade show d-block" tabIndex="-1" role="dialog">
+            &lt;div
+                className="modal-dialog"
+                role="document"
+                style={{ maxWidth: "500px", margin: "1.75rem auto" }} // Adjust width and margin
+            >
+                &lt;div className="modal-content">
+                    {/* Modal Header */}
+                    &lt;div className="modal-header">
+                        &lt;h5 className="modal-title">{item.item_name}&lt;/h5>
+                        &lt;button
+                            type="button"
+                            className="btn-close"
+                            aria-label="Close"
+                            onClick={onClose}
+                        >&lt;/button>
+                    &lt;/div>
+
+                    {/* Modal Body */}
+                    &lt;div className="modal-body">
+                        &lt;div className="text-center">
+                            {item.image_url &amp;&amp; (
+                                &lt;img
+                                    src={item.image_url}
+                                    alt={item.item_name}
+                                    className="img-fluid rounded mb-3"
+                                    style={{ maxHeight: "200px", objectFit: "cover" }} // Reduced image height
+                                />
+                            )}
+                        &lt;/div>
+                        &lt;p className="text-muted mb-3 text-center">{item.descr}&lt;/p>
+
+                        {/* Size Details */}
+                        {selectedSizeDetails &amp;&amp; (
+                            &lt;div className="mb-2 text-center">
+                                &lt;p className="mb-1">
+                                    &lt;strong>Calories:&lt;/strong> {selectedSizeDetails.calories} cal
+                                &lt;/p>
+                                &lt;p className="mb-1">
+                                    &lt;strong>Price:&lt;/strong> ${selectedSizeDetails.price}
+                                &lt;/p>
+                            &lt;/div>
+                        )}
+
+                        {/* Size Dropdown */}
+                        &lt;div className="text-center">
+                            &lt;label htmlFor="sizeSelect" className="form-label">
+                                &lt;strong>Select Size:&lt;/strong>
+                            &lt;/label>
+                            &lt;select
+                                id="sizeSelect"
+                                className="form-select"
+                                value={selectedSize}
+                                onChange={handleSizeChange}
+                                style={{ maxWidth: "300px", margin: "0 auto" }}
+                            >
+                                {sizes.map(size => (
+                                    &lt;option key={size.item_size} value={size.item_size}>
+                                        {size.item_size}
+                                    &lt;/option>
+                                ))}
+                            &lt;/select>
+                        &lt;/div>
+                    &lt;/div>
+
+                    {/* Modal Footer */}
+                    &lt;div className="modal-footer justify-content-center">
+                        &lt;button
+                            type="button"
+                            className="btn btn-secondary"
+                            onClick={onClose}
+                        >
+                            Close
+                        &lt;/button>
+                        &lt;button
+                            type="button"
+                            className="btn btn-danger"
+                            onClick={() => {
+                                onAdd(item, selectedSize);
+                                onClose();
+                            }}
+                        >
+                            Add to Cart
+                        &lt;/button>
+                    &lt;/div>
+                &lt;/div>
+            &lt;/div>
+        &lt;/div>
+    );
+};
+
+export default ItemModal;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-ConfirmationPage.html">ConfirmationPage</a></li><li><a href="module-CreditCardPopUp.html">CreditCardPopUp</a></li><li><a href="module-ManagerHomePage.html">ManagerHomePage</a></li><li><a href="module-OrderPage.html">OrderPage</a></li><li><a href="module-Page.html">Page</a></li><li><a href="module-api_getInventory.html">api/getInventory</a></li><li><a href="module-api_getItemSizes.html">api/getItemSizes</a></li><li><a href="module-api_getMenu.html">api/getMenu</a></li><li><a href="module-api_getProducts.html">api/getProducts</a></li><li><a href="module-api_getReports.html">api/getReports</a></li><li><a href="module-employee_cashier_order_confirmation_page.html">employee/cashier/order/confirmation/page</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Appetizer">Appetizer</a></li><li><a href="global.html#BootstrapClient">BootstrapClient</a></li><li><a href="global.html#CACHE_DURATION">CACHE_DURATION</a></li><li><a href="global.html#Cart">Cart</a></li><li><a href="global.html#CartPage">CartPage</a></li><li><a href="global.html#CartPageWrapper">CartPageWrapper</a></li><li><a href="global.html#CashConfirmation">CashConfirmation</a></li><li><a href="global.html#Chat">Chat</a></li><li><a href="global.html#ChatBot">ChatBot</a></li><li><a href="global.html#ClockPage">ClockPage</a></li><li><a href="global.html#ContactForm">ContactForm</a></li><li><a href="global.html#ContactPage">ContactPage</a></li><li><a href="global.html#CustomerHeader">CustomerHeader</a></li><li><a href="global.html#CustomerLoginForm">CustomerLoginForm</a></li><li><a href="global.html#CustomerLoginPage">CustomerLoginPage</a></li><li><a href="global.html#CustomerPage">CustomerPage</a></li><li><a href="global.html#DiscountPopUp">DiscountPopUp</a></li><li><a href="global.html#Drink">Drink</a></li><li><a href="global.html#EmployeeCard">EmployeeCard</a></li><li><a href="global.html#EmployeeDetails">EmployeeDetails</a></li><li><a href="global.html#EmployeeHeader">EmployeeHeader</a></li><li><a href="global.html#EmployeeHomePage">EmployeeHomePage</a></li><li><a href="global.html#EmployeeInfo">EmployeeInfo</a></li><li><a href="global.html#EmployeeLogInHeader">EmployeeLogInHeader</a></li><li><a href="global.html#EmployeeLoginButton">EmployeeLoginButton</a></li><li><a href="global.html#EmployeeLoginPage">EmployeeLoginPage</a></li><li><a href="global.html#EmployeePage">EmployeePage</a></li><li><a href="global.html#EmployeePay">EmployeePay</a></li><li><a href="global.html#Entree">Entree</a></li><li><a href="global.html#GET">GET</a></li><li><a href="global.html#GoogleTranslate">GoogleTranslate</a></li><li><a href="global.html#GuestLoginForm">GuestLoginForm</a></li><li><a href="global.html#Inventory">Inventory</a></li><li><a href="global.html#InventoryPopup">InventoryPopup</a></li><li><a href="global.html#ItemModal">ItemModal</a></li><li><a href="global.html#KioskPage">KioskPage</a></li><li><a href="global.html#LoginForm">LoginForm</a></li><li><a href="global.html#LoyaltyLoginForm">LoyaltyLoginForm</a></li><li><a href="global.html#LoyaltyLoginPage">LoyaltyLoginPage</a></li><li><a href="global.html#MealModal">MealModal</a></li><li><a href="global.html#MealSelectionPage">MealSelectionPage</a></li><li><a href="global.html#Menu">Menu</a></li><li><a href="global.html#MenuBoardPage">MenuBoardPage</a></li><li><a href="global.html#MenuPopularity">MenuPopularity</a></li><li><a href="global.html#MobilePage">MobilePage</a></li><li><a href="global.html#OrderCard">OrderCard</a></li><li><a href="global.html#OrderInfo">OrderInfo</a></li><li><a href="global.html#POST">POST</a></li><li><a href="global.html#PUT">PUT</a></li><li><a href="global.html#Page">Page</a></li><li><a href="global.html#PaymentPopUp">PaymentPopUp</a></li><li><a href="global.html#ProductUsageChart">ProductUsageChart</a></li><li><a href="global.html#RenderMenu">RenderMenu</a></li><li><a href="global.html#SalesChart">SalesChart</a></li><li><a href="global.html#SalesReport">SalesReport</a></li><li><a href="global.html#Side">Side</a></li><li><a href="global.html#SizeSelection">SizeSelection</a></li><li><a href="global.html#XReport">XReport</a></li><li><a href="global.html#ZReport">ZReport</a></li><li><a href="global.html#authOptions">authOptions</a></li><li><a href="global.html#cache">cache</a></li><li><a href="global.html#fetchEmployees">fetchEmployees</a></li><li><a href="global.html#fetchPayData">fetchPayData</a></li><li><a href="global.html#fetchPopularItems">fetchPopularItems</a></li><li><a href="global.html#fetchProductUsageData">fetchProductUsageData</a></li><li><a href="global.html#fetchWeather">fetchWeather</a></li><li><a href="global.html#fetchZReport">fetchZReport</a></li><li><a href="global.html#formatCurrency">formatCurrency</a></li><li><a href="global.html#handleNChange">handleNChange</a></li><li><a href="global.html#handleSubmit">handleSubmit</a></li><li><a href="global.html#inter">inter</a></li><li><a href="global.html#metadata">metadata</a></li><li><a href="global.html#pool">pool</a></li><li><a href="global.html#query">query</a></li><li><a href="global.html#weatherMap">weatherMap</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Wed Dec 11 2024 23:17:49 GMT-0600 (Central Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

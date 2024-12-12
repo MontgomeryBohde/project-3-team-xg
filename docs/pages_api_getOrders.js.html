@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: pages/api/getOrders.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: pages/api/getOrders.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { Pool } from 'pg';
+
+const pool = new Pool({
+    host: 'csce-315-db.engr.tamu.edu',
+    user: 'team_xg',
+    password: 'palenumber97',
+    database: 'team_xg_db',
+    port: 5432,
+});
+
+/**
+ * Handles the API requests for fetching a list of orders with information on the meal type, price, items, etc.
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @returns {void}
+ */
+export default async function handler(req, res) {
+    if (req.method === 'GET') {
+        try {
+            const query = `
+                SELECT
+    o.id AS order_id,
+    o.placed_time,
+    o.order_total,
+    o.payment_method,  -- Keep payment method from orders table
+
+    -- Retrieve all food item names associated with this order
+    ARRAY(
+        SELECT menu_item.item_name
+        FROM menu_items AS menu_item
+        WHERE menu_item.id = ANY(o.meal_item_ids)  -- Correctly using meal_item_ids
+    ) AS food_names,
+
+    -- Retrieve the meal type from the meal_items table
+    CASE
+        WHEN m.id IS NOT NULL THEN m.meal_type  -- Assuming meal_type is a field in meal_items
+        ELSE NULL
+    END AS meal_type,
+
+    -- Retrieve the side name associated with the meal item
+    CASE
+        WHEN m.side_id IS NOT NULL THEN side.item_name  -- side's name from menu_items
+        ELSE NULL
+    END AS side_name,
+
+    -- Retrieve all entree names associated with the meal item
+    CASE
+        WHEN m.entree_ids IS NOT NULL THEN 
+            ARRAY(
+                SELECT entree.item_name
+                FROM menu_items AS entree
+                WHERE entree.id = ANY(m.entree_ids)  -- Get entree names from menu_items
+            )
+        ELSE NULL
+    END AS entree_names
+
+FROM orders AS o
+LEFT JOIN meal_items AS m ON m.id = ANY(o.meal_item_ids)  -- Join meal_items on meal_item_ids in orders
+LEFT JOIN menu_items AS side ON side.id = m.side_id  -- Join menu_items as side for side_id
+LEFT JOIN menu_items AS entree ON entree.id = ANY(m.entree_ids)  -- Join menu_items as entree for entree_ids
+ORDER BY o.placed_time DESC
+LIMIT $1 OFFSET $2;
+
+;
+
+`
+
+const limit = parseInt(req.query.limit) || 100;  //100 items per page
+const offset = parseInt(req.query.offset) || 0;  //offset starts at 0
+
+
+const { rows } = await pool.query(query, [limit, offset]);
+
+/**
+ * Transforms the raw order data into a structured array of order.
+ * @param {Array} rows - An array of objects representing raw order data.
+ * @returns {Array} - An array of order objects with aggregated information.
+ */
+const orders = rows.reduce((acc, row) => {
+    const existingOrder = acc.find(order => order.id === row.order_id);
+    
+    if (existingOrder) {
+        // Ensure meal_type is an array and push the current meal_type if not already present
+        if (row.meal_type &amp;&amp; !existingOrder.meal_type.includes(row.meal_type)) {
+            existingOrder.meal_type.push(row.meal_type);
+        }
+
+        // Add new side if it's available and not already in the array
+        if (row.side_name &amp;&amp; !existingOrder.side.includes(row.side_name)) {
+            existingOrder.side.push(row.side_name);
+        }
+
+        // Push entree names only if they are available and unique
+        if (row.entree_names) {
+            existingOrder.entree_names = existingOrder.entree_names || [];
+            row.entree_names.forEach(entree => {
+                if (!existingOrder.entree_names.includes(entree)) {
+                    existingOrder.entree_names.push(entree);
+                }
+            });
+        }
+
+        // Push food names only if they are available and unique
+        if (row.food_names) {
+            existingOrder.food_names = existingOrder.food_names || [];
+            row.food_names.forEach(food => {
+                if (!existingOrder.food_names.includes(food)) {
+                    existingOrder.food_names.push(food);
+                }
+            });
+        }
+
+    } else {
+        // First occurrence of this order, initialize it with the current row's data
+        acc.push({
+            id: row.order_id,
+            time: row.placed_time,
+            side: row.side_name ? [row.side_name] : [],  // Initialize side as an array
+            food_names: row.food_names || [],  
+            entree_names: row.entree_names || [],  
+            total: parseFloat(row.order_total).toFixed(2),
+            meal_type: row.meal_type ? [row.meal_type] : [],  // Initialize meal_type as an array
+            payment_method: row.payment_method || null
+        });
+    }
+    return acc;
+}, []);
+
+// Log final orders to ensure they are being aggregated correctly
+// console.log('Final Orders:', orders);
+res.status(200).json(orders);
+
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+            res.status(500).json({ error: 'Failed to fetch orders', details: error.message });
+        }
+    } else {
+        res.status(405).json({ error: 'Method Not Allowed' });
+    }
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-ConfirmationPage.html">ConfirmationPage</a></li><li><a href="module-CreditCardPopUp.html">CreditCardPopUp</a></li><li><a href="module-ManagerHomePage.html">ManagerHomePage</a></li><li><a href="module-OrderPage.html">OrderPage</a></li><li><a href="module-Page.html">Page</a></li><li><a href="module-api_getInventory.html">api/getInventory</a></li><li><a href="module-api_getItemSizes.html">api/getItemSizes</a></li><li><a href="module-api_getMenu.html">api/getMenu</a></li><li><a href="module-api_getProducts.html">api/getProducts</a></li><li><a href="module-api_getReports.html">api/getReports</a></li><li><a href="module-employee_cashier_order_confirmation_page.html">employee/cashier/order/confirmation/page</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Appetizer">Appetizer</a></li><li><a href="global.html#BootstrapClient">BootstrapClient</a></li><li><a href="global.html#CACHE_DURATION">CACHE_DURATION</a></li><li><a href="global.html#Cart">Cart</a></li><li><a href="global.html#CartPage">CartPage</a></li><li><a href="global.html#CartPageWrapper">CartPageWrapper</a></li><li><a href="global.html#CashConfirmation">CashConfirmation</a></li><li><a href="global.html#Chat">Chat</a></li><li><a href="global.html#ChatBot">ChatBot</a></li><li><a href="global.html#ClockPage">ClockPage</a></li><li><a href="global.html#ContactForm">ContactForm</a></li><li><a href="global.html#ContactPage">ContactPage</a></li><li><a href="global.html#CustomerHeader">CustomerHeader</a></li><li><a href="global.html#CustomerLoginForm">CustomerLoginForm</a></li><li><a href="global.html#CustomerLoginPage">CustomerLoginPage</a></li><li><a href="global.html#CustomerPage">CustomerPage</a></li><li><a href="global.html#DiscountPopUp">DiscountPopUp</a></li><li><a href="global.html#Drink">Drink</a></li><li><a href="global.html#EmployeeCard">EmployeeCard</a></li><li><a href="global.html#EmployeeDetails">EmployeeDetails</a></li><li><a href="global.html#EmployeeHeader">EmployeeHeader</a></li><li><a href="global.html#EmployeeHomePage">EmployeeHomePage</a></li><li><a href="global.html#EmployeeInfo">EmployeeInfo</a></li><li><a href="global.html#EmployeeLogInHeader">EmployeeLogInHeader</a></li><li><a href="global.html#EmployeeLoginButton">EmployeeLoginButton</a></li><li><a href="global.html#EmployeeLoginPage">EmployeeLoginPage</a></li><li><a href="global.html#EmployeePage">EmployeePage</a></li><li><a href="global.html#EmployeePay">EmployeePay</a></li><li><a href="global.html#Entree">Entree</a></li><li><a href="global.html#GET">GET</a></li><li><a href="global.html#GoogleTranslate">GoogleTranslate</a></li><li><a href="global.html#GuestLoginForm">GuestLoginForm</a></li><li><a href="global.html#Inventory">Inventory</a></li><li><a href="global.html#InventoryPopup">InventoryPopup</a></li><li><a href="global.html#ItemModal">ItemModal</a></li><li><a href="global.html#KioskPage">KioskPage</a></li><li><a href="global.html#LoginForm">LoginForm</a></li><li><a href="global.html#LoyaltyLoginForm">LoyaltyLoginForm</a></li><li><a href="global.html#LoyaltyLoginPage">LoyaltyLoginPage</a></li><li><a href="global.html#MealModal">MealModal</a></li><li><a href="global.html#MealSelectionPage">MealSelectionPage</a></li><li><a href="global.html#Menu">Menu</a></li><li><a href="global.html#MenuBoardPage">MenuBoardPage</a></li><li><a href="global.html#MenuPopularity">MenuPopularity</a></li><li><a href="global.html#MobilePage">MobilePage</a></li><li><a href="global.html#OrderCard">OrderCard</a></li><li><a href="global.html#OrderInfo">OrderInfo</a></li><li><a href="global.html#POST">POST</a></li><li><a href="global.html#PUT">PUT</a></li><li><a href="global.html#Page">Page</a></li><li><a href="global.html#PaymentPopUp">PaymentPopUp</a></li><li><a href="global.html#ProductUsageChart">ProductUsageChart</a></li><li><a href="global.html#RenderMenu">RenderMenu</a></li><li><a href="global.html#SalesChart">SalesChart</a></li><li><a href="global.html#SalesReport">SalesReport</a></li><li><a href="global.html#Side">Side</a></li><li><a href="global.html#SizeSelection">SizeSelection</a></li><li><a href="global.html#XReport">XReport</a></li><li><a href="global.html#ZReport">ZReport</a></li><li><a href="global.html#authOptions">authOptions</a></li><li><a href="global.html#cache">cache</a></li><li><a href="global.html#fetchEmployees">fetchEmployees</a></li><li><a href="global.html#fetchPayData">fetchPayData</a></li><li><a href="global.html#fetchPopularItems">fetchPopularItems</a></li><li><a href="global.html#fetchProductUsageData">fetchProductUsageData</a></li><li><a href="global.html#fetchWeather">fetchWeather</a></li><li><a href="global.html#fetchZReport">fetchZReport</a></li><li><a href="global.html#formatCurrency">formatCurrency</a></li><li><a href="global.html#handleNChange">handleNChange</a></li><li><a href="global.html#handleSubmit">handleSubmit</a></li><li><a href="global.html#inter">inter</a></li><li><a href="global.html#metadata">metadata</a></li><li><a href="global.html#pool">pool</a></li><li><a href="global.html#query">query</a></li><li><a href="global.html#weatherMap">weatherMap</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Wed Dec 11 2024 23:17:49 GMT-0600 (Central Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,8 +1,40 @@
 // src/components/ui/customer/menu-selection/RenderMenu.js
+
+/**
+ * @fileoverview This file contains the RenderMenu component which displays a list of menu items.
+ * It uses icons from react-icons library to indicate allergens and vegan items.
+ * @requires react
+ * @requires react-icons/fa
+ * @requires react-icons/md
+ */
+
 import React from "react";
 import { FaLeaf } from "react-icons/fa";
 import { MdWarning } from "react-icons/md";
 
+
+/**
+ * RenderMenu component to display a list of menu items.
+ *
+ * @param {Object[]} menuItems - Array of menu items to be displayed.
+ * @param {Object} menuItems[].id - Unique identifier for the menu item.
+ * @param {string} menuItems[].item_name - Name of the menu item.
+ * @param {string} [menuItems[].image_url] - URL of the menu item's image.
+ * 
+ * @param {Object} itemSizes - Object containing sizes for each menu item.
+ * @param {Object[]} itemSizes[].item_size - Size of the menu item.
+ * @param {string} itemSizes[].item_size.item_size - Size label (e.g., "Small").
+ * @param {number} itemSizes[].item_size.calories - Calorie count for the size.
+ * 
+ * @param {Object[]} inventoryData - Array of inventory data for menu items.
+ * @param {string} inventoryData[].item_name - Name of the menu item.
+ * @param {boolean} [inventoryData[].is_allergen] - Indicates if the item contains allergens.
+ * @param {boolean} [inventoryData[].is_vegan] - Indicates if the item is vegan.
+ * 
+ * @param {Function} setSelectedItem - Function to set the selected item.
+ *
+ * @returns {JSX.Element[]} Array of JSX elements representing the menu items.
+ */
 const RenderMenu = ({ menuItems, itemSizes, inventoryData, setSelectedItem }) => {
     return menuItems.map((item) => {
         const sizes = itemSizes[item.id] || [];

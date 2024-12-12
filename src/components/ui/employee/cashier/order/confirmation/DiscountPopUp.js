@@ -1,6 +1,22 @@
 // src/components/ui/employee/cashier/order/confirmation/DiscountPopUp.js
+
+/**
+ * @file DiscountPopUp.js
+ * @description This component provides a popup for applying discounts and promo codes.
+ * @requires React
+ * @requires useState
+ * @requires useEffect
+ */
+
 import React, { useState, useEffect } from 'react';
 
+/**
+ * DiscountPopUp component
+ * @param {Object} props - Component props
+ * @param {Function} props.onClose - Function to call when the popup is closed
+ * @param {Function} props.onApplyDiscount - Function to call when a discount is applied
+ * @returns {JSX.Element} The rendered component
+ */
 const DiscountPopUp = ({ onClose, onApplyDiscount }) => {
     const [selectedDiscount, setSelectedDiscount] = useState(0);
     const [isTaxExempt, setIsTaxExempt] = useState(false);
@@ -14,7 +30,10 @@ const DiscountPopUp = ({ onClose, onApplyDiscount }) => {
         'HAPPYHOUR': 15,
     };
 
-    // Load discount details from localStorage when the component mounts
+    /**
+     * Load discount details from localStorage when the component mounts
+     * @function
+     */
     useEffect(() => {
         const storedDiscount = localStorage.getItem('selectedDiscount');
         const storedTaxExempt = localStorage.getItem('isTaxExempt');
@@ -25,13 +44,22 @@ const DiscountPopUp = ({ onClose, onApplyDiscount }) => {
         if (storedPromoCode) setPromoCode(storedPromoCode);
     }, []);
 
-    // Function to save discount details to localStorage
-    const saveDiscountDetails = (discountValue, taxExemptValue, promoCodeValue) => {
+    /**
+     * Save discount details to localStorage
+     * @function
+     * @param {number} discountValue - The discount value to save
+     * @param {boolean} taxExemptValue - The tax exemption status to save
+     * @param {string} promoCodeValue - The promo code to save
+     */    const saveDiscountDetails = (discountValue, taxExemptValue, promoCodeValue) => {
         localStorage.setItem('selectedDiscount', discountValue);
         localStorage.setItem('isTaxExempt', taxExemptValue);
         localStorage.setItem('promoCode', promoCodeValue);
     };
 
+    /**
+     * Apply the promo code and update the discount
+     * @function
+     */
     const applyPromoCode = () => {
         if (promoCode in validPromoCodes) {
             const discountValue = validPromoCodes[promoCode];
@@ -43,6 +71,10 @@ const DiscountPopUp = ({ onClose, onApplyDiscount }) => {
         }
     };
 
+    /**
+     * Apply the discount and call the onApplyDiscount function
+     * @function
+     */
     const applyDiscount = () => {
         saveDiscountDetails(selectedDiscount, isTaxExempt, promoCode);
         onApplyDiscount(selectedDiscount, isTaxExempt);

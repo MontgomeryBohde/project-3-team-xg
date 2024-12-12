@@ -1,6 +1,12 @@
 // pages/api/getEmployees.js
 import { query } from "@lib/db";
 
+/**
+ * Handles the API requests for fetching a list of employees.
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @returns {void}
+ */
 export default async function handler(req, res) {
     if (req.method === "GET") {
         try {

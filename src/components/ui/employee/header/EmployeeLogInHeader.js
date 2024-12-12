@@ -1,10 +1,25 @@
 // src/components/ui/employee/header/EmployeeLogInHeader.js
+
+/**
+ * @file EmployeeLogInHeader.js
+ * @description This file contains the EmployeeLogInHeader component which displays the employee login header with current time and weather information.
+ * @requires next/image
+ * @requires ./EmployeeHeader.css
+ */
+
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import './EmployeeHeader.css';
 
+/**
+ * EmployeeLogInHeader component.
+ * Displays the employee login header with current time and weather information.
+ *
+ * @component
+ * @returns {JSX.Element} The EmployeeLogInHeader component.
+ */
 const EmployeeLogInHeader = () => {
   const [employee, setEmployee] = useState(null);
   const [weather, setWeather] = useState({ temperature: '', description: '', icon: '' });
@@ -25,6 +40,10 @@ const EmployeeLogInHeader = () => {
   };
 
   useEffect(() => {
+    /**
+     * Retrieves the logged-in employee data from localStorage and sets it to state.
+     * Also sets the loggedIn flag in localStorage.
+     */
     const storedEmployee = localStorage.getItem('loggedInEmployee');
     if (storedEmployee) {
       setEmployee(JSON.parse(storedEmployee));
@@ -32,6 +51,9 @@ const EmployeeLogInHeader = () => {
     // Set loggedIn to true in localStorage if employee data exists
     localStorage.setItem('loggedIn', 'true');
 
+    /**
+     * Updates the current time every minute.
+     */
     const updateTime = () => {
       const now = new Date();
       const hours = now.getHours();
@@ -41,6 +63,14 @@ const EmployeeLogInHeader = () => {
       setCurrentTime(formattedTime);
     };
 
+    /**
+     * Fetches the current weather data from the API and sets it to state.
+     * Maps the weather icon to a corresponding icon name.
+     *
+     * @async
+     * @function fetchWeather
+     * @throws Will throw an error if the fetch request fails.
+     */
     const fetchWeather = async () => {
       try {
         const response = await fetch('/api/getWeather');

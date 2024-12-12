@@ -1,21 +1,47 @@
 // src/app/employee/manager/reports/page.js
 "use client";
+
+/**
+ * @fileoverview This file contains the Page component for the employee manager reports.
+ * It includes navigation functions to different report pages.
+ * @module Page
+ * @requires next/navigation
+ * @requires @/components/ui/employee/header/EmployeeLogInHeader
+ * @requires next/head
+ */
+
 import { useRouter } from "next/navigation";
 import EmployeeLogInHeader from "@/components/ui/employee/header/EmployeeLogInHeader";
 import Head from "next/head";
 
+/**
+ * Page component for the employee manager reports.
+ * @returns {JSX.Element} The rendered component.
+ */
 const Page = () => {
     const router = useRouter();
 
+    /**
+     * Navigates to the Sales Report page.
+     */
     const navigateToSales = () => {
         router.push("/employee/manager/reports/sales");
     };
+    /**
+     * Navigates to the Daily Reports page.
+     */
     const navigateToDailyReports = () => {
         router.push("/employee/manager/reports/daily-reports");
     };
+    /**
+     * Navigates to the Menu Popularity page.
+     */
     const navigateToMenuPopularity = () => {
         router.push("/employee/manager/reports/menu-popularity");
     };
+    /**
+     * Navigates to the Product Usage page.
+     */
     const navigateToProductUsage = () => {
         router.push("/employee/manager/reports/product-usage");
     };

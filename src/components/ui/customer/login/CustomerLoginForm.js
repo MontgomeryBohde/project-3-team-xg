@@ -1,15 +1,31 @@
 // src/components/ui/customer/header/CustomerHeader.js
 "use client";
 
+/**
+ * @file CustomerLoginForm.js
+ * @description This file contains the CustomerLoginForm component which handles the login process for customers.
+ * @requires react
+ * @requires next/navigation
+ */
+
+
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
+/**
+ * CustomerLoginForm component handles the login process for customers.
+ * @component
+ * @returns {JSX.Element} The CustomerLoginForm component.
+ */
 const CustomerLoginForm = () => {
     const [code, setCode] = useState("");
     const [error, setError] = useState(null);
     const router = useRouter();
 
-    // Handle form submission
+    /**
+     * Handles the form submission for customer login.
+     * @param {Event} event - The form submission event.
+     */
     const handleLogin = async (event) => {
         event.preventDefault();
 
@@ -38,7 +54,9 @@ const CustomerLoginForm = () => {
         }
     };
 
-    // Navigate back to the kiosk page
+    /**
+     * Navigates back to the kiosk page.
+     */
     const navigateToKioskPage = () => {
         router.push("/customer/kiosk/");
     };

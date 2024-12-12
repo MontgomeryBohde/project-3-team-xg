@@ -1,11 +1,24 @@
 // contact maintenance page
 "use client";
 
+/**
+ * @fileoverview Contact Maintenance Page
+ * @requires react
+ * @requires @/components/ui/employee/header/EmployeeLogInHeader
+ * @requires next/head
+ * @requires bootstrap/dist/css/bootstrap.css
+ */
+
 import { useState } from 'react';
 import EmployeeLogInHeader from '@/components/ui/employee/header/EmployeeLogInHeader';
 import Head from 'next/head';
 import 'bootstrap/dist/css/bootstrap.css';
 
+
+/**
+ * ContactPage component renders the contact maintenance page.
+ * @returns {JSX.Element} The rendered contact maintenance page.
+ */
 const ContactPage = () => {
 	return (
 		<>
@@ -18,11 +31,20 @@ const ContactPage = () => {
 	);
 };
 
+/**
+ * ContactForm component renders the contact form.
+ * @returns {JSX.Element} The rendered contact form.
+ */
 const ContactForm = () => {
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
 	const [description, setDescription] = useState('');
 
+
+    /**
+     * Handles the form submission.
+     * @param {React.FormEvent<HTMLFormElement>} event - The form submission event.
+     */
 	const handleSubmit = (event) => {
 		event.preventDefault();
 	};

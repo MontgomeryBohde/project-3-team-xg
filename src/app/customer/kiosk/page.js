@@ -5,13 +5,26 @@ import { useRouter } from "next/navigation";
 import Image from 'next/image';
 import pandaIcon from '/public/panda-icon.png';
 
+/**
+ * KioskPage component renders the customer kiosk page.
+ * It provides options to navigate to the meal selection page or back to the main page.
+ * 
+ * @component
+ * @returns {JSX.Element} The rendered component.
+ */
 const KioskPage = () => {
     const router = useRouter();
 
+    /**
+     * Navigates to the Meal Selection page.
+     */
     const navigateToMeal = () => {
         router.push("/customer/kiosk/login"); // Navigate to the Meal Selection page
     };
 
+    /**
+     * Navigates back to the Main Page.
+     */
     const navigateToMainPage = () => {
         router.push("/customer/"); // Navigate back to the Main Page
     };

@@ -1,6 +1,20 @@
 // Appetizer.js
+/**
+ * @file Appetizer.js
+ * @description This file contains the Appetizer component which displays a list of appetizer menu items.
+ */
+
 import React from 'react';
 
+/**
+ * Appetizer component to display a list of appetizer menu items.
+ *
+ * @param {Object[]} menuItems - Array of appetizer menu items.
+ * @param {Object} menuItems[].id - Unique identifier for the appetizer.
+ * @param {string} menuItems[].item_name - Name of the appetizer.
+ * @param {Function} handleAddToCart - Function to handle adding an appetizer to the cart.
+ * @returns {JSX.Element} The rendered component.
+ */
 const Appetizer = ({ menuItems, handleAddToCart }) => (
     <div className="card mb-4 shadow-sm">
         <div className="card-body md">

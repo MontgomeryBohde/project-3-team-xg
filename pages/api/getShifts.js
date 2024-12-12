@@ -1,6 +1,16 @@
 // pages/api/getShifts.js
 import { query } from "@lib/db";
 
+/**
+ * API handler for managing shifts.
+ * 
+ * @param {Object} req - The request object.
+ * @param {string} req.method - The HTTP method of the request.
+ * @param {Object} req.body - The body of the request.
+ * @param {Object} req.query - The query parameters of the request.
+ * @param {Object} res - The response object.
+ * @returns {Promise<void>} - The response to the client.
+ */
 export default async function handler(req, res) {
     const { method, body, query: queryParams } = req;
 

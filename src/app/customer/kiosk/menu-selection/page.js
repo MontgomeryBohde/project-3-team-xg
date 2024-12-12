@@ -11,6 +11,14 @@ import MealModal from "@/components/ui/customer/menu-selection/MealModal";
 import './menu-selection.css';
 import './menu-selection-trevor.css';
 
+/**
+ * MealSelectionPage component
+ * 
+ * This component represents the meal selection page where users can view and select menu items,
+ * add items to their cart, and view special deals.
+ * 
+ * @component
+ */
 const MealSelectionPage = () => {
     const [menuItems, setMenuItems] = useState([]);
     const [itemSizes, setItemSizes] = useState({});
@@ -26,7 +34,14 @@ const MealSelectionPage = () => {
         { name: "50 percent off", image: "/images/50per.jpg", sizeType: "special" }
     ];
 
-    // rewards from sessionStorage
+
+    /**
+     * Fetches the initial data for the menu item page. Including:
+    * 1. menu items from the server.
+    * 2. available sizes for each menu item.
+    * 3. inventory data.
+    * 4. loads the saved cart from sessionStorage.
+    */
     const [rewards, setRewards] = useState();
     useEffect(() => {
         const storedRewards = JSON.parse(sessionStorage.getItem('rewards'));
@@ -36,7 +51,6 @@ const MealSelectionPage = () => {
         }
     }, []); 
 
-    // is customer logged in
     const [custLoggedIn, setCustLoggedIn] = useState(false);
     useEffect(() => {
         const loggedInCustomer = JSON.parse(sessionStorage.getItem('loggedInCustomer'));
@@ -44,6 +58,7 @@ const MealSelectionPage = () => {
             setCustLoggedIn(true);
         }
     }, []);
+
 
 
     useEffect(() => {
@@ -87,7 +102,10 @@ const MealSelectionPage = () => {
         script.async = true;
         document.body.appendChild(script);
 
-        // Initialize YouTube Player API
+        /**
+        * Initializes the YouTube player API.
+        *  Displays the Subway Surfers video for Trevor Mode
+        */
         window.onYouTubeIframeAPIReady = () => {
             const playerInstance = new window.YT.Player("trevor-video-iframe", {
                 videoId: "ObhmrE6FyNs",
@@ -115,6 +133,13 @@ const MealSelectionPage = () => {
         };
     }, []);
 
+    /**
+    * Adds an item to the cart from menu. 
+    * Handles adding new items or increasing the quantity of existing items in the cart.
+    * Updates the cart state and sessionStorage. 
+    * @param {Object} item - The item going to be added to the cart.
+    * @param {string} size - The size of the item.
+    */
     const handleAddToCart = (item, size) => {
         if (size == "special") { // free bowls & other rewards
             let updatedCart;
@@ -142,6 +167,11 @@ const MealSelectionPage = () => {
         }  
     };
 
+    /**
+    * Allows the scroll to move smoothly to the clicked section. 
+    * Finds the element with the given ID and then scrolls the page to that element.
+    * @param {string} sectionId - The ID of the element to scroll to.
+    */
     const handleScrollToSection = (sectionId) => {
         const element = document.getElementById(sectionId);
         if (element) {
@@ -149,7 +179,11 @@ const MealSelectionPage = () => {
         }
     };
 
-    // Trevor Mode
+    /**
+    * Displays a message that indicates whether or not currently in Trevor Mode.
+    * Creates a toast elementa and appends to document body.
+    * Removes the toast element after 3 seconds.
+    */
     const showTrevorToast = () => {
         const toast = document.createElement("div");
         toast.innerText = isTrevorModeActive ? "Trevor Mode Deactivated 🚫" : "Trevor Mode Activated 🕶️";
@@ -172,6 +206,10 @@ const MealSelectionPage = () => {
         }, 3000);
     };
 
+    /**
+    * Creates an Audio object for the "vine-boom.mp3" sound and
+    * plays a hover sound effect when cursor goes over the sidebar
+    */
     const playHoverSound = () => {
         const boomSound = new Audio("/sounds/vine-boom.mp3");
         boomSound.volume = 0.2;
@@ -183,6 +221,14 @@ const MealSelectionPage = () => {
         }
     };
     
+    /**
+    * Toggles Trevor Mode.
+    * 1. Toggles the `isTrevorModeActive` state.
+    * 2. Updates the `trevorModeActive` state in sessionStorage.
+    * 3. Plays a sound effect.
+    * 4. Shows a toast notification with the current Trevor Mode status.
+    * 5. Controls the YouTube player as well if Trevor Mode is on.
+    */
     const toggleTrevorMode = () => {
         const newState = !isTrevorModeActive;
         setIsTrevorModeActive(newState);

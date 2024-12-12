@@ -1,14 +1,32 @@
 // src/app/employee/manager/reports/daily-reports/Z-Report/page.js
 "use client";
 
+/**
+ * @fileoverview This file contains the ZReport component which fetches and displays the Z Report data.
+ * @requires react
+ * @requires @/components/ui/employee/header/EmployeeLogInHeader
+ * @requires next/head
+ */
+
 import { useEffect, useState } from 'react';
 import EmployeeLogInHeader from '@/components/ui/employee/header/EmployeeLogInHeader';
 import Head from 'next/head';
 
+/**
+ * ZReport component fetches and displays the Z Report data.
+ * @component
+ * @returns {JSX.Element} The rendered component.
+ */
 const ZReport = () => {
     const [reportData, setReportData] = useState(null);
 
     useEffect(() => {
+        /**
+         * Fetches the Z Report data from the API.
+         * @async
+         * @function fetchZReport
+         * @returns {Promise<void>}
+         */
         async function fetchZReport() {
             try {
                 const response = await fetch('/api/getReports?type=zReport');
@@ -26,6 +44,12 @@ const ZReport = () => {
         fetchZReport();
     }, []);    
 
+    /**
+     * Formats a value as currency.
+     * @function formatCurrency
+     * @param {string|number} value - The value to format.
+     * @returns {string} The formatted currency string.
+     */
     const formatCurrency = (value) => {
         const numericValue = parseFloat(value); // Convert string to number
         if (isNaN(numericValue)) {

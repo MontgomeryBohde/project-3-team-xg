@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: src/components/ui/customer/login/CustomerLoginForm.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: src/components/ui/customer/login/CustomerLoginForm.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// src/components/ui/customer/header/CustomerHeader.js
+"use client";
+
+/**
+ * @file CustomerLoginForm.js
+ * @description This file contains the CustomerLoginForm component which handles the login process for customers.
+ * @requires react
+ * @requires next/navigation
+ */
+
+
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+
+/**
+ * CustomerLoginForm component handles the login process for customers.
+ * @component
+ * @returns {JSX.Element} The CustomerLoginForm component.
+ */
+const CustomerLoginForm = () => {
+    const [code, setCode] = useState("");
+    const [error, setError] = useState(null);
+    const router = useRouter();
+
+    /**
+     * Handles the form submission for customer login.
+     * @param {Event} event - The form submission event.
+     */
+    const handleLogin = async (event) => {
+        event.preventDefault();
+
+        // Reset error state
+        setError(null);
+
+        try {
+            // Validate the 4-digit code
+            if (code === "1234") {
+                // Simulate fetching customer data associated with the code
+                const customer = { name: "Mike Moore", id: 1 }; // Replace with real customer data if applicable
+
+                // Store customer in sessionStorage
+                window.localStorage.setItem("loggedInCustomer", JSON.stringify(customer));
+                window.localStorage.setItem("loggedInCustomerName", customer.name);
+
+                // Navigate to menu selection
+                router.push("/customer/kiosk/menu-selection/");
+            } else {
+                // Invalid code
+                setError("No login found for code. Please enter a valid code.");
+            }
+        } catch (err) {
+            setError("An error occurred. Please try again.");
+            console.error(err);
+        }
+    };
+
+    /**
+     * Navigates back to the kiosk page.
+     */
+    const navigateToKioskPage = () => {
+        router.push("/customer/kiosk/");
+    };
+
+    return (
+        &lt;div id="form-wrapper" className="bg-light p-4 rounded shadow-sm">
+            &lt;h1 className="text-center mb-4">Login&lt;/h1>
+            &lt;form onSubmit={handleLogin}>
+                &lt;div className="form-group mb-3">
+                    &lt;label htmlFor="user-code">Enter 4-Digit Code&lt;/label>
+                    &lt;input
+                        type="text"
+                        className="form-control"
+                        id="user-code"
+                        placeholder="1234"
+                        value={code}
+                        onChange={(e) => setCode(e.target.value)}
+                    />
+                &lt;/div>
+
+                {error &amp;&amp; (
+                    &lt;div className="alert alert-danger mb-3">
+                        {error}
+                    &lt;/div>
+                )}
+
+                &lt;button type="submit" className="btn btn-danger w-100">
+                    Submit
+                &lt;/button>
+            &lt;/form>
+            &lt;button
+                type="button"
+                className="btn btn-secondary w-100 mt-3"
+                onClick={() => router.push("/customer/kiosk/guest/")}
+            >
+                Guest Login
+            &lt;/button>
+            &lt;button
+                type="button"
+                className="btn btn-secondary w-100 mt-3"
+                onClick={navigateToKioskPage}
+            >
+                Back to Customer Page
+            &lt;/button>
+        &lt;/div>
+    );
+};
+
+export default CustomerLoginForm;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-ConfirmationPage.html">ConfirmationPage</a></li><li><a href="module-CreditCardPopUp.html">CreditCardPopUp</a></li><li><a href="module-ManagerHomePage.html">ManagerHomePage</a></li><li><a href="module-OrderPage.html">OrderPage</a></li><li><a href="module-Page.html">Page</a></li><li><a href="module-api_getInventory.html">api/getInventory</a></li><li><a href="module-api_getItemSizes.html">api/getItemSizes</a></li><li><a href="module-api_getMenu.html">api/getMenu</a></li><li><a href="module-api_getProducts.html">api/getProducts</a></li><li><a href="module-api_getReports.html">api/getReports</a></li><li><a href="module-employee_cashier_order_confirmation_page.html">employee/cashier/order/confirmation/page</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Appetizer">Appetizer</a></li><li><a href="global.html#BootstrapClient">BootstrapClient</a></li><li><a href="global.html#CACHE_DURATION">CACHE_DURATION</a></li><li><a href="global.html#Cart">Cart</a></li><li><a href="global.html#CartPage">CartPage</a></li><li><a href="global.html#CartPageWrapper">CartPageWrapper</a></li><li><a href="global.html#CashConfirmation">CashConfirmation</a></li><li><a href="global.html#Chat">Chat</a></li><li><a href="global.html#ChatBot">ChatBot</a></li><li><a href="global.html#ClockPage">ClockPage</a></li><li><a href="global.html#ContactForm">ContactForm</a></li><li><a href="global.html#ContactPage">ContactPage</a></li><li><a href="global.html#CustomerHeader">CustomerHeader</a></li><li><a href="global.html#CustomerLoginForm">CustomerLoginForm</a></li><li><a href="global.html#CustomerLoginPage">CustomerLoginPage</a></li><li><a href="global.html#CustomerPage">CustomerPage</a></li><li><a href="global.html#DiscountPopUp">DiscountPopUp</a></li><li><a href="global.html#Drink">Drink</a></li><li><a href="global.html#EmployeeCard">EmployeeCard</a></li><li><a href="global.html#EmployeeDetails">EmployeeDetails</a></li><li><a href="global.html#EmployeeHeader">EmployeeHeader</a></li><li><a href="global.html#EmployeeHomePage">EmployeeHomePage</a></li><li><a href="global.html#EmployeeInfo">EmployeeInfo</a></li><li><a href="global.html#EmployeeLogInHeader">EmployeeLogInHeader</a></li><li><a href="global.html#EmployeeLoginButton">EmployeeLoginButton</a></li><li><a href="global.html#EmployeeLoginPage">EmployeeLoginPage</a></li><li><a href="global.html#EmployeePage">EmployeePage</a></li><li><a href="global.html#EmployeePay">EmployeePay</a></li><li><a href="global.html#Entree">Entree</a></li><li><a href="global.html#GET">GET</a></li><li><a href="global.html#GoogleTranslate">GoogleTranslate</a></li><li><a href="global.html#GuestLoginForm">GuestLoginForm</a></li><li><a href="global.html#Inventory">Inventory</a></li><li><a href="global.html#InventoryPopup">InventoryPopup</a></li><li><a href="global.html#ItemModal">ItemModal</a></li><li><a href="global.html#KioskPage">KioskPage</a></li><li><a href="global.html#LoginForm">LoginForm</a></li><li><a href="global.html#LoyaltyLoginForm">LoyaltyLoginForm</a></li><li><a href="global.html#LoyaltyLoginPage">LoyaltyLoginPage</a></li><li><a href="global.html#MealModal">MealModal</a></li><li><a href="global.html#MealSelectionPage">MealSelectionPage</a></li><li><a href="global.html#Menu">Menu</a></li><li><a href="global.html#MenuBoardPage">MenuBoardPage</a></li><li><a href="global.html#MenuPopularity">MenuPopularity</a></li><li><a href="global.html#MobilePage">MobilePage</a></li><li><a href="global.html#OrderCard">OrderCard</a></li><li><a href="global.html#OrderInfo">OrderInfo</a></li><li><a href="global.html#POST">POST</a></li><li><a href="global.html#PUT">PUT</a></li><li><a href="global.html#Page">Page</a></li><li><a href="global.html#PaymentPopUp">PaymentPopUp</a></li><li><a href="global.html#ProductUsageChart">ProductUsageChart</a></li><li><a href="global.html#RenderMenu">RenderMenu</a></li><li><a href="global.html#SalesChart">SalesChart</a></li><li><a href="global.html#SalesReport">SalesReport</a></li><li><a href="global.html#Side">Side</a></li><li><a href="global.html#SizeSelection">SizeSelection</a></li><li><a href="global.html#XReport">XReport</a></li><li><a href="global.html#ZReport">ZReport</a></li><li><a href="global.html#authOptions">authOptions</a></li><li><a href="global.html#cache">cache</a></li><li><a href="global.html#fetchEmployees">fetchEmployees</a></li><li><a href="global.html#fetchPayData">fetchPayData</a></li><li><a href="global.html#fetchPopularItems">fetchPopularItems</a></li><li><a href="global.html#fetchProductUsageData">fetchProductUsageData</a></li><li><a href="global.html#fetchWeather">fetchWeather</a></li><li><a href="global.html#fetchZReport">fetchZReport</a></li><li><a href="global.html#formatCurrency">formatCurrency</a></li><li><a href="global.html#handleNChange">handleNChange</a></li><li><a href="global.html#handleSubmit">handleSubmit</a></li><li><a href="global.html#inter">inter</a></li><li><a href="global.html#metadata">metadata</a></li><li><a href="global.html#pool">pool</a></li><li><a href="global.html#query">query</a></li><li><a href="global.html#weatherMap">weatherMap</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Wed Dec 11 2024 23:17:49 GMT-0600 (Central Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

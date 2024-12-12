@@ -5,11 +5,23 @@ import React, { useEffect } from "react";
 import CustomerHeader from "@/components/ui/customer/header/CustomerHeader";
 import GuestLoginForm from "@/components/ui/customer/guest/GuestLoginForm";
 
+
+/**
+ * CustomerLoginPage component
+ * 
+ * This component renders the customer login page. It removes the loggedInCustomer
+ * from localStorage on page load and displays the login form.
+ * 
+ * @component
+ * @returns {JSX.Element} The rendered component
+ */
 const CustomerLoginPage = () => {
     const router = useRouter();
 
     useEffect(() => {
-        // Remove loggedInCustomer from localStorage on page load
+        /**
+         * Effect to remove loggedInCustomer from localStorage on page load
+         */
         const loggedInCustomer = localStorage.getItem("loggedInCustomer");
         if (loggedInCustomer) {
             console.log("Removing loggedInCustomer from localStorage...");

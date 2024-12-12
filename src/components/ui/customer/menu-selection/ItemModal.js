@@ -1,9 +1,32 @@
 // src/components/ui/customer/menu-selection/ItemModal.js
+
+/**
+ * @fileoverview ItemModal component for displaying item details and size selection in a modal.
+ * @requires React
+ */
+
 import React from "react";
 
+/**
+ * ItemModal component displays a modal with item details and size selection.
+ *
+ * @param {Object} props - The component props.
+ * @param {Object} props.item - The item details.
+ * @param {Array} props.sizes - The available sizes for the item.
+ * @param {string} props.selectedSize - The currently selected size.
+ * @param {Function} props.setSelectedSize - Function to set the selected size.
+ * @param {Function} props.onClose - Function to handle closing the modal.
+ * @param {Function} props.onAdd - Function to handle adding the item.
+ * @returns {JSX.Element|null} The rendered component or null if no item is provided.
+ */
 const ItemModal = ({ item, sizes, selectedSize, setSelectedSize, onClose, onAdd }) => {
     if (!item) return null;
 
+    /**
+     * Handles the change of the selected size.
+     *
+     * @param {Object} e - The event object.
+     */
     const handleSizeChange = (e) => {
         setSelectedSize(e.target.value); // Update the selected size
     };

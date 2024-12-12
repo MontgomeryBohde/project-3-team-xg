@@ -2,6 +2,12 @@
 import { NextResponse } from 'next/server';
 import { Client } from 'pg';
 
+/**
+ * Handles GET requests to fetch the ID of a menu item by its name.
+ * 
+ * @param {Request} request - The incoming request object.
+ * @returns {Promise<Response>} - The response object containing the menu item ID or an error message.
+ */
 export async function GET(request) {
     const connectionString = process.env.POSTGRES_URL;
     const client = new Client({ connectionString });

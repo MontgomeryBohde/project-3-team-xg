@@ -5,8 +5,17 @@ const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 });
 
+/**
+ * Handler function for processing chatbot responses.
+ * @param {import('next').NextApiRequest} req - The API request object.
+ * @param {import('next').NextApiResponse} res - The API response object.
+ * @returns {Promise<void>}
+ */
 export default async function handler(req, res) {
-
+    /**
+     * Query to fetch menu items from the database.
+     * @type {Array<Object>}
+     */
     const menuItems = await query(`
         SELECT 
         mi.id AS menu_item_id,
@@ -34,6 +43,10 @@ export default async function handler(req, res) {
         item_sizes sz ON mi.id = sz.item_id;
     `);
 
+    /**
+     * System prompt for the OpenAI API.
+     * @type {string}
+     */
     const systemPrompt = `
         You are Pandy, the Panda Express AI Assistant. Your role is to enhance the customer experience and
         answer questions about the menu. You can provide information about menu items, including their names, 

@@ -1,6 +1,23 @@
 // src/components/ui/customer/menu-selection/MealModal.js
+
+/**
+ * @file MealModal.js
+ * @description Component for selecting meal options in the menu selection UI.
+ * @requires React
+ */
+
 import React, { useState, useEffect } from "react";
 
+/**
+ * MealModal component for selecting meal options.
+ *
+ * @component
+ * @param {Object} props - Component props
+ * @param {string} props.mealType - Type of the meal (e.g., "Bowl", "Plate")
+ * @param {function} props.onClose - Function to call when the modal is closed
+ * @param {function} props.onConfirm - Function to call when the meal selection is confirmed
+ * @returns {JSX.Element} The rendered component
+ */
 const MealModal = ({ mealType, onClose, onConfirm }) => {
     const [sides, setSides] = useState([]);
     const [entrees, setEntrees] = useState([]);
@@ -8,6 +25,9 @@ const MealModal = ({ mealType, onClose, onConfirm }) => {
     const [selectedEntrees, setSelectedEntrees] = useState([]);
     const [mealDetails, setMealDetails] = useState({ sides: 0, entrees: 0, price: 0 });
 
+    /**
+     * Fetches menu items from the API and sets the sides and entrees state.
+     */
     useEffect(() => {
         const fetchMenuItems = async () => {
             try {
@@ -33,6 +53,12 @@ const MealModal = ({ mealType, onClose, onConfirm }) => {
         setMealDetails(mealTypes[mealType]);
     }, [mealType]);
 
+    /**
+     * Handles the selection of sides and entrees.
+     *
+     * @param {string} type - The type of item being selected ("side" or "entree")
+     * @param {string} itemName - The name of the item being selected
+     */
     const handleSelection = (type, itemName) => {
         if (type === "side") {
             setSelectedSides((prev) =>
@@ -53,6 +79,12 @@ const MealModal = ({ mealType, onClose, onConfirm }) => {
         }
     };
 
+    /**
+     * Handles the change in quantity of entrees.
+     * @param {string} itemName - The name of the entree item
+     * @param {number} increment - The amount to increment the quantity by
+     * @returns {void}
+     */
     const handleQuantityChange = (itemName, increment) => {
         setSelectedEntrees((prev) => {
             const updated = [...prev];
@@ -66,6 +98,10 @@ const MealModal = ({ mealType, onClose, onConfirm }) => {
         });
     };
 
+    /**
+     * Handles the confirmation of the meal selection.
+     * @returns {void}
+     */
     const handleConfirm = () => {
         if (
             selectedSides.length === mealDetails.sides &&

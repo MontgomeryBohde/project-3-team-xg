@@ -1,6 +1,15 @@
 // src/components/ui/employee/header/EmployeeHeader.js
 "use client";
 
+/**
+ * @fileoverview EmployeeHeader component that displays employee information, current time, and weather.
+ * @requires 'bootstrap-icons/font/bootstrap-icons.css'
+ * @requires 'react'
+ * @requires 'next/navigation'
+ * @requires 'next/image'
+ * @requires './EmployeeHeader.css'
+ */
+
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import React, { useState, useEffect } from 'react';
@@ -8,6 +17,11 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import './EmployeeHeader.css';
 
+/**
+ * EmployeeHeader component.
+ * @component
+ * @returns {JSX.Element} The EmployeeHeader component.
+ */
 const EmployeeHeader = () => {
   const [employee, setEmployee] = useState('');
   const [weather, setWeather] = useState({ temperature: '', description: '', icon: '' });
@@ -34,6 +48,9 @@ const EmployeeHeader = () => {
       setEmployee(storedEmployee);
     }
 
+    /**
+     * Updates the current time.
+     */
     const updateTime = () => {
       const now = new Date();
       const hours = now.getHours();
@@ -43,6 +60,12 @@ const EmployeeHeader = () => {
       setCurrentTime(formattedTime);
     };
 
+    /**
+     * Fetches the weather data from the API.
+     * @async
+     * @function fetchWeather
+     * @throws Will throw an error if the fetch operation fails.
+     */
     const fetchWeather = async () => {
       try {
         const response = await fetch('/api/getWeather');

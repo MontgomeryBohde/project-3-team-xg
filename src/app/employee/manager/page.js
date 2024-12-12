@@ -1,14 +1,33 @@
 // src/app/employee/manager/page.js
 "use client";
+/**
+ * @fileoverview This file contains the ManagerHomePage component for the employee manager.
+ * It includes navigation functions to different manager pages.
+ * @module ManagerHomePage
+ * @requires next/navigation
+ * @requires react
+ * @requires @/components/ui/employee/header/EmployeeLogInHeader
+ * @requires react-icons/fa
+ * @requires ./manager.css
+ */
+
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import EmployeeLogInHeader from '@/components/ui/employee/header/EmployeeLogInHeader';
 import { FaUtensils, FaClipboardList, FaChartLine, FaBoxes, FaUserTie, FaPhone } from 'react-icons/fa';
 import './manager.css'; // Import the external CSS
 
+/**
+ * ManagerHomePage component for the employee manager.
+ * @returns {JSX.Element} The rendered component.
+ */
 const ManagerHomePage = () => {
     const router = useRouter();
 
+    /**
+     * Navigates to the specified path.
+     * @param {string} path - The path to navigate to.
+     */
     const navigateTo = (path) => {
         router.push(path);
     };

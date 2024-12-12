@@ -1,6 +1,17 @@
 // src/app/employee/manager/reports/product-usage/page.js
 "use client";
 
+/**
+ * @fileoverview This file contains the implementation of the ProductUsageChart component
+ * which fetches and displays product usage data in a bar chart using Chart.js.
+ * 
+ * @requires react
+ * @requires react-chartjs-2
+ * @requires @/components/ui/employee/header/EmployeeLogInHeader
+ * @requires next/head
+ * @requires chart.js
+ */
+
 import React, { useEffect, useState } from 'react';
 import { Bar } from 'react-chartjs-2'; // Importing Bar chart from Chart.js
 import EmployeeLogInHeader from '@/components/ui/employee/header/EmployeeLogInHeader';
@@ -10,6 +21,12 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Toolti
 // Register necessary Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
+/**
+ * ProductUsageChart component fetches product usage data and displays it in a bar chart.
+ * 
+ * @component
+ * @returns {JSX.Element} The rendered component.
+ */
 const ProductUsageChart = () => {
     const [productData, setProductData] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -17,7 +34,13 @@ const ProductUsageChart = () => {
     const [n, setN] = useState(10); // Default number of items to display is 10
 
     useEffect(() => {
-        // Fetch product usage data from the API with the specified number of items (n)
+        /**
+         * Fetch product usage data from the API with the specified number of items (n).
+         * 
+         * @async
+         * @function fetchProductUsageData
+         * @returns {Promise<void>}
+         */
         const fetchProductUsageData = async () => {
             setLoading(true);  // Set loading to true
             setError(null);     // Reset error message
@@ -43,7 +66,12 @@ const ProductUsageChart = () => {
         fetchProductUsageData();
     }, [n]); // Re-run this effect whenever `n` changes
 
-    // Handle the change in the number of items to display
+    /**
+     * Handle the change in the number of items to display.
+     * 
+     * @function handleNChange
+     * @param {React.ChangeEvent<HTMLInputElement>} e - The change event.
+     */
     const handleNChange = (e) => {
         setN(Number(e.target.value)); // Update the number of items to display
     };

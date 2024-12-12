@@ -1,5 +1,11 @@
 // pages/api/addToCart.js
 
+/**
+ * Handles the API requests for adding a meal to the cart.
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @returns {void}
+ */
 export default function handler(req, res) {
   if (req.method === 'POST') {
     const { mealName } = req.body;

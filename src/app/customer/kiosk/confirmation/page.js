@@ -7,6 +7,10 @@ import CustomerHeader from "@/components/ui/customer/header/CustomerHeader";
 import Image from 'next/image';
 import './confirmation.css';
 
+/**
+ * Creates Order Confirmation page. 
+ * @returns Order Confirmation page that shows the order number and counts down to the next customer. 
+ */
 const CashConfirmation = () => {
 	const [timeLeft, setTimeLeft] = useState(15);
 	const [paymentMethod, setPaymentMethod] = useState("Cash");

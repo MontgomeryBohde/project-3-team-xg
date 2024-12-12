@@ -4,6 +4,18 @@ import React, { useEffect } from "react";
 import CustomerHeader from "@/components/ui/customer/header/CustomerHeader";
 import CustomerLoginForm from "@/components/ui/customer/login/CustomerLoginForm";
 
+/**
+ * CustomerLoginPage component
+ * 
+ * This component represents the login page for customers. It clears any 
+ * logged-in customer information from localStorage when the component mounts.
+ * 
+ * @component
+ * @example
+ * return (
+ *   <CustomerLoginPage />
+ * )
+ */
 const CustomerLoginPage = () => {
     useEffect(() => {
         // Clear localStorage items after component mounts (in the browser)

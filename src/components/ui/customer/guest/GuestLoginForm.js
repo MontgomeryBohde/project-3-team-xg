@@ -1,14 +1,36 @@
 "use client";
 
+/**
+ * @file GuestLoginForm.js
+ * @description This file contains the GuestLoginForm component which allows a guest user to log in by entering their name.
+ * @requires react
+ * @requires next/navigation
+ */
+
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
+/**
+ * GuestLoginForm component allows a guest user to log in by entering their name.
+ *
+ * @component
+ * @returns {JSX.Element} The GuestLoginForm component.
+ * @example
+ * return (
+ *   <GuestLoginForm />
+ * )
+ */
 const GuestLoginForm = () => {
   const [name, setName] = useState("");
   const [error, setError] = useState(null);
   const router = useRouter();
 
-  // Handle form submission
+  /**
+   * Handles the form submission for guest login.
+   *
+   * @param {React.FormEvent<HTMLFormElement>} event - The form submission event.
+   * @returns {void}
+   */
   const handleLogin = async (event) => {
     event.preventDefault();
 

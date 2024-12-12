@@ -1,5 +1,18 @@
 "use client";
 
+/**
+ * @fileoverview This file contains the SalesReport component which displays a sales report using Chart.js.
+ * It includes the necessary imports and the SalesChart component to fetch and display sales data.
+ * 
+ * @requires chartjs-adapter-date-fns
+ * @requires react
+ * @requires react-chartjs-2
+ * @requires chart.js
+ * @requires next/head
+ * @requires @/components/ui/employee/header/EmployeeLogInHeader
+ */
+
+
 import 'chartjs-adapter-date-fns';
 import { useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
@@ -20,6 +33,11 @@ import EmployeeLogInHeader from "@/components/ui/employee/header/EmployeeLogInHe
 
 ChartJS.register(TimeScale, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
+/**
+ * SalesReport component that renders the sales report page.
+ * 
+ * @returns {JSX.Element} The SalesReport component.
+ */
 const SalesReport = () => {
     return (
         <>
@@ -35,10 +53,21 @@ const SalesReport = () => {
     );
 };
 
+/**
+ * SalesChart component that fetches and displays sales data in a chart.
+ * 
+ * @returns {JSX.Element} The SalesChart component.
+ */
 function SalesChart() {
     const [chartData, setChartData] = useState(null);
     const [selectedPeriod, setSelectedPeriod] = useState('365'); // Default is 1 year
 
+    /**
+     * Fetches sales data for the specified period.
+     * 
+     * @param {string} period - The period for which to fetch sales data.
+     * @returns {Promise<void>} A promise that resolves when the data is fetched.
+     */
     const fetchSalesData = async (period) => {
         try {
             const response = await fetch(`/api/getReports?type=allSales&period=${period}`);

@@ -1,9 +1,20 @@
 import { Pool } from 'pg';
 
+/**
+ * Creates a new pool instance to manage PostgreSQL connections.
+ * @type {Pool}
+ */
 const pool = new Pool({
     connectionString: process.env.POSTGRES_URL,  // Use the correct connection string
 });
 
+/**
+ * Handles the HTTP request to fetch inventory items from the database.
+ * 
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise<void>} - A promise that resolves when the response is sent.
+ */
 export default async function handler(req, res) {
     try {
         const queryText = 'SELECT * FROM inventory_items';

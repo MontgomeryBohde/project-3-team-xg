@@ -1,10 +1,22 @@
 // src/app/employee/clock/page.js
 "use client";
 
+/**
+ * @fileoverview ClockPage component for employee clock-in and clock-out functionality.
+ * @requires react
+ * @requires next/navigation
+ * @requires @/components/ui/employee/header/EmployeeLogInHeader
+ */
+
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import EmployeeLogInHeader from "@/components/ui/employee/header/EmployeeLogInHeader";
 
+/**
+ * ClockPage component for managing employee clock-in and clock-out.
+ * @component
+ * @returns {JSX.Element} The ClockPage component.
+ */
 const ClockPage = () => {
     const [employee, setEmployee] = useState(null);
     const [shift, setShift] = useState(null);
@@ -25,6 +37,12 @@ const ClockPage = () => {
         }
     }, [router]);
 
+    /**
+     * Fetches the current shift for the logged-in employee.
+     * @async
+     * @param {number} employeeId - The ID of the logged-in employee.
+     * @returns {Promise<void>}
+     */
     const fetchCurrentShift = async (employeeId) => {
         try {
             const response = await fetch(`/api/getShifts`, {
@@ -48,6 +66,11 @@ const ClockPage = () => {
         }
     };
 
+    /**
+     * Handles the clock-in action for the employee.
+     * @async
+     * @returns {Promise<void>}
+     */
     const handleClockIn = async () => {
         setError(null);
         setSuccessMessage(null);
@@ -72,6 +95,11 @@ const ClockPage = () => {
         }
     };
 
+    /**
+     * Handles the clock-out action for the employee.
+     * @async
+     * @returns {Promise<void>}
+     */
     const handleClockOut = async () => {
         setError(null);
         setSuccessMessage(null);

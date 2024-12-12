@@ -4,6 +4,12 @@ const pool = new Pool({
   connectionString: process.env.POSTGRES_URL,
 });
 
+/**
+ * Handles the API requests for deleting an order.
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @returns {void}
+ */
 export default async function handler(req, res) {
     if (req.method === 'DELETE') {
         const { id } = req.query;

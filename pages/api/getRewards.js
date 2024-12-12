@@ -1,6 +1,19 @@
 // pages/api/getRewards.js
 import { query } from '@lib/db';
 
+
+/**
+ * API handler for fetching rewards based on the request type.
+ * 
+ * @param {Object} req - The request object.
+ * @param {Object} req.query - The query parameters.
+ * @param {string} req.query.type - The type of rewards to fetch (e.g., 'orders').
+ * @param {string} req.query.customer_id - The ID of the customer.
+ * @param {string} [req.query.n] - The number of records to fetch (optional).
+ * @param {string} req.method - The HTTP method of the request.
+ * @param {Object} res - The response object.
+ * @returns {Promise<void>} - A promise that resolves when the request is handled.
+ */
 export default async function handler(req, res) {
     const { type, customer_id, n } = req.query;
 

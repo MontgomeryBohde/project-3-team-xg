@@ -6,11 +6,32 @@ import DiscountPopUp from '@/components/ui/employee/cashier/order/confirmation/D
 import PaymentPopUp from '@/components/ui/employee/cashier/order/confirmation/PaymentPopUp';
 import EmployeeLogInHeader from "@/components/ui/employee/header/EmployeeLogInHeader";
 
+/**
+ * @file Confirmation page component for the cashier order system
+ * @module ConfirmationPage
+ */
+
+/**
+ * @typedef {Object} CartItem
+ * @property {number} price - The price of the item
+ * @property {number} quantity - The quantity of the item
+ */
+
+/**
+ * Confirmation page component that handles order details, discounts, and payment processing
+ * @component
+ * @returns {JSX.Element} The rendered confirmation page component
+ */
 const ConfirmationPage = () => {
+    /** @type {[CartItem[], function]} State for storing cart items */
     const [cartItems, setCartItems] = useState([]);
+    /** @type {[number, function]} State for storing discount percentage */
     const [discount, setDiscount] = useState(0);
+    /** @type {[boolean, function]} State for tax exemption status */
     const [taxExempt, setTaxExempt] = useState(false);
+    /** @type {[boolean, function]} State for controlling payment popup visibility */
     const [showPaymentPopUp, setShowPaymentPopUp] = useState(false);
+    /** @type {[boolean, function]} State for controlling discount popup visibility */
     const [showDiscountPopUp, setShowDiscountPopUp] = useState(false);
 
     useEffect(() => {
@@ -27,15 +48,27 @@ const ConfirmationPage = () => {
         if (storedTaxExempt) setTaxExempt(storedTaxExempt === 'true');
     }, []);
 
+    /**
+     * Calculates the subtotal of all items in the cart
+     * @returns {number} The total price before tax and discounts
+     */
     const calculateSubtotal = () => {
         return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
     };
 
+    /**
+     * Calculates the discount amount based on the current discount percentage
+     * @returns {number} The calculated discount amount
+     */
     const calculateDiscountAmount = () => {
         const subtotal = calculateSubtotal();
         return (subtotal * discount) / 100;
     };
 
+    /**
+     * Calculates the final total including tax and discounts
+     * @returns {string} The formatted total price with 2 decimal places
+     */
     const calculateTotal = () => {
         const subtotal = calculateSubtotal();
         const discountAmount = calculateDiscountAmount();
@@ -43,22 +76,40 @@ const ConfirmationPage = () => {
         return (subtotal - discountAmount + tax).toFixed(2);
     };
 
+    /**
+     * Handles returning to the previous page by saving cart state
+     */
     const handleReturn = () => {
         // Save the cart items to local storage before returning
         localStorage.setItem('cart', JSON.stringify(cartItems));
     };
 
+    /**
+     * Updates the quantity of an item in the cart
+     * @param {number} index - The index of the item in the cart array
+     * @param {number} quantity - The new quantity to set
+     */
     const handleQuantityChange = (index, quantity) => {
         const updatedCartItems = [...cartItems];
         updatedCartItems[index].quantity = quantity || 1;
         setCartItems(updatedCartItems);
     };
 
+    /**
+     * Removes an item from the cart
+     * @param {number} index - The index of the item in the cart array
+     * @returns {void}
+     */
     const handleRemoveItem = (index) => {
         const updatedCartItems = cartItems.filter((_, i) => i !== index);
         setCartItems(updatedCartItems);
     };
 
+    /**
+     * Renders the sub-items of a cart item
+     * @param {CartItem[]} subItems - The sub-items to render
+     * @returns {JSX.Element} The rendered sub-items list
+     */
     const renderSubItems = (subItems) => (
         <ul className="list-group list-group-flush mt-2">
             {subItems.map((subItem, subIndex) => (
@@ -69,6 +120,12 @@ const ConfirmationPage = () => {
         </ul>
     );
 
+    /**
+     * Renders a single cart item with quantity controls
+     * @param {CartItem} item - The cart item to render
+     * @param {number} index - The index of the item in the cart array
+     * @returns {JSX.Element} The rendered cart item
+     */
     const renderCartItem = (item, index) => (
         <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
             <div className="d-flex flex-column">

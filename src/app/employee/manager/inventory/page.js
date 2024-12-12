@@ -1,12 +1,26 @@
 // src/app/employee/manager/inventory/page.js
 'use client';
 
+/**
+ * @requires react
+ * @requires react-icons/fa
+ * @requires ./inventory.css
+ * @requires @/components/ui/employee/header/EmployeeLogInHeader
+ * @requires @/components/ui/employee/manager/inventory/InventoryPopUp
+ */
+
 import { useState, useEffect, useRef } from 'react';
 import EmployeeLogInHeader from '@/components/ui/employee/header/EmployeeLogInHeader';
 import InventoryPopUp from '@/components/ui/employee/manager/inventory/InventoryPopUp';
 import { FaAppleAlt, FaDrumstickBite, FaCarrot, FaCocktail, FaToolbox, FaUtensils } from 'react-icons/fa';
 import './inventory.css';
 
+/**
+ * Inventory component to manage and display inventory items.
+ * 
+ * @component
+ * @returns {JSX.Element} The Inventory component.
+ */
 const Inventory = () => {
     const [inventoryItems, setInventoryItems] = useState({
         Appetizer: [],
@@ -46,7 +60,13 @@ const Inventory = () => {
         Utensils: <FaUtensils />,
     };
 
-    // Fetch inventory items
+    /**
+     * Fetch inventory items from the server.
+     * 
+     * @async
+     * @function
+     * @returns {Promise<void>}
+     */
     const fetchInventoryItems = async () => {
         try {
             const response = await fetch('/api/getInventory?type=inventory');
@@ -72,6 +92,9 @@ const Inventory = () => {
         fetchInventoryItems();
     }, []);
 
+    /** 
+     * Scroll to the selected category.
+     */
     const handleNavigation = (category) => {
         const ref = categoryRefs[category];
         if (ref && ref.current) {
@@ -79,6 +102,9 @@ const Inventory = () => {
         }
     };
 
+    /**
+     * Handle the popup for adding, editing, or removing an inventory item.
+     */
     const handlePopup = (item) => {
         if (item) {
             setItemId(item.id || null);
@@ -96,6 +122,9 @@ const Inventory = () => {
         }
     };
 
+    /**
+     * Add an inventory item to the database.
+     */
     const addItem = async () => {
         if (!itemName.trim() || !itemCategory || isNaN(itemPrice) || isNaN(currentStock) || !restockDate) {
             alert('All fields are required and must have valid values!');
@@ -130,6 +159,9 @@ const Inventory = () => {
         }
     };
 
+    /**
+     * Edit an inventory item in the database.
+     */
     const editItem = async () => {
         if (!itemId || !itemName.trim() || !itemCategory || isNaN(itemPrice) || isNaN(currentStock) || !restockDate) {
             alert('All fields are required and must have valid values!');
@@ -172,6 +204,9 @@ const Inventory = () => {
         }
     };
 
+    /**
+     * Remove an inventory item from the database.
+     */
     const removeItem = async () => {
         if (!selectedItem?.id) {
             alert('Item ID is required!');

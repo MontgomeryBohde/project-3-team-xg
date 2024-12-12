@@ -1,5 +1,21 @@
 // src/app/employee/cashier/order/page.js
 'use client';
+
+/**
+ * OrderPage component for handling customer orders.
+ * @file OrderPage component
+ * @module OrderPage
+ * @requires React
+ * @requires '@/components/ui/employee/cashier/order/Cart'
+ * @requires '@/components/ui/employee/header/EmployeeLogInHeader'
+ * @requires 'next/link'
+ * @requires '@/components/ui/employee/cashier/order/Appetizer'
+ * @requires '@/components/ui/employee/cashier/order/Entree'
+ * @requires '@/components/ui/employee/cashier/order/Side'
+ * @requires '@/components/ui/employee/cashier/order/Drink'
+ * @requires '@/components/ui/employee/cashier/order/SizeSelection'
+ */
+
 import React, { useState, useEffect } from 'react';
 import Cart from '@/components/ui/employee/cashier/order/Cart';
 import EmployeeLogInHeader from "@/components/ui/employee/header/EmployeeLogInHeader";
@@ -10,22 +26,36 @@ import Side from '@/components/ui/employee/cashier/order/Side';
 import Drink from '@/components/ui/employee/cashier/order/Drink';
 import SizeSelection from '@/components/ui/employee/cashier/order/SizeSelection';
 
+/**
+ * Functional component representing the order page.
+ * @returns {JSX.Element} The rendered order page component.
+ */
 const OrderPage = () => {
+    /** State to track the number of entrees selected */
     const [entreeCount, setEntreeCount] = useState(0);
+    /** State to track the number of sides selected */
     const [sideCount, setSideCount] = useState(0);
+    /** State to track the selected meal type */
     const [selectedMealType, setSelectedMealType] = useState(null);
+    /** State to manage the items in the cart */
     const [cart, setCart] = useState([]);
+    /** State to track the meal being assembled */
     const [inProgressMeal, setInProgressMeal] = useState(null);
+    /** State to track the current menu being displayed */
     const [currentMenu, setCurrentMenu] = useState('main');
+    /** State to store any warning messages */
     const [warningMessage, setWarningMessage] = useState('');
+    /** State to store the menu items fetched from the API */
     const [menuItems, setMenuItems] = useState({
         appetizers: [],
         entrees: [],
         sides: [],
         drinks: []
     });
+    /** State to track the currently selected item */
     const [selectedItem, setSelectedItem] = useState(null);
 
+    /** Array of meal types available */
     const mealTypes = [
         { item_name: "Bowl", sides: 1, entrees: 1, price: 8.30 },
         { item_name: "Plate", sides: 1, entrees: 2, price: 10.00 },
@@ -39,8 +69,10 @@ const OrderPage = () => {
     }, [inProgressMeal]);
 
     
-    // Fetch menu items from the database using the API endpoint
     useEffect(() => {
+        /**
+         * Fetch menu items from the database using the API endpoint.
+         */
         const fetchMenuItems = async () => {
             try {
                 const response = await fetch('/api/getMenu?type=menu');

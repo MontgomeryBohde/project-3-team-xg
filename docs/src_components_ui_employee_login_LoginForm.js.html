@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: src/components/ui/employee/login/LoginForm.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: src/components/ui/employee/login/LoginForm.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// src/components/ui/employee/login/LoginForm.js
+"use client";
+
+/**
+ * @fileoverview LoginForm component for employee login.
+ * @requires react
+ * @requires next/navigation
+ * @requires next-auth/react
+ * @requires react-icons/fa
+ */
+
+import React, { useState, useEffect } from 'react';
+import { useRouter } from "next/navigation";
+import { signIn } from 'next-auth/react';
+import { FaGithub } from 'react-icons/fa'; // Import GitHub icon
+
+/**
+ * LoginForm component for employee login.
+ * @component
+ * @returns {JSX.Element} The rendered component.
+ */
+const LoginForm = () => {
+  const [userId, setUserId] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
+  const [employees, setEmployees] = useState([]);
+  const router = useRouter();
+
+  /**
+   * Fetch employee data from the API.
+   * @async
+   * @function fetchEmployees
+   * @returns {Promise&lt;void>}
+   */
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const response = await fetch('/api/getEmployees');
+        if (!response.ok) {
+          throw new Error('Failed to fetch employees');
+        }
+        const data = await response.json();
+        setEmployees(data);
+      } catch (error) {
+        console.error('Error fetching employees:', error);
+      }
+    };
+
+    fetchEmployees();
+  }, []);
+
+  /**
+   * Handle form submission.
+   * @async
+   * @function handleSubmit
+   * @param {Event} event - The form submission event.
+   * @returns {Promise&lt;void>}
+   */
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    // Reset error state
+    setError(null);
+
+    // Find the employee by user ID
+    const employee = employees.find(emp => emp.id.toString() === userId);
+
+    // Check if the employee exists
+    if (!employee) {
+      setError("User ID not found");
+      return;
+    }
+
+    // Store this employee in local storage for session persistence
+    localStorage.setItem('loggedInEmployee', JSON.stringify(employee));
+
+    // Validate password
+    if (password !== "1234") {
+      setError("Incorrect password");
+      return;
+    }
+
+    // Redirect to the home page for employees
+    router.push('/employee/home');
+  };
+
+  const handleGithubLogin = () => {
+    const employee = employees.find(emp => emp.id.toString() === '2');
+    localStorage.setItem('loggedInEmployee', JSON.stringify(employee));
+    signIn("github", { callbackUrl: "/employee/home/"});
+    localStorage.setItem('loggedInEmployee', JSON.stringify(employee));
+    router.push('/employee/home');
+  };
+
+  return (
+    &lt;div id="form-wrapper">
+      &lt;form className="p-4" onSubmit={handleSubmit}>
+        &lt;div className="form-group mb-3">
+          &lt;label htmlFor="user-id">ID&lt;/label>
+          &lt;input
+            type="text"
+            className="form-control"
+            id="user-id"
+            placeholder="ID"
+            value={userId}
+            onChange={(e) => setUserId(e.target.value)}
+          />
+        &lt;/div>
+        &lt;div className="form-group mb-3">
+          &lt;label htmlFor="user-password">Password&lt;/label>
+          &lt;input
+            type="password"
+            className="form-control"
+            id="user-password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        &lt;/div>
+
+        {error &amp;&amp; (
+          &lt;div className="alert alert-danger mb-3">
+            {error}
+          &lt;/div>
+        )}
+
+        &lt;button type="submit" className="btn btn-primary bg-danger w-100">
+          Submit
+        &lt;/button>
+        {/* GitHub Login Button */}
+        &lt;button
+          type="button"
+          className="btn btn-dark w-100 mt-3 d-flex align-items-center justify-content-center"
+          onClick={handleGithubLogin}
+        >
+          &lt;FaGithub size={20} className="me-2" />
+          Login with GitHub
+        &lt;/button>
+      &lt;/form>
+    &lt;/div>
+  );
+};
+
+export default LoginForm;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-ConfirmationPage.html">ConfirmationPage</a></li><li><a href="module-CreditCardPopUp.html">CreditCardPopUp</a></li><li><a href="module-ManagerHomePage.html">ManagerHomePage</a></li><li><a href="module-OrderPage.html">OrderPage</a></li><li><a href="module-Page.html">Page</a></li><li><a href="module-api_getInventory.html">api/getInventory</a></li><li><a href="module-api_getItemSizes.html">api/getItemSizes</a></li><li><a href="module-api_getMenu.html">api/getMenu</a></li><li><a href="module-api_getProducts.html">api/getProducts</a></li><li><a href="module-api_getReports.html">api/getReports</a></li><li><a href="module-employee_cashier_order_confirmation_page.html">employee/cashier/order/confirmation/page</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Appetizer">Appetizer</a></li><li><a href="global.html#BootstrapClient">BootstrapClient</a></li><li><a href="global.html#CACHE_DURATION">CACHE_DURATION</a></li><li><a href="global.html#Cart">Cart</a></li><li><a href="global.html#CartPage">CartPage</a></li><li><a href="global.html#CartPageWrapper">CartPageWrapper</a></li><li><a href="global.html#CashConfirmation">CashConfirmation</a></li><li><a href="global.html#Chat">Chat</a></li><li><a href="global.html#ChatBot">ChatBot</a></li><li><a href="global.html#ClockPage">ClockPage</a></li><li><a href="global.html#ContactForm">ContactForm</a></li><li><a href="global.html#ContactPage">ContactPage</a></li><li><a href="global.html#CustomerHeader">CustomerHeader</a></li><li><a href="global.html#CustomerLoginForm">CustomerLoginForm</a></li><li><a href="global.html#CustomerLoginPage">CustomerLoginPage</a></li><li><a href="global.html#CustomerPage">CustomerPage</a></li><li><a href="global.html#DiscountPopUp">DiscountPopUp</a></li><li><a href="global.html#Drink">Drink</a></li><li><a href="global.html#EmployeeCard">EmployeeCard</a></li><li><a href="global.html#EmployeeDetails">EmployeeDetails</a></li><li><a href="global.html#EmployeeHeader">EmployeeHeader</a></li><li><a href="global.html#EmployeeHomePage">EmployeeHomePage</a></li><li><a href="global.html#EmployeeInfo">EmployeeInfo</a></li><li><a href="global.html#EmployeeLogInHeader">EmployeeLogInHeader</a></li><li><a href="global.html#EmployeeLoginButton">EmployeeLoginButton</a></li><li><a href="global.html#EmployeeLoginPage">EmployeeLoginPage</a></li><li><a href="global.html#EmployeePage">EmployeePage</a></li><li><a href="global.html#EmployeePay">EmployeePay</a></li><li><a href="global.html#Entree">Entree</a></li><li><a href="global.html#GET">GET</a></li><li><a href="global.html#GoogleTranslate">GoogleTranslate</a></li><li><a href="global.html#GuestLoginForm">GuestLoginForm</a></li><li><a href="global.html#Inventory">Inventory</a></li><li><a href="global.html#InventoryPopup">InventoryPopup</a></li><li><a href="global.html#ItemModal">ItemModal</a></li><li><a href="global.html#KioskPage">KioskPage</a></li><li><a href="global.html#LoginForm">LoginForm</a></li><li><a href="global.html#LoyaltyLoginForm">LoyaltyLoginForm</a></li><li><a href="global.html#LoyaltyLoginPage">LoyaltyLoginPage</a></li><li><a href="global.html#MealModal">MealModal</a></li><li><a href="global.html#MealSelectionPage">MealSelectionPage</a></li><li><a href="global.html#Menu">Menu</a></li><li><a href="global.html#MenuBoardPage">MenuBoardPage</a></li><li><a href="global.html#MenuPopularity">MenuPopularity</a></li><li><a href="global.html#MobilePage">MobilePage</a></li><li><a href="global.html#OrderCard">OrderCard</a></li><li><a href="global.html#OrderInfo">OrderInfo</a></li><li><a href="global.html#POST">POST</a></li><li><a href="global.html#PUT">PUT</a></li><li><a href="global.html#Page">Page</a></li><li><a href="global.html#PaymentPopUp">PaymentPopUp</a></li><li><a href="global.html#ProductUsageChart">ProductUsageChart</a></li><li><a href="global.html#RenderMenu">RenderMenu</a></li><li><a href="global.html#SalesChart">SalesChart</a></li><li><a href="global.html#SalesReport">SalesReport</a></li><li><a href="global.html#Side">Side</a></li><li><a href="global.html#SizeSelection">SizeSelection</a></li><li><a href="global.html#XReport">XReport</a></li><li><a href="global.html#ZReport">ZReport</a></li><li><a href="global.html#authOptions">authOptions</a></li><li><a href="global.html#cache">cache</a></li><li><a href="global.html#fetchEmployees">fetchEmployees</a></li><li><a href="global.html#fetchPayData">fetchPayData</a></li><li><a href="global.html#fetchPopularItems">fetchPopularItems</a></li><li><a href="global.html#fetchProductUsageData">fetchProductUsageData</a></li><li><a href="global.html#fetchWeather">fetchWeather</a></li><li><a href="global.html#fetchZReport">fetchZReport</a></li><li><a href="global.html#formatCurrency">formatCurrency</a></li><li><a href="global.html#handleNChange">handleNChange</a></li><li><a href="global.html#handleSubmit">handleSubmit</a></li><li><a href="global.html#inter">inter</a></li><li><a href="global.html#metadata">metadata</a></li><li><a href="global.html#pool">pool</a></li><li><a href="global.html#query">query</a></li><li><a href="global.html#weatherMap">weatherMap</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Wed Dec 11 2024 23:17:49 GMT-0600 (Central Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
