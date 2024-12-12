@@ -373,6 +373,10 @@ const MealSelectionPage = () => {
                             <section id="deal" className="py-3">
                                 <h2>Rewards</h2>
                                 {custLoggedIn ? (
+                                    <div className="py-3" id="rewards">
+                                        <p>You have not claimed any rewards yet.</p>
+                                    </div>
+                                ) : (
                                     rewards && rewards.length > 0 ? (
                                         <div className="py-3" id="rewards">
                                             <div className="row">
@@ -403,10 +407,6 @@ const MealSelectionPage = () => {
                                             <p>You have not claimed any rewards yet.</p>
                                         </div>
                                     )
-                                ) : (
-                                    <div className="py-3" id="rewards">
-                                        <p>You have not claimed any rewards yet.</p>
-                                    </div>
                                 )}
 
                             </section>

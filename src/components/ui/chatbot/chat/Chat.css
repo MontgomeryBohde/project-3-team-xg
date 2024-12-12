@@ -41,7 +41,7 @@
 .input button {
     padding: 8px 16px;
     border: none;
-    background-color: #DC4C64;
+    background-color: #146cfc;
     color: #fff;
     border-radius: 4px;
     cursor: pointer;
@@ -49,7 +49,7 @@
 }
 
 .input button:hover {
-    background-color: #dc6f81;
+    background-color: #146cfc;
 }
 
 .message {
