@@ -61,7 +61,7 @@ const LoginForm = () => {
   };
 
   const handleGithubLogin = () => {
-    signIn("github", { callbackUrl: "/employee"});
+    signIn("github", { callbackUrl: "/employee/home/"});
     const employee = employees.find(emp => emp.id.toString() === '1');
     localStorage.setItem('loggedInEmployee', JSON.stringify(employee));
     router.push('/employee/home');
