@@ -49,7 +49,12 @@ const CartPage = () => {
 
         initializeCustomerId();
     }, []);
-    // Fetch the next customer ID for guest
+    /**
+     * Fetches the next customer ID from the server.
+     *
+     * @async
+     * @returns {Promise<void>}
+     */
     const fetchNextCustomerId = async () => {
         try {
         const response = await fetch('/api/customers', {
@@ -125,6 +130,13 @@ const CartPage = () => {
 
         
     // Now, fetch prices for the non-mealCartItem items from the server
+    /**
+    * Fetches prices for non-meal items (a la carte, drinks, or appetizers) in the cart. This logic is handled seperately.
+    * If there are non-meal items:
+    *   - Sends a POST request to the '/api/getProducts?type=price' endpoint 
+    *     with the list of non-meal item names in the request body.
+    *   - Updates the `prices` state with the fetched price map.
+    */
     const nonMealItems = cart.filter(item => !item.mealItem).map(item => item.name);
         if (nonMealItems.length > 0) {
         fetch('/api/getProducts?type=price', {
@@ -158,6 +170,11 @@ const CartPage = () => {
         }
     }, [cart]); // This effect runs whenever the `cart` state changes.  
 
+    /**
+    * Calculates the subtotal of the items currently in the cart.
+    * Iterates through each item in the cart and determines their price and sums them up.
+    * Returns the calculated subtotal.
+    */
     const calculateSubtotal = () => {
     return cart.reduce((total, item) => {
         let itemPrice;
@@ -177,6 +194,10 @@ const CartPage = () => {
 
     const subtotal = calculateSubtotal();
 
+    /**
+    * Applies the entered promo code to calculate the discount and checks if the entered code is the valid current promo code.
+    * Updates the discount state with the calculated value.
+    */
     const handleApplyPromoCode = () => {
         if (promoCode === "SAVE10") {
             setDiscount(subtotal * 0.1); 
@@ -192,7 +213,16 @@ const CartPage = () => {
     const tax = subtotal * taxRate;
     const total = subtotal - discount - automaticDiscount + tax;
 
-    //can update the quanitity in the cart 
+   
+    /**
+     * Can update the quantity of an item in the cart.
+    * Creates a new cart array that has the updated item.
+    * Updates the `cart` state with the new cart array.
+    * Updates the cart in sessionStorage.
+    *
+    * @param {number} index - The index num of the item in the cart.
+    * @param {number} change - The amount to change the quantity by.
+    */
     const updateQuantity = (index, change) => {
         const updatedCart = cart.map((item, i) => {
             if (i === index) {
@@ -207,7 +237,13 @@ const CartPage = () => {
         sessionStorage.setItem("cart", JSON.stringify(updatedCart));
     };
 
-    //remove item from cart button
+    /**
+    * Removes item from cart.
+    * Creates a new cart array by filtering out  item at the specified index.
+    * and updates the cart in sessionStorage with the new cart array.
+
+    * @param {number} index - The index of the item to remove.
+    */
     const removeItemFromCart = (index) => {
         const updatedCart = cart.filter((_, i) => i !== index); // Remove item by index
         setCart(updatedCart);
@@ -222,6 +258,12 @@ const CartPage = () => {
 
     // check out button
     const router = useRouter();
+    /**
+     * Handles the checkout process from cart. 
+     * 
+     * Prepares order data, then sends a POST request to create the order, 
+     * then handles the response, updates customer data, and clears the cart.
+     */
     const handleCheckout = async () => {
         const cashierId = 0; // kiosk order --> 0
         const paymentMethod = "Credit Card"; // TODO: replace later according to pop-up
@@ -369,6 +411,13 @@ const CartPage = () => {
     };
     
     // +10 this customer's points
+    /**
+     * Updates or creates the customer data based on the login status.
+    * If the user is logged in:
+    *   - It will update the customer data in the database.
+    * If the user is a guest:
+    *   - It will create a new customer record in the database.
+    */
     const handleCustomerData = async () => {
         const loggedInCustomer = JSON.parse(localStorage.getItem('loggedInCustomer'));
 
