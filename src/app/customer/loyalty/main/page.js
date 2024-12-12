@@ -172,7 +172,9 @@ export default function Home() {
     router.push("/customer/kiosk"); // Navigate to the Kiosk Order page
   }
 
-
+  const handleLogout = () => {
+    router.push("/customer/loyalty/login"); 
+  }
 
   return (
     <div>
@@ -189,11 +191,12 @@ export default function Home() {
           <p>
             <strong>Email:</strong> {customer.email}
           </p>
+          <button className="btn btn-danger" onClick={handleLogout}> Logout </button>
         </div>
 
         {/* Past Orders */}
         <div className="mb-4">
-          <h2>Past Orders</h2>
+          <h2>Past 5 Orders</h2>
           <table className="table table-striped">
             <thead>
               <tr>
