@@ -3,6 +3,10 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import CustomerHeader from "@/components/ui/customer/header/CustomerHeader";
 
+/**
+ * Assembles the Customer Loyalty Home Page
+ * @returns Loyalty Home Page displaying the current rewards progress and old orders for a selected customer.
+ */
 export default function Home() {
   const router = useRouter();
 
@@ -19,6 +23,9 @@ export default function Home() {
 
   // Fetch customer from localStorage
   useEffect(() => {
+    /**
+     * Gets customer from localStorage and sets storedCustomer to it.  
+     */
     const fetchCustomer = async () => {
       const storedCustomer = localStorage.getItem("loyaltyCustomer");
       console.log("stored customer:", storedCustomer);
@@ -42,7 +49,9 @@ export default function Home() {
 
     if (!customer?.id) return; // Make sure we have customer data before fetching
 
-
+    /**
+     * Fetches the customer's points. 
+     */
     const fetchPoints = async () => {
       try {
         const response = await fetch(`/api/getRewards?type=points&customer_id=${customer.id}`);
@@ -57,6 +66,9 @@ export default function Home() {
       }
     };
 
+    /**
+     * Fetches the number of this customer's orders in this month. 
+     */
     const fetchOrdersThisMonth = async () => {
       try {
         const response = await fetch(`/api/getRewards?type=month&customer_id=${customer.id}`);
@@ -71,7 +83,10 @@ export default function Home() {
       }
     };
     
-    const fetchOrders = async () => { // FIXME: this still doesn't work fully!
+    /**
+     * Fetches the last 5 orders this customer has made. 
+     */
+    const fetchOrders = async () => {
       try {
         const response = await fetch(`/api/getRewards?type=orders&customer_id=${customer.id}&n=5`);
         const data = await response.json();
@@ -122,6 +137,10 @@ export default function Home() {
     }
   };
 
+  /**
+   * "Claims" a reward by creating a reward object and storing it in session storage. 
+   * @param {*} reward is the name of the reward that was passed in to be claimed. 
+   */
   // Claim Reward
   const claimReward = async (reward) => {
     try {

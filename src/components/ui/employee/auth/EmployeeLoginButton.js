@@ -3,7 +3,9 @@
 
 import { signIn } from "next-auth/react"; 
 import { useRouter } from "next/navigation";
-
+/**
+ * @returns Employee Login Button which authenticates user using github oauth.
+ */
 const EmployeeLoginButton = () => {
   const router = useRouter();
 
