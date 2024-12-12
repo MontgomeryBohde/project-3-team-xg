@@ -5,6 +5,12 @@ import Link from "next/link";
 import CustomerHeader from '@/components/ui/customer/header/CustomerHeader';
 import './cart.css'; // Add this CSS file for Trevor Mode styles
 
+/**
+ * Renders the CartPage component.
+ * Overall manages the entire cart state, fetches product prices, calculates the subtotal, 
+ * handles promo code application, updates item quantities, and also removes and clears  
+ * Includes logic for handling logged-in users and guest users and the checkout from the cart at end.
+ */
 const CartPage = () => {
     const [cart, setCart] = useState(() => {
         const storedCart = sessionStorage.getItem('cart');
